@@ -11,8 +11,8 @@ pub struct Logger {
 }
 
 impl Logger {
-    pub fn new(algorithm: Algorithm, instance_name: &str) -> Logger {
-        fs::create_dir_all("results").expect("Failed creating directory.");
+    pub fn new(algorithm: &Algorithm, instance_name: &str) -> Logger {
+        fs::create_dir_all(format!("results/{}", algorithm)).expect("Failed to create directories.");
         Logger {
             timer: Instant::now(),
             path: String::from(format!("results/{}/{}", algorithm, instance_name)) // TODO: Properly set log path
@@ -27,11 +27,10 @@ impl Logger {
         let mut result_strings = Vec::new();
 
         // TODO: Get results from instance and format according to guidelines
-        
-        self.to_file(result_strings).expect("Failed to write to file.");
+        self.to_file(result_strings).expect("Failed to log to file.");
     }
 
-
+    // Writes the given result strings to file
     fn to_file(&self, result_strings: Vec<String>) -> Result<(), Error> {
         let f = OpenOptions::new().write(true).create(true).append(false).open(&self.path)?;
         let mut f = BufWriter::new(f);

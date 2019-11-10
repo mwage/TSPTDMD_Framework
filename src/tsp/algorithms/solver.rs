@@ -1,6 +1,9 @@
 use std::fmt;
 
-#[derive(Debug)]
+use crate::tsp::TSPInstance;
+use crate::tsp::Logger;
+
+#[derive(Debug, Clone)]
 pub enum Algorithm {
     Greedy,
     RandomGreedy
@@ -13,5 +16,5 @@ impl fmt::Display for Algorithm {
 }
 
 pub trait Solver {
-
+    fn solve(&mut self, instance: &mut TSPInstance, logger: &Logger);
 }
