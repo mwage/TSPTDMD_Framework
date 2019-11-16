@@ -13,7 +13,7 @@ impl GreedySolver {
 }
 
 impl Solver for GreedySolver {
-    fn solve(&mut self, instance: &mut TSPInstance, logger: &Logger) {
+    fn solve(&mut self, instance: TSPInstance, logger: Logger) {
         // TODO
     }
 
@@ -33,7 +33,7 @@ impl RandomGreedySolver {
 }
 
 impl Solver for RandomGreedySolver {
-    fn solve(&mut self, instance: &mut TSPInstance, logger: &Logger) {
+    fn solve(&mut self, instance: TSPInstance, logger: Logger) {
         // TODO
     }
     

@@ -1,3 +1,8 @@
+mod flip;
+
+pub use flip::Flip;
+
+
 use std::fmt;
 
 #[derive(Debug, Clone)]
@@ -12,5 +17,5 @@ impl fmt::Display for Neighborhood {
 }
     
 pub trait NeighborhoodImpl {
-    
+
 }

@@ -1,3 +1,8 @@
+mod best_improvement;
+
+pub use best_improvement::BestImprovement;
+
+
 use std::fmt;
 
 #[derive(Debug, Clone)]

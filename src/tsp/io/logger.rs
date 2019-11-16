@@ -12,14 +12,14 @@ pub struct Logger {
 
 impl Logger {
     pub fn new<T: Solver >(solver: &T, instance_name: &str) -> Logger {
-        fs::create_dir_all(format!("results/{}", solver.to_string())).expect("Failed to create directories.");
+        fs::create_dir_all(format!("results/{}", solver.to_string())).expect("Failed to create directories.");  // Create log directory if non existant
         Logger {
-            timer: Instant::now(),
-            path: String::from(format!("results/{}/{}", solver.to_string(), instance_name)) // TODO: Properly set log path
+            timer: Instant::now(),  // Start timer
+            path: String::from(format!("results/{}/{}", solver.to_string(), instance_name)) // TODO: Properly set log path, add a number for multiple runs?
         }
     }
 
-    pub fn get_elapsed(&self) -> u128 {
+    pub fn get_elapsed(&self) -> u128 { // elapsed time since start in ms
         self.timer.elapsed().as_millis()
     }
 
