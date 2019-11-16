@@ -17,3 +17,19 @@ impl Solver for GreedySolver {
         // TODO
     }
 }
+
+pub struct RandomGreedySolver {
+
+}
+
+impl RandomGreedySolver {
+    pub fn new() -> GreedySolver {
+        GreedySolver{}
+    }
+}
+
+impl Solver for RandomGreedySolver {
+    fn solve(&mut self, instance: &mut TSPInstance, logger: &Logger) {
+        // TODO
+    }
+}
