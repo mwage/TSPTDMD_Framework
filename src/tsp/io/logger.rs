@@ -1,5 +1,5 @@
 use crate::tsp::TSPInstance;
-use crate::Algorithm;
+use crate::tsp::solver::Solver;
 use std::time::Instant;
 use std::fs;
 use std::fs::OpenOptions;
@@ -11,11 +11,11 @@ pub struct Logger {
 }
 
 impl Logger {
-    pub fn new(algorithm: &Algorithm, instance_name: &str) -> Logger {
-        fs::create_dir_all(format!("results/{}", algorithm)).expect("Failed to create directories.");
+    pub fn new<T: Solver >(solver: &T, instance_name: &str) -> Logger {
+        fs::create_dir_all(format!("results/{}", solver.to_string())).expect("Failed to create directories.");
         Logger {
             timer: Instant::now(),
-            path: String::from(format!("results/{}/{}", algorithm, instance_name)) // TODO: Properly set log path
+            path: String::from(format!("results/{}/{}", solver.to_string(), instance_name)) // TODO: Properly set log path
         }
     }
 

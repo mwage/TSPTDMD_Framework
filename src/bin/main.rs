@@ -1,8 +1,20 @@
 extern crate tsp;
 
-use tsp::Algorithm;
+use tsp::Neighborhood;
+use tsp::StepFunction;
 
 fn main() {
-    // tsp::test_instance("0010_k1.txt", Algorithm::Greedy);
-    // tsp::test_all_instances(Algorithm::Greedy);
+    tsp::deterministic_construction_heuristic(Some("test.txt"));
+    // tsp::local_search(Neighborhood::Flip, StepFunction::BestImprovement);
+    // test_all_local_searches();
+}
+
+fn test_all_local_searches() {
+    let neighborhoods = vec![Neighborhood::Flip];
+    let step_functions = vec![StepFunction::BestImprovement];
+    for neighborhood in neighborhoods.iter() {
+        for stepfunction in step_functions.iter() {
+            tsp::local_search(neighborhood.to_owned(), stepfunction.to_owned());
+        }
+    }
 }

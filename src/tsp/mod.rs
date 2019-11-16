@@ -1,9 +1,9 @@
-pub mod algorithms;
-mod io;
+pub mod solver;
+pub mod neighborhood;
+pub mod step_function;
+pub mod io;
 mod testrunner;
 mod tsp_instance;
 
-pub use io::Logger;
-pub use io::InstanceParser;
 pub use testrunner::TestRunner;
 pub use tsp_instance::TSPInstance;

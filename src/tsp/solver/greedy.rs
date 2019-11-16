@@ -1,6 +1,6 @@
 use super::Solver;
+use crate::tsp::io::Logger;
 use crate::tsp::TSPInstance;
-use crate::tsp::Logger;
 
 pub struct GreedySolver {
 
@@ -15,6 +15,10 @@ impl GreedySolver {
 impl Solver for GreedySolver {
     fn solve(&mut self, instance: &mut TSPInstance, logger: &Logger) {
         // TODO
+    }
+
+    fn to_string(&self) -> &str {
+        "Greedy"
     }
 }
 
@@ -31,5 +35,9 @@ impl RandomGreedySolver {
 impl Solver for RandomGreedySolver {
     fn solve(&mut self, instance: &mut TSPInstance, logger: &Logger) {
         // TODO
+    }
+    
+    fn to_string(&self) -> &str {
+        "Random Greedy"
     }
 }

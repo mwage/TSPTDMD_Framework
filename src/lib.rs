@@ -2,39 +2,31 @@
 
 mod tsp;
 use tsp::TestRunner;
+use tsp::solver::Solver;
+use tsp::solver::GreedySolver;
+use tsp::neighborhood::NeighborhoodImpl;
+use tsp::step_function::StepFunctionImpl;
 
 // exports
-pub use tsp::algorithms::Algorithm;
-pub use tsp::algorithms::NeighborhoodFunction;
-pub use tsp::algorithms::StepFunction;
-pub use tsp::algorithms::Neighborhood;
-pub use tsp::algorithms::StepFunctionImpl;
+pub use tsp::neighborhood::Neighborhood;
+pub use tsp::step_function::StepFunction;
 
 
-pub fn deterministicConstructionHeuristic() {
+
+pub fn deterministic_construction_heuristic(instance_name: Option<&str>) {
+    TestRunner::solve_instance(GreedySolver::new(), instance_name);
+}
+
+pub fn randomized_construction_heuristic() {
 
 }
 
-pub fn randomizedConstructionHeuristic() {
-
+pub fn local_search(neighborhoodFunction: Neighborhood, stepFunction: StepFunction) {
+    // let neighborhoodImpl = selectNeighborhood(neighborhoodFunction);
+    // let stepFunctionImpl = selectStepFunction(stepFunction);
 }
 
-pub fn localSearch(neighborhoodFunction: NeighborhoodFunction, stepFunction: StepFunction) {
-    
-}
-
-pub fn testAllLocalSearches() {
-    let neighborhoods = vec![NeighborhoodFunction::Flip];
-    let stepFunctions = vec![StepFunction::BestImprovement];
-    for neighborhood in neighborhoods.iter().map(|x| selectNeighborhood(x)) {
-        for stepfunction in stepFunctions.iter().map(|x| selectStepFunction(x)) {
-        
-        }
-    }
-
-}
-
-pub fn grasp(neighborhoodFunction: NeighborhoodFunction, stepFunction: StepFunction) {
+pub fn grasp(neighborhoodFunction: Neighborhood, stepFunction: StepFunction) {
 
 }
 
@@ -46,23 +38,10 @@ pub fn metaheuristic() {
 
 }
 
-fn selectNeighborhood(neighborhood: &NeighborhoodFunction) -> impl Neighborhood {
-    unimplemented!()
-}
+// fn selectNeighborhood(neighborhood: Neighborhood) -> impl NeighborhoodImpl {
+//     unimplemented!();
+// }
 
-fn selectStepFunction(stepFunction: &StepFunction) -> impl StepFunctionImpl {
-    unimplemented!()
-}
-
-
-
-pub fn test_instance(instance: &str, algorithm: Algorithm) {
-    TestRunner::run_instance(&algorithm, instance);
-}
-
-
-
-pub fn test_all_instances(algorithm: Algorithm, neighborhood: Option<Vec<NeighborhoodFunction>>) {
-    TestRunner::
-    TestRunner::run_all_instances(algorithm, neighborhood);
-}
+// fn selectStepFunction(stepFunction: StepFunction) -> impl StepFunctionImpl {
+//     unimplemented!();
+// }
