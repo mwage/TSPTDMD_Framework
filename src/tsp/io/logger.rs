@@ -4,7 +4,6 @@ use std::fs::OpenOptions;
 use std::io::{Write, BufWriter, Error};
 use std::path::Path;
 
-use crate::tsp::TSPInstance;
 use crate::tsp::solver::Solver;
 use crate::tsp::Solution;
 
@@ -57,7 +56,7 @@ impl Logger {
         let f = OpenOptions::new().write(true).create(true).append(false).open(&self.path)?;
         let mut f = BufWriter::new(f);
         for result in result_strings.iter() {
-            f.write_all(format!("{}\n", result).as_bytes())?;
+            f.write_all(format!("{}\r\n", result).as_bytes())?;
         }
 
         Ok(())
