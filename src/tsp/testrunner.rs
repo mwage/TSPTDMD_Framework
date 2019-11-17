@@ -20,7 +20,7 @@ impl TestRunner {
         let paths = fs::read_dir("instances").unwrap(); // Get all file paths in the instances folder
         for path in paths {
             let path_buff = path.unwrap().path();   // Get path
-            let instance_name = path_buff.to_str().unwrap().split('\\').last().unwrap();    // Get instance name from path
+            let instance_name = path_buff.to_str().unwrap().split('\\').last().unwrap().split('.').next().unwrap();    // Get instance name from path
             if instance_name != ".gitignore" {
                 TestRunner::run_instance(&mut solver, instance_name);   // Solve the given instance
             }
@@ -33,7 +33,7 @@ impl TestRunner {
         {
             Ok(x) => x,
             Err(_) => {
-                println!("Skipping {}: Failed to read instance.", instance_name);
+                println!("Skipping {}.txt: Failed to read instance.", instance_name);
                 return;
             },
         };

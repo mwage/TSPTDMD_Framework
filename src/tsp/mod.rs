@@ -2,8 +2,10 @@ pub mod solver;
 pub mod neighborhood;
 pub mod step_function;
 pub mod io;
-mod testrunner;
-mod tsp_instance;
 
+mod instance;
+mod testrunner;
+
+pub use instance::Solution;
 pub use testrunner::TestRunner;
-pub use tsp_instance::TSPInstance;
+pub use instance::TSPInstance;

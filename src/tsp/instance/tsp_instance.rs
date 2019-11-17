@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+use super::Vertex;
+
 #[derive(Debug)]
 pub struct TSPInstance {
     number_of_vertices: u32,
@@ -38,23 +40,5 @@ impl TSPInstance {
                 self.vertices.get_mut(&i).unwrap().add_edge(j, self.m);
             }
         }
-    }
-}
-
-#[derive(Debug)]
-pub struct Vertex {
-    edges: HashMap<u32, usize>
-}
-
-impl Vertex {
-    pub fn new() -> Self {
-        Vertex {
-            edges: HashMap::new()
-        }
-    }
-
-    pub fn add_edge(&mut self, idx: u32, weight: usize) {
-        self.edges.entry(idx).or_insert(weight);
-        // self.edges.insert(idx, weight);
     }
 }

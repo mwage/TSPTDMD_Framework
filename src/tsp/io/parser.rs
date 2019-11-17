@@ -3,13 +3,14 @@ use std::io::Error;
 use std::collections::VecDeque;
 
 use crate::tsp::TSPInstance;
+use super::Point;
 
 pub struct InstanceParser {
 }
 
 impl InstanceParser {
     pub fn get_instance(name: &str) -> Result<TSPInstance, Error> {
-        let lines = fs::read_to_string(format!("instances/{}", name))?; // Read text from file
+        let lines = fs::read_to_string(format!("instances/{}.txt", name))?; // Read text from file
         let mut lines: VecDeque<&str> = lines.split('\n').collect();    // Split them into lines
         match lines.pop_front().unwrap() {  // Match the first line to get the format
             "EDGELIST" => Ok(InstanceParser::get_edge_list(lines)),
@@ -79,35 +80,4 @@ impl InstanceParser {
 
         instance
     }
-}
-
-#[derive(Debug)]
-pub struct Point {
-    x: i32,
-    y: i32
-}
-
-impl Point {
-    pub fn new(x: i32, y: i32) -> Self{
-        Point {
-            x,
-            y
-        }
-    }
-
-    pub fn calculate_distance(&self, point: &Point) -> usize {
-        let a = ((self.x - point.x) as f64).powf(2f64);
-        let b = ((self.y - point.y) as f64).powf(2f64);
-        let dist = (a + b).sqrt().round() as usize;
-        dist
-    }
-}
-
-#[test]
-fn test_distance() {
-    let first = Point::new(-2, 5);
-    let second = Point::new(7, 9);
-    let third = Point::new(302, -721);
-    assert_eq!(first.calculate_distance(&second), 10);
-    assert_eq!(first.calculate_distance(&third), 787);
 }
