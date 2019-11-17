@@ -62,6 +62,7 @@ impl InstanceParser {
         let (number_of_vertices, _, number_of_drivers, desired_travel_distance) = (vec[0], vec[1], vec[2], vec[3]);
 
         let mut instance = TSPInstance::new(number_of_vertices, number_of_drivers, desired_travel_distance);   // Create TSP instance
+        let mut total_edge_weight = 0;  // Sum of all edge weights, used to complete graph
         for i in 0..number_of_vertices {    // Add all vertices to the instance
             instance.add_vertex(i);
         }
@@ -72,9 +73,10 @@ impl InstanceParser {
             }
             let vec: Vec<usize> = line.split(' ').map(|x| x.parse().unwrap()).collect();
             instance.add_edge(vec[0] as u32, vec[1] as u32, vec[2]);    // Add an edge for each line in the file
+            total_edge_weight += vec[2];
         }
 
-        instance.complete_graph();  // Set weight for all unspecified edges
+        instance.complete_graph(total_edge_weight);  // Set weight for all unspecified edges
 
         // println!("{:?}", instance);
 

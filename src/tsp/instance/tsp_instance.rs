@@ -7,8 +7,7 @@ pub struct TSPInstance {
     number_of_vertices: u32,
     number_of_drivers: u32, 
     desired_travel_distance: u32,
-    vertices: HashMap<u32, Vertex>,
-    m: usize
+    vertices: HashMap<u32, Vertex>
 }
 
 impl TSPInstance {
@@ -17,8 +16,7 @@ impl TSPInstance {
             number_of_vertices,
             number_of_drivers,
             desired_travel_distance,
-            vertices: HashMap::new(),
-            m: 100000000
+            vertices: HashMap::new()
         }
     }
 
@@ -31,13 +29,13 @@ impl TSPInstance {
         self.vertices.get_mut(&second).unwrap().add_edge(first, weight);
     }
 
-    pub fn complete_graph(&mut self) {
+    pub fn complete_graph(&mut self, m: usize) {
         for i in 0..self.number_of_vertices {
             for j in 0..self.number_of_vertices {
                 if i == j {
                     continue;
                 }
-                self.vertices.get_mut(&i).unwrap().add_edge(j, self.m);
+                self.vertices.get_mut(&i).unwrap().add_edge(j, m);
             }
         }
     }

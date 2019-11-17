@@ -21,9 +21,7 @@ impl TestRunner {
         for path in paths {
             let path_buff = path.unwrap().path();   // Get path
             let instance_name = path_buff.to_str().unwrap().split('\\').last().unwrap().split('.').next().unwrap();    // Get instance name from path
-            if instance_name != ".gitignore" {
-                TestRunner::run_instance(&mut solver, instance_name);   // Solve the given instance
-            }
+            TestRunner::run_instance(&mut solver, instance_name);   // Solve the given instance
         }
     }
 
