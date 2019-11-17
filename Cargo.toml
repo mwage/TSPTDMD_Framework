@@ -1,5 +1,5 @@
 [package]
-name = "tsp"
+name = "tsp_framework"
 version = "0.1.0"
 authors = ["mwage <michael.joh.wagner@gmail.com>"]
 edition = "2018"

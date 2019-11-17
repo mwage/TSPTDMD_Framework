@@ -3,7 +3,6 @@ use std::collections::HashMap;
 #[derive(Debug)]
 pub struct TSPInstance {
     number_of_vertices: u32,
-    number_of_edges: u32, 
     number_of_drivers: u32, 
     desired_travel_distance: u32,
     vertices: HashMap<u32, Vertex>,
@@ -11,14 +10,13 @@ pub struct TSPInstance {
 }
 
 impl TSPInstance {
-    pub fn new(number_of_vertices: u32, number_of_edges: u32, number_of_drivers: u32, desired_travel_distance: u32) -> Self {
+    pub fn new(number_of_vertices: u32, number_of_drivers: u32, desired_travel_distance: u32) -> Self {
         TSPInstance {
             number_of_vertices,
-            number_of_edges,
             number_of_drivers,
             desired_travel_distance,
             vertices: HashMap::new(),
-            m: 1000000
+            m: 100000000
         }
     }
 
@@ -32,14 +30,13 @@ impl TSPInstance {
     }
 
     pub fn complete_graph(&mut self) {
-        for vertex in self.vertices.values_mut() {
-            for i in 0..self.number_of_vertices {
-                vertex.add_edge(i, self.m);
-            }
-        }
-
         for i in 0..self.number_of_vertices {
-
+            for j in 0..self.number_of_vertices {
+                if i == j {
+                    continue;
+                }
+                self.vertices.get_mut(&i).unwrap().add_edge(j, self.m);
+            }
         }
     }
 }
