@@ -4,7 +4,7 @@ use tsp::Neighborhood;
 use tsp::StepFunction;
 
 fn main() {
-    tsp::deterministic_construction_heuristic(Some("test.txt"));
+    tsp::deterministic_construction_heuristic(Some("0010_k1.txt"));
     // tsp::local_search(Neighborhood::Flip, StepFunction::BestImprovement);
     // test_all_local_searches();
 }
