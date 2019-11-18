@@ -6,8 +6,8 @@ use tsp_framework::deterministic_construction_heuristic;
 use tsp_framework::local_search;
 
 fn main() {
-    // deterministic_construction_heuristic(Some("berlin52_k1_1"));
-    deterministic_construction_heuristic(None);
+    deterministic_construction_heuristic(Some("berlin52_k2_2"));
+    // deterministic_construction_heuristic(None);
     // tsp::local_search(Neighborhood::Flip, StepFunction::BestImprovement);
     // test_all_local_searches();
 }

@@ -1,7 +1,6 @@
 mod greedy;
 
 pub use greedy::GreedySolver;
-pub use greedy::RandomGreedySolver;
 
 use crate::tsp::TSPInstance;
 use crate::tsp::io::Logger;

@@ -14,6 +14,9 @@ impl Vertex {
 
     pub fn add_edge(&mut self, idx: u32, weight: usize) {
         self.edges.entry(idx).or_insert(weight);
-        // self.edges.insert(idx, weight);
+    }
+
+    pub fn get_weight(&self, idx: u32) -> usize {
+        self.edges[&idx]
     }
 }
