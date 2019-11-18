@@ -4,6 +4,7 @@ mod tsp;
 
 use tsp::TestRunner;
 use tsp::solver::GreedySolver;
+use tsp::solver::Pilot;
 use tsp::neighborhood::NeighborhoodImpl;
 use tsp::neighborhood::Flip;
 use tsp::step_function::StepFunctionImpl;
@@ -14,7 +15,8 @@ pub use tsp::neighborhood::Neighborhood;
 pub use tsp::step_function::StepFunction;
 
 pub fn deterministic_construction_heuristic(instance_name: Option<&str>) {
-    TestRunner::solve_instance(GreedySolver::new(), instance_name);
+    // TestRunner::solve_instance(GreedySolver::new(), instance_name);
+    TestRunner::solve_instance(Pilot::new(2), instance_name);
 }
 
 pub fn randomized_construction_heuristic() {

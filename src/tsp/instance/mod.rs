@@ -6,3 +6,4 @@ use vertex::Vertex;
 
 pub use tsp_instance::TSPInstance;
 pub use solution::Solution;
+pub use solution::Assignment;

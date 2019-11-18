@@ -1,6 +1,10 @@
 mod greedy;
+mod partial_greedy;
+mod pilot;
 
 pub use greedy::GreedySolver;
+pub use pilot::Pilot;
+pub use partial_greedy::PartialGreedy;
 
 use crate::tsp::TSPInstance;
 use crate::tsp::io::Logger;

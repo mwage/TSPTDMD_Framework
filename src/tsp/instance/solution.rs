@@ -1,11 +1,13 @@
 use crate::tsp::TSPInstance;
 
+#[derive(Clone)]
 pub struct Solution {
     assignments: Vec<Assignment>,
     driver_distances: Vec<usize>,
     pub number_of_vertices: usize,
     pub desired_travel_distance: usize,
-    objective_value: usize
+    pub objective_value: usize, 
+    unassigned_vertices: Vec<u32>
 }
 
 impl Solution {
@@ -16,10 +18,19 @@ impl Solution {
             driver_distances: vec![0; instance.number_of_drivers as usize],
             number_of_vertices,
             desired_travel_distance: instance.desired_travel_distance as usize,
-            objective_value: 0
+            objective_value: 0,
+            unassigned_vertices: (1..instance.number_of_vertices).collect()
         };
-        solution.calculate_objective_value();
+        // solution.calculate_objective_value();
         solution
+    }
+
+    pub fn assignments(&self) -> &Vec<Assignment> {
+        &self.assignments
+    }
+
+    pub fn unassigned_vertices(&self) -> &Vec<u32> {
+        &self.unassigned_vertices
     }
 
     pub fn drivers(&self) -> usize {
@@ -34,7 +45,7 @@ impl Solution {
         self.driver_distances[idx]
     }
 
-    pub fn assignments(&self) -> usize {
+    pub fn number_of_assignments(&self) -> usize {
         self.assignments.len()
     }
 
@@ -46,25 +57,24 @@ impl Solution {
         println!("{:?}", self.assignments.last());
     }
     
-    pub fn add_assignment(&mut self, vertex: u32, driver: u32, distance: usize, delta_evaluation: bool) {
+    pub fn add_assignment(&mut self, vertex: u32, driver: u32, distance: usize) {
         if self.assignments.len() > self.number_of_vertices {
             panic!("Exceeded maximum number of assignments.");
         }
-        self.assignments.push(Assignment::new(vertex, driver));
+        self.assignments.push(Assignment::new(vertex, driver));        
         self.driver_distances[driver as usize] += distance;
-        if delta_evaluation {
-            unimplemented!();
-        } else {
-            self.calculate_objective_value();
+
+        if vertex != 0 {
+            let idx = self.unassigned_vertices.iter().position(|x| *x == vertex).unwrap();  // Remove vertex out of unassigned
+            self.unassigned_vertices.remove(idx);
         }
     }
 
-    fn get_next_driver(&self) -> u32 {
+    pub fn get_smallest_driver(&self) -> u32 {
         let mut min_distance = usize::max_value();        
         let mut best_driver = u32::max_value();
-        let solution = self.current_solution();
-        for i in 0..solution.drivers() {
-            let distance = solution.get_driver_distance(i);
+        for i in 0..self.drivers() {
+            let distance = self.get_driver_distance(i);
             if distance < min_distance {
                 min_distance = distance;
                 best_driver = i as u32;
@@ -92,13 +102,13 @@ fn test_obj_function() {
     let instance = TSPInstance::new_test_instance();
     let mut solution = Solution::new(&instance);
     assert_eq!(solution.objective_value, 25);
-    solution.add_assignment(1, 0, 2, false);
+    solution.add_assignment(1, 0, 2);
     assert_eq!(solution.objective_value, 9);
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Assignment {
-    vertex: u32,
+    pub vertex: u32,
     driver: u32
 }
 
