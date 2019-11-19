@@ -23,10 +23,6 @@ impl Solution {
         }
     }
 
-    pub fn assignments(&self) -> &Vec<Assignment> {
-        &self.assignments
-    }
-
     pub fn unassigned_vertices(&self) -> &Vec<u32> {
         &self.unassigned_vertices
     }
@@ -77,6 +73,10 @@ impl Solution {
         }
     }
 
+    pub fn get_last_vertex(&self) -> u32 {
+        self.assignments.last().unwrap().vertex()
+    }
+
     pub fn get_smallest_driver(&self) -> u32 {
         let mut min_distance = usize::max_value();        
         let mut best_driver = u32::max_value();
@@ -100,7 +100,7 @@ impl Solution {
     }
 
     pub fn calculate_objective_value(&mut self) {
-        self.objective_value = self.driver_distances.iter().map(|x| (self.instance.desired_travel_distance() - *x).pow(2)).collect::<Vec<usize>>().iter().sum();
+        self.objective_value = self.driver_distances.iter().map(|x| (self.instance.desired_travel_distance() as isize - *x as isize).pow(2) as usize).collect::<Vec<usize>>().iter().sum();
     }
 }
 

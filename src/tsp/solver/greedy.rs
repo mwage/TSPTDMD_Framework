@@ -19,7 +19,7 @@ impl GreedySolver {
         }
     }
 
-    fn current_solution(&self) -> &Solution {
+    pub fn current_solution(&self) -> &Solution {
         if let Some(solution) = &self.current_solution {
             solution
         } else {
@@ -68,28 +68,45 @@ impl GreedySolver {
 
         (best_vertex, min_difference)
     }
-}
 
-impl Solver for GreedySolver {
-    fn solve(&mut self, instance: Rc<TSPInstance>, logger: Logger) {
-        self.instance = Some(Rc::clone(&instance));
-        self.current_solution = Some(Solution::new(Rc::clone(&instance)));
-        let (best_vertex, distance) = self.get_best_vertex();
-        self.current_solution_mut().add_assignment(best_vertex, 0, distance);
-        // self.current_solution().print();
-        // println!("Target: {}", self.current_solution().desired_travel_distance);
-        // println!("{:?}", self.current_solution().driver_distances());
+    pub fn set_instance(&mut self, instance: &Rc<TSPInstance>) {
+        self.instance = Some(Rc::clone(instance));
+    }
 
-        let mut last_vertex = best_vertex;
+    pub fn solve_from_solution(&mut self, base_solution: Solution, vertex: u32) -> &Solution {
+        self.current_solution = Some(base_solution);
+        let next_driver = self.current_solution().get_smallest_driver();
+        let distance = self.instance().get_vertex(self.current_solution().get_last_vertex() as usize).get_weight(vertex);
+        self.current_solution_mut().add_assignment(vertex, next_driver, distance);
+        self.solve_greedy();
+        self.current_solution()
+    }
+
+    fn solve_greedy(&mut self) {
         while !self.current_solution().is_complete() {
             let next_driver = self.current_solution().get_smallest_driver();
             let (best_vertex, distance) = self.get_best_vertex();
             self.current_solution_mut().add_assignment(best_vertex, next_driver, distance);
-            last_vertex = best_vertex;
+            
+            self.current_solution_mut().calculate_objective_value();
+            println!("{}", self.current_solution().objective_value());
         }
         let next_driver = self.current_solution().get_smallest_driver();
-        let distance = instance.get_vertex(last_vertex as usize).get_weight(0);
+        let distance = self.instance().get_vertex(self.current_solution().get_last_vertex() as usize).get_weight(0);
         self.current_solution_mut().add_assignment(0, next_driver, distance);
+    }
+}
+
+impl Solver for GreedySolver {
+    fn solve(&mut self, instance: Rc<TSPInstance>, logger: Logger) {        
+        self.instance = Some(Rc::clone(&instance));
+        self.current_solution = Some(Solution::new(Rc::clone(&instance)));
+
+        let (best_vertex, distance) = self.get_best_vertex();
+        self.current_solution_mut().add_assignment(best_vertex, 0, distance);
+
+        self.solve_greedy();
+        
         logger.log_result(&self.current_solution());
     }
 

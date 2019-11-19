@@ -73,14 +73,14 @@ impl PartialGreedy {
         self.instance = Some(Rc::clone(instance));
         self.current_solution = Some(solution);
         let driver = self.current_solution().get_smallest_driver();  // Find driver for first vertex
-        let distance = instance.get_vertex(self.current_solution().assignments().last().unwrap().vertex() as usize).get_weight(vertex);
+        let distance = instance.get_vertex(self.current_solution().get_last_vertex() as usize).get_weight(vertex);
         self.current_solution_mut().add_assignment(vertex, 0, distance);
 
         // self.current_solution().print();
         // println!("Target: {}", self.current_solution().desired_travel_distance);
         // println!("{:?}", self.current_solution().driver_distances());
 
-        let mut last_vertex = self.current_solution().assignments().last().unwrap().vertex();
+        let mut last_vertex = self.current_solution().get_last_vertex();
         let mut first = true;
         let mut driver = 0;
 
