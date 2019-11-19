@@ -1,9 +1,10 @@
+mod assignment;
 mod solution;
 mod tsp_instance;
 mod vertex;
 
 use vertex::Vertex;
 
-pub use tsp_instance::TSPInstance;
+use assignment::Assignment;
 pub use solution::Solution;
-pub use solution::Assignment;
+pub use tsp_instance::TSPInstance;

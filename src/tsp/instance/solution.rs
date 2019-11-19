@@ -1,6 +1,7 @@
 use std::rc::Rc;
 
 use crate::tsp::TSPInstance;
+use super::Assignment;
 
 #[derive(Clone)]
 pub struct Solution {
@@ -54,6 +55,15 @@ impl Solution {
         println!("{:?}", self.assignments.last());
     }
     
+    pub fn set_unassigned(&mut self) {
+        let mut unassigned: Vec<u32> = (1..self.instance.number_of_vertices() as u32).collect();
+        for assignment in self.assignments.iter() {
+            let idx = unassigned.iter().position(|x| *x == assignment.vertex()).unwrap();  // Remove vertex out of unassigned
+            unassigned.remove(idx);
+        }
+        self.unassigned_vertices = unassigned
+    }
+
     pub fn add_assignment(&mut self, vertex: u32, driver: u32, distance: usize) {
         if self.assignments.len() > self.instance.number_of_vertices() {
             panic!("Exceeded maximum number of assignments.");
@@ -101,19 +111,4 @@ fn test_obj_function() {
     assert_eq!(solution.objective_value, 25);
     solution.add_assignment(1, 0, 2);
     assert_eq!(solution.objective_value, 9);
-}
-
-#[derive(Debug, Clone)]
-pub struct Assignment {
-    pub vertex: u32,
-    driver: u32
-}
-
-impl Assignment {
-    pub fn new(vertex: u32, driver: u32) -> Self {
-        Assignment {
-            vertex,
-            driver
-        }
-    }
 }

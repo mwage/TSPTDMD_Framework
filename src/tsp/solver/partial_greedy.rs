@@ -5,7 +5,6 @@ use super::Solver;
 use crate::tsp::io::Logger;
 use crate::tsp::TSPInstance;
 use crate::tsp::Solution;
-use crate::tsp::instance::Assignment;
 
 pub struct PartialGreedy {
     current_solution: Option<Solution>,
@@ -54,21 +53,18 @@ impl PartialGreedy {
         available_capacity / (self.instance().number_of_vertices() - self.current_solution().number_of_assignments())
     }
 
-    fn get_best_vertex(&self, instance: &TSPInstance, unassigned_vertices: &mut Vec<u32>) -> (u32, usize) {
+    fn get_best_vertex(&self) -> (u32, usize) {
         let mut min_difference = usize::max_value();
         let mut best_vertex = 0;
         let target_distance = self.calculate_target_distance(); // Total available capacity / unvisited vertices
 
-        for i in unassigned_vertices.iter() {   // Find vertex closest to the target distance
-            let difference = (instance.get_vertex(0).get_weight(*i) as isize - target_distance as isize).abs() as usize;
+        for i in self.current_solution().unassigned_vertices() {   // Find vertex closest to the target distance
+            let difference = (self.instance().get_vertex(0).get_weight(*i) as isize - target_distance as isize).abs() as usize;
             if difference < min_difference {
                 min_difference = difference;
                 best_vertex = *i;
             }
         }
-
-        let idx = unassigned_vertices.iter().position(|x| *x == best_vertex).unwrap();  // Remove vertex out of unassigned
-        unassigned_vertices.remove(idx);
 
         (best_vertex, min_difference)
     }
@@ -76,21 +72,15 @@ impl PartialGreedy {
     pub fn solve(&mut self, instance: &Rc<TSPInstance>, solution: Solution, vertex: u32) -> (u32, usize) {
         self.instance = Some(Rc::clone(instance));
         self.current_solution = Some(solution);
-        let mut unassigned_vertices: Vec<u32> = (1..instance.number_of_vertices() as u32).collect();
-        for assignment in self.current_solution().assignments() {
-            let idx = unassigned_vertices.iter().position(|x| *x == assignment.vertex).unwrap();  // Remove vertex out of unassigned
-            unassigned_vertices.remove(idx);
-        }
-
         let driver = self.current_solution().get_smallest_driver();  // Find driver for first vertex
-        let distance = instance.get_vertex(self.current_solution().assignments().last().unwrap().vertex as usize).get_weight(vertex);
+        let distance = instance.get_vertex(self.current_solution().assignments().last().unwrap().vertex() as usize).get_weight(vertex);
         self.current_solution_mut().add_assignment(vertex, 0, distance);
 
         // self.current_solution().print();
         // println!("Target: {}", self.current_solution().desired_travel_distance);
         // println!("{:?}", self.current_solution().driver_distances());
 
-        let mut last_vertex = self.current_solution().assignments().last().unwrap().vertex;
+        let mut last_vertex = self.current_solution().assignments().last().unwrap().vertex();
         let mut first = true;
         let mut driver = 0;
 
@@ -100,7 +90,7 @@ impl PartialGreedy {
                 driver = next_driver;
                 first = false;
             }
-            let (best_vertex, distance) = self.get_best_vertex(&instance, &mut unassigned_vertices);
+            let (best_vertex, distance) = self.get_best_vertex();
             self.current_solution_mut().add_assignment(best_vertex, next_driver, distance);
             last_vertex = best_vertex;
             // self.current_solution().print();

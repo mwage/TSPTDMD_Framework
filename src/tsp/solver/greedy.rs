@@ -53,13 +53,13 @@ impl GreedySolver {
         available_capacity / (self.instance().number_of_vertices() - self.current_solution().number_of_assignments())
     }
 
-    fn get_best_vertex(&self, instance: &TSPInstance) -> (u32, usize) {
+    fn get_best_vertex(&self) -> (u32, usize) {
         let mut min_difference = usize::max_value();
         let mut best_vertex = 0;
         let target_distance = self.calculate_target_distance(); // Total available capacity / unvisited vertices
 
         for i in self.current_solution().unassigned_vertices() {   // Find vertex closest to the target distance
-            let difference = (instance.get_vertex(0).get_weight(*i) as isize - target_distance as isize).abs() as usize;
+            let difference = (self.instance().get_vertex(0).get_weight(*i) as isize - target_distance as isize).abs() as usize;
             if difference < min_difference {
                 min_difference = difference;
                 best_vertex = *i;
@@ -74,7 +74,7 @@ impl Solver for GreedySolver {
     fn solve(&mut self, instance: Rc<TSPInstance>, logger: Logger) {
         self.instance = Some(Rc::clone(&instance));
         self.current_solution = Some(Solution::new(Rc::clone(&instance)));
-        let (best_vertex, distance) = self.get_best_vertex(&instance);
+        let (best_vertex, distance) = self.get_best_vertex();
         self.current_solution_mut().add_assignment(best_vertex, 0, distance);
         // self.current_solution().print();
         // println!("Target: {}", self.current_solution().desired_travel_distance);
@@ -83,17 +83,13 @@ impl Solver for GreedySolver {
         let mut last_vertex = best_vertex;
         while !self.current_solution().is_complete() {
             let next_driver = self.current_solution().get_smallest_driver();
-            let (best_vertex, distance) = self.get_best_vertex(&instance);
+            let (best_vertex, distance) = self.get_best_vertex();
             self.current_solution_mut().add_assignment(best_vertex, next_driver, distance);
             last_vertex = best_vertex;
-            // self.current_solution().print();
-            // println!("{:?}", self.current_solution().driver_distances());
         }
         let next_driver = self.current_solution().get_smallest_driver();
         let distance = instance.get_vertex(last_vertex as usize).get_weight(0);
         self.current_solution_mut().add_assignment(0, next_driver, distance);
-        // self.current_solution().print();
-        // println!("{:?}", self.current_solution().driver_distances());
         logger.log_result(&self.current_solution());
     }
 
