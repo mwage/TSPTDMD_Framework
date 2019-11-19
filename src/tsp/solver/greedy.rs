@@ -57,16 +57,16 @@ impl GreedySolver {
         let mut min_difference = usize::max_value();
         let mut best_vertex = 0;
         let target_distance = self.calculate_target_distance(); // Total available capacity / unvisited vertices
-
+        let last_vertex = self.current_solution().get_last_vertex();
         for i in self.current_solution().unassigned_vertices() {   // Find vertex closest to the target distance
-            let difference = (self.instance().get_vertex(0).get_weight(*i) as isize - target_distance as isize).abs() as usize; 
+            let difference = (self.instance().get_vertex(last_vertex as usize).get_weight(*i) as isize - target_distance as isize).abs() as usize; 
             if difference < min_difference {
                 min_difference = difference;
                 best_vertex = *i;
             }
         }
 
-        (best_vertex, min_difference)
+        (best_vertex, self.instance().get_vertex(last_vertex as usize).get_weight(best_vertex))
     }
 
     pub fn set_instance(&mut self, instance: &Rc<TSPInstance>) {
@@ -88,9 +88,6 @@ impl GreedySolver {
             let next_driver = self.current_solution().get_smallest_driver();    // Find best driver
             let (best_vertex, distance) = self.get_best_vertex();   // Find next best vertex
             self.current_solution_mut().add_assignment(best_vertex, next_driver, distance); // Add new vertex to the solution
-            
-            // self.current_solution_mut().calculate_objective_value();
-            // println!("{}", self.current_solution().objective_value());
         }
         let next_driver = self.current_solution().get_smallest_driver();    // Find best driver
         let distance = self.instance().get_vertex(self.current_solution().get_last_vertex() as usize).get_weight(0);    // distance between the last assigned vertex and vertex 0
@@ -103,18 +100,13 @@ impl Solver for GreedySolver {
         self.instance = Some(Rc::clone(&instance)); // Initialize TSP instance
         self.current_solution = Some(Solution::new(Rc::clone(&instance)));  // Initialize solution
 
-        let (best_vertex, distance) = self.get_best_vertex();   // Find first best vertex
-        self.current_solution_mut().add_assignment(best_vertex, 0, distance);   // Add first best vertex with driver 0 to the solution
-
         self.solve_greedy();    // Solve the remaining problem
 
+        // Logging
         self.current_solution_mut().calculate_objective_value();    // Calculate the objective value of the solution
-        println!("{}", self.current_solution().objective_value());
-        // println!("{:?}", self.current_solution().print_assignments());
-
-        println!("{}", self.instance().desired_travel_distance());
+        println!("Val: {}", self.current_solution().objective_value());
+        println!("Target: {}", self.instance().desired_travel_distance());
         println!("{:?}", self.current_solution().driver_distances());
-        
         
         logger.log_result(&self.current_solution());    // Log results
     }

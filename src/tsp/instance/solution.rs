@@ -48,7 +48,7 @@ impl Solution {
     }
 
     pub fn is_complete(&self) -> bool {
-        self.assignments.len() == self.instance.number_of_vertices() - 1
+        self.assignments.len() >= self.instance.number_of_vertices() - 1
     }
     
     pub fn set_unassigned(&mut self) {

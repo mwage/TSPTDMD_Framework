@@ -1,4 +1,5 @@
 use std::rc::Rc;
+use std::cmp;
 
 use super::Solver;
 use super::GreedySolver;
@@ -26,17 +27,16 @@ impl PilotSolver {
 impl Solver for PilotSolver {
     fn solve(&mut self, instance: Rc<TSPInstance>, logger: Logger) {
         self.greedy.set_instance(&instance);    // Initialize instance of greedy algorithm
+        let initial = Solution::new(Rc::clone(&instance);
         let mut results: Vec<(u32, u32, u32, usize)> = Vec::with_capacity(instance.number_of_vertices() as usize - 1);  // Initialize vector with results of the different branches
         for i in 1..instance.number_of_vertices() as u32 {  // Loop over all neighbors
-            let solution = self.greedy.solve_from_solution(Solution::new(Rc::clone(&instance)), i); // Use greedy algorithm to solve the branch
+            let solution = self.greedy.solve_from_solution(initial.clone()), i); // Use greedy algorithm to solve the branch
             results.push((0, i, solution.get_assignment(0).driver(), solution.objective_value()));  // Add the result to the list
-
-            // candidate.calculate_objective_value();
-            // results.push((i, candidate.objective_value));
         }
-        results.sort_by(|a, b| a.3.cmp(&b.3));
+        results.sort_by(|a, b| a.3.cmp(&b.3));  // sort results by objective value
         println!("{:?}", results);
 
+        // let min = cmp::min(results.len(), self.beta);
         // for i in 0..self.beta {
         //     self.best_solutions.push(Solution::new(Rc::clone(&instance)));
         //     if i < results.len() {
@@ -75,10 +75,14 @@ impl Solver for PilotSolver {
         //     }
         // }
 
-        let solution = self.greedy.solve_from_solution(Solution::new(Rc::clone(&instance)), 4);
-        println!("{}", instance.desired_travel_distance());
-        println!("{:?}", solution.driver_distances());
-        logger.log_result(&solution);
+
+
+
+
+        // let solution = self.greedy.solve_from_solution(Solution::new(Rc::clone(&instance)), 41);
+        // println!("{}", instance.desired_travel_distance());
+        // println!("{:?}", solution.driver_distances());
+        // logger.log_result(&solution);
         // for  in  {
             
         // }
