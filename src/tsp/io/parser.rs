@@ -22,7 +22,7 @@ impl InstanceParser {
     // Create TSP instance from COORDS
     fn get_coordinate_format(mut lines: VecDeque<&str>) -> TSPInstance {
         println!("Get COORDS");
-        let vec: Vec<u32> = lines.pop_front().unwrap().split(' ').map(|x| x.parse().unwrap()).collect();    // Get the parameters from the second line
+        let vec: Vec<usize> = lines.pop_front().unwrap().split(' ').map(|x| x.parse().unwrap()).collect();    // Get the parameters from the second line
         let (number_of_vertices, number_of_drivers, desired_travel_distance) = (vec[0], vec[1], vec[2]);
 
         let mut instance = TSPInstance::new(number_of_vertices, number_of_drivers, desired_travel_distance);   // Create TSP instance
@@ -42,7 +42,7 @@ impl InstanceParser {
                 }
                 let first = &points[i as usize];
                 let second = &points[j as usize];
-                instance.add_edge(i, j, first.calculate_distance(second));  // Add edges between all points using the calculated distance
+                instance.add_edge(i as u32, j as u32, first.calculate_distance(second));  // Add edges between all points using the calculated distance
             }
         }
 
@@ -54,7 +54,7 @@ impl InstanceParser {
     // Create TSP instance from EDGELIST
     fn get_edge_list(mut lines: VecDeque<&str>) -> TSPInstance {
         println!("Get EDGELIST");
-        let vec: Vec<u32> = lines.pop_front().unwrap().split(' ').map(|x| x.parse().unwrap()).collect();    // Get the parameters from the second line
+        let vec: Vec<usize> = lines.pop_front().unwrap().split(' ').map(|x| x.parse().unwrap()).collect();    // Get the parameters from the second line
         let (number_of_vertices, _, number_of_drivers, desired_travel_distance) = (vec[0], vec[1], vec[2], vec[3]);
 
         let mut instance = TSPInstance::new(number_of_vertices, number_of_drivers, desired_travel_distance);   // Create TSP instance

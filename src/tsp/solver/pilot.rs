@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use super::Solver;
 use super::PartialGreedy;
 
@@ -22,13 +24,13 @@ impl Pilot {
 }
 
 impl Solver for Pilot {
-    fn solve(&mut self, instance: TSPInstance, logger: Logger) {
-        let mut results: Vec<(u32, u32, u32, usize)> = Vec::with_capacity(instance.number_of_vertices as usize - 1);
+    fn solve(&mut self, instance: Rc<TSPInstance>, logger: Logger) {
+        let mut results: Vec<(u32, u32, u32, usize)> = Vec::with_capacity(instance.number_of_vertices() as usize - 1);
         // self.best_solutions.push(Solution::new(&instance));
-        for i in 1..instance.number_of_vertices {
-            let mut candidate = Solution::new(&instance);
+        for i in 1..instance.number_of_vertices() as u32 {
+            let mut candidate = Solution::new(Rc::clone(&instance));
             candidate.add_assignment(i, 0, instance.get_vertex(0).get_weight(i));
-            let (driver, value) = self.greedy.solve(&instance, candidate);
+            let (driver, value) = self.greedy.solve(&instance, candidate, i);
             results.push((0, i, driver, value));
             // candidate.calculate_objective_value();
             // results.push((i, candidate.objective_value));
@@ -36,7 +38,7 @@ impl Solver for Pilot {
         results.sort_by(|a, b| a.3.cmp(&b.3));
         // println!("{:?}", results);
         for i in 0..self.beta {
-            self.best_solutions.push(Solution::new(&instance));
+            self.best_solutions.push(Solution::new(Rc::clone(&instance)));
             if i < results.len() {
                 let res = results[i];
                 let distance = instance.get_vertex(0).get_weight(res.1);
@@ -48,21 +50,21 @@ impl Solver for Pilot {
             }
         }
 
-        for r in 1..instance.number_of_vertices - 1 {
-            let mut results: Vec<(u32, u32, u32, usize)> = Vec::with_capacity(instance.number_of_vertices as usize - r as usize);
-            self.best_solutions.push(Solution::new(&instance));
-            for i in 0..self.best_solutions.len() {
-                let solution = self.best_solutions[i];
+        for r in 1..instance.number_of_vertices() - 1 {
+            let mut results: Vec<(u32, u32, u32, usize)> = Vec::with_capacity(instance.number_of_vertices() - r);
+            self.best_solutions.push(Solution::new(Rc::clone(&instance)));
+            for i in 0..self.best_solutions.len() as u32 {
+                let solution = &self.best_solutions[i as usize];
                 for vertex in solution.unassigned_vertices() {
                     let mut candidate = solution.clone();
                     candidate.add_assignment(i, 0, instance.get_vertex(0).get_weight(i));
-                    let (driver, value) = self.greedy.solve(&instance, candidate);
+                    let (driver, value) = self.greedy.solve(&instance, candidate, *vertex);
                     results.push((0, i, driver, value));
                     // candidate.calculate_objective_value();
                     // results.push((i, candidate.objective_value));
                 }
             }
-            for v in 1..instance.number_of_vertices {
+            for v in 1..instance.number_of_vertices() {
 
             }
             results.sort_by(|a, b| a.3.cmp(&b.3));

@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use super::Solver;
 
 use crate::tsp::io::Logger;
@@ -5,20 +7,26 @@ use crate::tsp::TSPInstance;
 use crate::tsp::Solution;
 use crate::tsp::instance::Assignment;
 
-use std::usize;
-use std::u32;
-
-
 pub struct PartialGreedy {
-    current_solution: Option<Solution>
+    current_solution: Option<Solution>,
+    instance: Option<Rc<TSPInstance>>
 }
 
 impl PartialGreedy {
     pub fn new() -> PartialGreedy {
         PartialGreedy {
-            current_solution: None
+            current_solution: None,
+            instance: None
         }
-    }    
+    }
+    
+    fn instance(&self) -> &Rc<TSPInstance> {
+        if let Some(instance) = &self.instance {
+            instance
+        } else {
+            panic!("Tried accessing uninitialized solution.");
+        }
+    }
 
     fn current_solution(&self) -> &Solution {
         if let Some(solution) = &self.current_solution {
@@ -39,11 +47,11 @@ impl PartialGreedy {
     fn calculate_target_distance(&self) -> usize {
         let mut available_capacity = 0;
         for distance in self.current_solution().driver_distances() {    // Sum of available capacity
-            if *distance < self.current_solution().desired_travel_distance {
-                available_capacity += self.current_solution().desired_travel_distance - *distance;
+            if *distance < self.instance().desired_travel_distance() {
+                available_capacity += self.instance().desired_travel_distance() - *distance;
             }
         }
-        available_capacity / (self.current_solution().number_of_vertices - self.current_solution().number_of_assignments())
+        available_capacity / (self.instance().number_of_vertices() - self.current_solution().number_of_assignments())
     }
 
     fn get_best_vertex(&self, instance: &TSPInstance, unassigned_vertices: &mut Vec<u32>) -> (u32, usize) {
@@ -65,9 +73,10 @@ impl PartialGreedy {
         (best_vertex, min_difference)
     }
     
-    pub fn solve(&mut self, instance: &TSPInstance, solution: Solution, vertex: u32) -> (u32, usize) {
+    pub fn solve(&mut self, instance: &Rc<TSPInstance>, solution: Solution, vertex: u32) -> (u32, usize) {
+        self.instance = Some(Rc::clone(instance));
         self.current_solution = Some(solution);
-        let mut unassigned_vertices: Vec<u32> = (1..instance.number_of_vertices).collect();
+        let mut unassigned_vertices: Vec<u32> = (1..instance.number_of_vertices() as u32).collect();
         for assignment in self.current_solution().assignments() {
             let idx = unassigned_vertices.iter().position(|x| *x == assignment.vertex).unwrap();  // Remove vertex out of unassigned
             unassigned_vertices.remove(idx);
@@ -103,6 +112,6 @@ impl PartialGreedy {
         // self.current_solution().print();
         // println!("{:?}", self.current_solution().driver_distances());
         self.current_solution_mut().calculate_objective_value();
-        (driver, self.current_solution().objective_value)
+        (driver, self.current_solution().objective_value())
     }
 }

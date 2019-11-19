@@ -1,28 +1,25 @@
+use std::rc::Rc;
+
 use crate::tsp::TSPInstance;
 
 #[derive(Clone)]
 pub struct Solution {
     assignments: Vec<Assignment>,
+    unassigned_vertices: Vec<u32>,
     driver_distances: Vec<usize>,
-    pub number_of_vertices: usize,
-    pub desired_travel_distance: usize,
-    pub objective_value: usize, 
-    unassigned_vertices: Vec<u32>
+    instance: Rc<TSPInstance>,
+    objective_value: usize
 }
 
 impl Solution {
-    pub fn new(instance: &TSPInstance) -> Self {
-        let number_of_vertices = instance.number_of_vertices as usize;
-        let mut solution = Solution {
-            assignments: Vec::with_capacity(number_of_vertices),
-            driver_distances: vec![0; instance.number_of_drivers as usize],
-            number_of_vertices,
-            desired_travel_distance: instance.desired_travel_distance as usize,
-            objective_value: 0,
-            unassigned_vertices: (1..instance.number_of_vertices).collect()
-        };
-        // solution.calculate_objective_value();
-        solution
+    pub fn new(instance: Rc<TSPInstance>) -> Self {
+        Solution {
+            assignments: Vec::with_capacity(instance.number_of_vertices()),
+            unassigned_vertices: (1..instance.number_of_vertices() as u32).collect(),
+            driver_distances: vec![0; instance.number_of_drivers()],
+            instance,
+            objective_value: usize::max_value()
+        }
     }
 
     pub fn assignments(&self) -> &Vec<Assignment> {
@@ -33,8 +30,8 @@ impl Solution {
         &self.unassigned_vertices
     }
 
-    pub fn drivers(&self) -> usize {
-        self.driver_distances.len()
+    pub fn objective_value(&self) -> usize {
+        self.objective_value
     }
 
     pub fn driver_distances(&self) -> &Vec<usize> {
@@ -50,7 +47,7 @@ impl Solution {
     }
 
     pub fn is_complete(&self) -> bool {
-        self.assignments.len() == self.number_of_vertices - 1
+        self.assignments.len() == self.instance.number_of_vertices() - 1
     }
 
     pub fn print(&self) {
@@ -58,7 +55,7 @@ impl Solution {
     }
     
     pub fn add_assignment(&mut self, vertex: u32, driver: u32, distance: usize) {
-        if self.assignments.len() > self.number_of_vertices {
+        if self.assignments.len() > self.instance.number_of_vertices() {
             panic!("Exceeded maximum number of assignments.");
         }
         self.assignments.push(Assignment::new(vertex, driver));        
@@ -73,7 +70,7 @@ impl Solution {
     pub fn get_smallest_driver(&self) -> u32 {
         let mut min_distance = usize::max_value();        
         let mut best_driver = u32::max_value();
-        for i in 0..self.drivers() {
+        for i in 0..self.instance.number_of_drivers() {
             let distance = self.get_driver_distance(i);
             if distance < min_distance {
                 min_distance = distance;
@@ -93,14 +90,14 @@ impl Solution {
     }
 
     pub fn calculate_objective_value(&mut self) {
-        self.objective_value = self.driver_distances.iter().map(|x| (self.desired_travel_distance - *x).pow(2)).collect::<Vec<usize>>().iter().sum();
+        self.objective_value = self.driver_distances.iter().map(|x| (self.instance.desired_travel_distance() - *x).pow(2)).collect::<Vec<usize>>().iter().sum();
     }
 }
 
 #[test]
 fn test_obj_function() {
     let instance = TSPInstance::new_test_instance();
-    let mut solution = Solution::new(&instance);
+    let mut solution = Solution::new(Rc::new(instance));
     assert_eq!(solution.objective_value, 25);
     solution.add_assignment(1, 0, 2);
     assert_eq!(solution.objective_value, 9);

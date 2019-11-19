@@ -1,4 +1,5 @@
 use std::fs;
+use std::rc::Rc;
 
 use crate::tsp::io::InstanceParser;
 use crate::tsp::io::Logger;
@@ -36,6 +37,6 @@ impl TestRunner {
             },
         };
         println!("Solve instance: {}", instance_name);
-        solver.solve(instance, logger);   // Solve TSP instance with selected solver    
+        solver.solve(Rc::new(instance), logger);   // Solve TSP instance with selected solver    
     }
 }

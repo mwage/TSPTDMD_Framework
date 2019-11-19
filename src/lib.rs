@@ -15,8 +15,8 @@ pub use tsp::neighborhood::Neighborhood;
 pub use tsp::step_function::StepFunction;
 
 pub fn deterministic_construction_heuristic(instance_name: Option<&str>) {
-    // TestRunner::solve_instance(GreedySolver::new(), instance_name);
-    TestRunner::solve_instance(Pilot::new(2), instance_name);
+    TestRunner::solve_instance(GreedySolver::new(), instance_name);
+    // TestRunner::solve_instance(Pilot::new(2), instance_name);
 }
 
 pub fn randomized_construction_heuristic() {
