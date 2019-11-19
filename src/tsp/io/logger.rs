@@ -47,6 +47,7 @@ impl Logger {
         result_strings.push(self.instance_name.to_owned());
         result_strings.push(solution.vertices_to_str());
         result_strings.push(solution.drivers_to_str());
+        result_strings.push(format!("val: {}", solution.objective_value()));
         result_strings.push(format!("{}ms", self.get_elapsed()));
         self.to_file(result_strings).expect("Failed to log to file.");
     }

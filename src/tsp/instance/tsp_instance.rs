@@ -28,7 +28,7 @@ impl TSPInstance {
     }
 
     pub fn number_of_drivers(&self) -> usize {
-        self.number_of_vertices
+        self.number_of_drivers
     }
 
     pub fn number_of_vertices(&self) -> usize {

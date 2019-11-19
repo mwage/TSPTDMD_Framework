@@ -39,16 +39,16 @@ impl Solution {
         self.driver_distances[idx]
     }
 
+    pub fn get_assignment(&self, idx: usize) -> &Assignment {
+        &self.assignments[idx]
+    }
+
     pub fn number_of_assignments(&self) -> usize {
         self.assignments.len()
     }
 
     pub fn is_complete(&self) -> bool {
         self.assignments.len() == self.instance.number_of_vertices() - 1
-    }
-
-    pub fn print(&self) {
-        println!("{:?}", self.assignments.last());
     }
     
     pub fn set_unassigned(&mut self) {
@@ -74,7 +74,10 @@ impl Solution {
     }
 
     pub fn get_last_vertex(&self) -> u32 {
-        self.assignments.last().unwrap().vertex()
+        match self.assignments.last() {
+            Some(x) => x.vertex(),
+            None => 0
+        }
     }
 
     pub fn get_smallest_driver(&self) -> u32 {
@@ -90,17 +93,32 @@ impl Solution {
 
         best_driver
     }
+    
+    pub fn calculate_objective_value(&mut self) {
+        self.objective_value = self.driver_distances.iter().map(|x| (self.instance.desired_travel_distance() as isize - *x as isize).pow(2) as usize).collect::<Vec<usize>>().iter().sum();
+    }
 
     pub fn vertices_to_str(&self) -> String {
-        String::from("1,2,3")
+        let mut result = String::from("0");
+        for i in 0..self.instance.number_of_vertices() - 1 {
+            result.push_str(" ");
+            result += &self.assignments[i].vertex().to_string();
+        }
+        result
     }
 
     pub fn drivers_to_str(&self) -> String {
-        String::from("1,2,3")
+        let mut result = String::new();
+        for i in 0..self.instance.number_of_vertices() {
+            result.push_str(" ");
+            result += &self.assignments[i].driver().to_string();
+        }
+        result
     }
 
-    pub fn calculate_objective_value(&mut self) {
-        self.objective_value = self.driver_distances.iter().map(|x| (self.instance.desired_travel_distance() as isize - *x as isize).pow(2) as usize).collect::<Vec<usize>>().iter().sum();
+
+    pub fn print_assignments(&self) {
+        println!("{:?}", self.assignments);
     }
 }
 

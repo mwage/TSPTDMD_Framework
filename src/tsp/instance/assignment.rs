@@ -15,4 +15,8 @@ impl Assignment {
     pub fn vertex(&self) -> u32 {
         self.vertex
     }
+
+    pub fn driver(&self) -> u32 {
+        self.driver
+    }
 }

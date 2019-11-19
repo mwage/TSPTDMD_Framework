@@ -24,7 +24,6 @@ impl InstanceParser {
         println!("Get COORDS");
         let vec: Vec<usize> = lines.pop_front().unwrap().split(' ').map(|x| x.parse().unwrap()).collect();    // Get the parameters from the second line
         let (number_of_vertices, number_of_drivers, desired_travel_distance) = (vec[0], vec[1], vec[2]);
-
         let mut instance = TSPInstance::new(number_of_vertices, number_of_drivers, desired_travel_distance);   // Create TSP instance
         let mut points: Vec<Point> = Vec::new();
         for line in lines.iter() {
