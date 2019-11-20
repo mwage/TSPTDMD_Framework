@@ -1,13 +1,20 @@
-mod flip;
+mod driver_flip;
+mod driver_swap;
+mod double_edge_exchange;
 
-pub use flip::Flip;
+pub use driver_flip::DriverFlip;
+pub use driver_swap::DriverSwap;
+pub use double_edge_exchange::DoubleEdgeExchange;
+
 
 
 use std::fmt;
 
+use crate::tsp::Solution;
+
 #[derive(Debug, Clone)]
 pub enum Neighborhood {
-    Flip
+    DriverFlip
 }
 
 impl fmt::Display for Neighborhood {
@@ -17,5 +24,5 @@ impl fmt::Display for Neighborhood {
 }
     
 pub trait NeighborhoodImpl {
-
+    fn apply_neighborhood(&self, solution: &mut Solution);
 }

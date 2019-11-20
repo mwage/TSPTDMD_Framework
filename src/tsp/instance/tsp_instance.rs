@@ -56,7 +56,7 @@ impl TSPInstance {
     }
 
     pub fn new_test_instance() -> Self {
-        let mut instance = TSPInstance::new(3, 1, 5);
+        let mut instance = TSPInstance::new(3, 2, 5);
         instance.add_edge(0, 1, 2);
         instance.add_edge(1, 2, 2);
         instance.add_edge(2, 0, 1);

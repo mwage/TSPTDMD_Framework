@@ -9,7 +9,7 @@ use tsp::solver::GreedySolver;
 use tsp::solver::RandomGreedySolver;
 use tsp::solver::PilotSolver;
 use tsp::neighborhood::NeighborhoodImpl;
-use tsp::neighborhood::Flip;
+use tsp::neighborhood::DriverFlip;
 use tsp::step_function::StepFunctionImpl;
 use tsp::step_function::BestImprovement;
 
@@ -48,7 +48,7 @@ pub fn metaheuristic() {
 
 fn selectNeighborhood(neighborhood: Neighborhood) -> impl NeighborhoodImpl {
     match neighborhood {
-        Neighborhood::Flip => Flip::new(),
+        Neighborhood::DriverFlip => DriverFlip::new(),
         _ => unimplemented!()
     }
 }

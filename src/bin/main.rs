@@ -17,7 +17,7 @@ fn main() {
 }
 
 fn test_all_local_searches() {
-    let neighborhoods = vec![Neighborhood::Flip];
+    let neighborhoods = vec![Neighborhood::DriverFlip];
     let step_functions = vec![StepFunction::BestImprovement];
     for neighborhood in neighborhoods.iter() {
         for stepfunction in step_functions.iter() {

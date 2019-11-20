@@ -44,6 +44,10 @@ impl Solution {
         &self.assignments[idx]
     }
 
+    pub fn get_assignment_mut(&mut self, idx: usize) -> &mut Assignment {
+        &mut self.assignments[idx]
+    }
+
     pub fn number_of_assignments(&self) -> usize {
         self.assignments.len()
     }
@@ -51,15 +55,14 @@ impl Solution {
     pub fn is_complete(&self) -> bool {
         self.assignments.len() >= self.instance.number_of_vertices() - 1
     }
-    
-    // pub fn set_unassigned(&mut self) {
-    //     let mut unassigned: Vec<u32> = (1..self.instance.number_of_vertices() as u32).collect();
-    //     for assignment in self.assignments.iter() {
-    //         let idx = unassigned.iter().position(|x| *x == assignment.vertex()).unwrap();  // Remove vertex out of unassigned
-    //         unassigned.remove(idx);
-    //     }
-    //     self.unassigned_vertices = unassigned
-    // }
+
+    pub fn instance(&self) -> &Rc<TSPInstance> {
+        &self.instance
+    }
+
+    pub fn assignments(&mut self) -> &mut Vec<Assignment> {
+        &mut self.assignments
+    }
 
     pub fn add_assignment(&mut self, vertex: u32, driver: u32, distance: usize) {
         if self.assignments.len() > self.instance.number_of_vertices() {
@@ -129,7 +132,9 @@ impl Solution {
 fn test_obj_function() {
     let instance = TSPInstance::new_test_instance();
     let mut solution = Solution::new(Rc::new(instance));
-    assert_eq!(solution.objective_value, 25);
+    solution.calculate_objective_value();
+    assert_eq!(solution.objective_value, 50);
     solution.add_assignment(1, 0, 2);
-    assert_eq!(solution.objective_value, 9);
+    solution.calculate_objective_value();
+    assert_eq!(solution.objective_value, 34);
 }
