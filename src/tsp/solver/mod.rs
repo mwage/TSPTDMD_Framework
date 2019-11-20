@@ -1,7 +1,9 @@
 mod greedy;
+mod random_greedy;
 mod pilot;
 
 pub use greedy::GreedySolver;
+pub use random_greedy::RandomGreedySolver;
 pub use pilot::PilotSolver;
 
 use crate::tsp::TSPInstance;

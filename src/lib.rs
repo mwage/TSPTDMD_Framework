@@ -1,9 +1,12 @@
 #![allow(dead_code)]
 
+extern crate rand;
+
 mod tsp;
 
 use tsp::TestRunner;
 use tsp::solver::GreedySolver;
+use tsp::solver::RandomGreedySolver;
 use tsp::solver::PilotSolver;
 use tsp::neighborhood::NeighborhoodImpl;
 use tsp::neighborhood::Flip;
@@ -22,8 +25,8 @@ pub fn greedy(instance_name: Option<&str>) {
     TestRunner::solve_instance(GreedySolver::new(), instance_name);
 }
 
-pub fn randomized_construction_heuristic() {
-
+pub fn randomized_construction_heuristic(instance_name: Option<&str>, candidate_size: usize) {
+    TestRunner::solve_instance(RandomGreedySolver::new(candidate_size), instance_name)
 }
 
 pub fn local_search(neighborhood: Neighborhood, stepFunction: StepFunction) {
