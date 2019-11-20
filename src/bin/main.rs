@@ -7,8 +7,8 @@ use tsp_framework::pilot;
 use tsp_framework::local_search;
 
 fn main() {
-    greedy(Some("berlin52_k2_2"));
-    // pilot(Some("berlin52_k2_2"), 1);
+    // greedy(Some("berlin52_k2_2"));
+    pilot(Some("eil51_k5_1"), 30);
     // deterministic_construction_heuristic(None);
     // tsp::local_search(Neighborhood::Flip, StepFunction::BestImprovement);
     // test_all_local_searches();

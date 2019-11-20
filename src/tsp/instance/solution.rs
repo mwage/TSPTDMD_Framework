@@ -1,4 +1,5 @@
 use std::rc::Rc;
+use std::cmp;
 
 use crate::tsp::TSPInstance;
 use super::Assignment;
@@ -51,14 +52,14 @@ impl Solution {
         self.assignments.len() >= self.instance.number_of_vertices() - 1
     }
     
-    pub fn set_unassigned(&mut self) {
-        let mut unassigned: Vec<u32> = (1..self.instance.number_of_vertices() as u32).collect();
-        for assignment in self.assignments.iter() {
-            let idx = unassigned.iter().position(|x| *x == assignment.vertex()).unwrap();  // Remove vertex out of unassigned
-            unassigned.remove(idx);
-        }
-        self.unassigned_vertices = unassigned
-    }
+    // pub fn set_unassigned(&mut self) {
+    //     let mut unassigned: Vec<u32> = (1..self.instance.number_of_vertices() as u32).collect();
+    //     for assignment in self.assignments.iter() {
+    //         let idx = unassigned.iter().position(|x| *x == assignment.vertex()).unwrap();  // Remove vertex out of unassigned
+    //         unassigned.remove(idx);
+    //     }
+    //     self.unassigned_vertices = unassigned
+    // }
 
     pub fn add_assignment(&mut self, vertex: u32, driver: u32, distance: usize) {
         if self.assignments.len() > self.instance.number_of_vertices() {
@@ -83,7 +84,7 @@ impl Solution {
     pub fn get_smallest_driver(&self) -> u32 {
         let mut min_distance = usize::max_value();        
         let mut best_driver = u32::max_value();
-        for i in 0..self.instance.number_of_drivers() {
+        for i in 0..self.instance.number_of_drivers() { // TODO: Look into enumerate + min_by + fold.
             let distance = self.get_driver_distance(i);
             if distance < min_distance {
                 min_distance = distance;
@@ -100,7 +101,8 @@ impl Solution {
 
     pub fn vertices_to_str(&self) -> String {
         let mut result = String::from("0");
-        for i in 0..self.instance.number_of_vertices() - 1 {
+        let min = cmp::min(self.instance.number_of_vertices() - 1, self.number_of_assignments());
+        for i in 0..min {
             result.push_str(" ");
             result += &self.assignments[i].vertex().to_string();
         }
@@ -109,7 +111,8 @@ impl Solution {
 
     pub fn drivers_to_str(&self) -> String {
         let mut result = String::new();
-        for i in 0..self.instance.number_of_vertices() {
+        let min = cmp::min(self.instance.number_of_vertices(), self.number_of_assignments());
+        for i in 0..min {
             result.push_str(" ");
             result += &self.assignments[i].driver().to_string();
         }

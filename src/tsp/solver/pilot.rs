@@ -27,70 +27,52 @@ impl PilotSolver {
 impl Solver for PilotSolver {
     fn solve(&mut self, instance: Rc<TSPInstance>, logger: Logger) {
         self.greedy.set_instance(&instance);    // Initialize instance of greedy algorithm
-        let initial = Solution::new(Rc::clone(&instance);
-        let mut results: Vec<(u32, u32, u32, usize)> = Vec::with_capacity(instance.number_of_vertices() as usize - 1);  // Initialize vector with results of the different branches
-        for i in 1..instance.number_of_vertices() as u32 {  // Loop over all neighbors
-            let solution = self.greedy.solve_from_solution(initial.clone()), i); // Use greedy algorithm to solve the branch
-            results.push((0, i, solution.get_assignment(0).driver(), solution.objective_value()));  // Add the result to the list
+        self.best_solutions.push(Solution::new(Rc::clone(&instance)));   // Add an initial empty solution
+        let mut results: Vec<(usize, u32, u32, usize)> = Vec::with_capacity(instance.number_of_vertices() as usize - 1);  // Initialize vector for results of different branches empty
+        
+        for i in 0..instance.number_of_vertices() - 1 {
+            for j in 0..self.best_solutions.len() {
+                let solution = &self.best_solutions[j];
+                for vertex in solution.unassigned_vertices() {  // Loop over all neighbors
+                    let solution = self.greedy.solve_from_solution(solution.clone(), *vertex); // Use greedy algorithm to solve the branch
+                    // println!("{}: {}", solution.get_assignment(i).driver(), solution.drivers_to_str());
+                    results.push((j, *vertex, solution.get_assignment(i).driver(), solution.objective_value()));  // Add the result to the list
+                }
+            }
+
+            results.sort_by(|a, b| a.3.cmp(&b.3));  // sort results by objective value
+            // println!("{:?}", results);
+
+
+            // Select best beta and update solution accordingly.
+
+            let min = cmp::min(results.len(), self.beta);
+            let mut new_best = Vec::new();
+            for i in 0..min {
+                let res = results[i];
+                let mut solution = self.best_solutions[res.0].clone();
+                let vertex = res.1;
+                let driver = res.2;
+                let distance = instance.get_vertex(solution.get_last_vertex()).get_weight(vertex);
+                solution.add_assignment(vertex, driver, distance);
+                new_best.push(solution);
+            }
+            self.best_solutions = new_best;
+            results = Vec::new();   // Reset results
         }
-        results.sort_by(|a, b| a.3.cmp(&b.3));  // sort results by objective value
-        println!("{:?}", results);
 
-        // let min = cmp::min(results.len(), self.beta);
-        // for i in 0..self.beta {
-        //     self.best_solutions.push(Solution::new(Rc::clone(&instance)));
-        //     if i < results.len() {
-        //         let res = results[i];
-        //         let distance = instance.get_vertex(0).get_weight(res.1);
-        //         self.best_solutions[res.0 as usize].add_assignment(res.1, res.2, distance);
-        //     } else {    // Padding in case beta > N(0)
-        //         let res = results[0];
-        //         let distance = instance.get_vertex(0).get_weight(res.1);
-        //         self.best_solutions[res.0 as usize].add_assignment(res.1, res.2, distance);
-        //     }
-        // }
+        // Finish solution
+        let solution = &mut self.best_solutions[0];
+        let driver = solution.get_smallest_driver();
+        let distance = instance.get_vertex(solution.get_last_vertex()).get_weight(0);    // distance between the last assigned vertex and vertex 0
+        solution.add_assignment(0, driver, distance);
 
-        // for r in 1..instance.number_of_vertices() - 1 {
-        //     let mut results: Vec<(u32, u32, u32, usize)> = Vec::with_capacity(instance.number_of_vertices() - r);
-        //     self.best_solutions.push(Solution::new(Rc::clone(&instance)));
-        //     for i in 0..self.best_solutions.len() as u32 {
-        //         let solution = &self.best_solutions[i as usize];
-        //         for vertex in solution.unassigned_vertices() {
-        //             let mut candidate = solution.clone();
-        //             let solution = self.greedy.solve_from_solution(candidate, i);
-        //             results.push((0, i, solution.get_assignment(0).driver(), solution.objective_value()));
-        //             // candidate.calculate_objective_value();
-        //             // results.push((i, candidate.objective_value));
-        //         }
-        //     }
-        //     for v in 1..instance.number_of_vertices() {
-
-        //     }
-        //     results.sort_by(|a, b| a.3.cmp(&b.3));
-        //     // println!("{:?}", results);
-        //     for i in 0..self.beta {
-        //         let res = results[i];
-        //         let distance = instance.get_vertex(0).get_weight(res.1);
-        //         self.best_solutions[res.0 as usize].add_assignment(res.1, res.2, distance);
-        //     }
-        // }
-
-
-
-
-
-        // let solution = self.greedy.solve_from_solution(Solution::new(Rc::clone(&instance)), 41);
-        // println!("{}", instance.desired_travel_distance());
-        // println!("{:?}", solution.driver_distances());
-        // logger.log_result(&solution);
-        // for  in  {
-            
-        // }
-
-
-
-        // let (best_vertex, distance) = self.get_best_vertex(&instance, &mut unassigned_vertices);
-        // self.current_solution_mut().add_assignment(best_vertex, 0, distance, false);
+        // Logging
+        solution.calculate_objective_value();
+        println!("Val: {}", solution.objective_value());
+        println!("Target: {}", instance.desired_travel_distance());
+        println!("{:?}", solution.driver_distances());
+        logger.log_result(solution);
     }
 
     fn to_string(&self) -> &str {

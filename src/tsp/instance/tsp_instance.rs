@@ -23,8 +23,8 @@ impl TSPInstance {
         }
     }
 
-    pub fn get_vertex(&self, idx: usize) -> &Vertex {
-        &self.vertices[idx]
+    pub fn get_vertex(&self, idx: u32) -> &Vertex {
+        &self.vertices[idx as usize]
     }
 
     pub fn number_of_drivers(&self) -> usize {
