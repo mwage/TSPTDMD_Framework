@@ -63,6 +63,15 @@ impl Solution {
     pub fn assignments(&mut self) -> &mut Vec<Assignment> {
         &mut self.assignments
     }
+    
+    /// Calculates the change in objective value given a
+    /// delta: change in distance for driver (old - new)
+    pub fn delta_evaluation(&mut self, driver: u32, delta: isize) {  
+        let new_distance = self.driver_distances[driver as usize] as isize - delta;
+        let x = self.objective_value() as isize - delta * (-2 * self.instance().desired_travel_distance() as isize + self.driver_distances[driver as usize] as isize + new_distance as isize);
+        self.objective_value = x as usize;
+        self.driver_distances[driver as usize] = new_distance as usize;
+    }
 
     pub fn add_assignment(&mut self, vertex: u32, driver: u32, distance: usize) {
         if self.assignments.len() > self.instance.number_of_vertices() {

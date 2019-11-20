@@ -6,12 +6,13 @@ use tsp_framework::greedy;
 use tsp_framework::randomized_construction_heuristic;
 use tsp_framework::pilot;
 use tsp_framework::local_search;
+use tsp_framework::test_delta;
 
 fn main() {
     // greedy(Some("berlin52_k2_2"));
     // pilot(Some("berlin52_k2_2"), 15);
-    randomized_construction_heuristic(Some("berlin52_k2_2"), 3);
-
+    // randomized_construction_heuristic(Some("berlin52_k2_2"), 3);
+    test_delta();
     // tsp::local_search(Neighborhood::Flip, StepFunction::BestImprovement);
     // test_all_local_searches();
 }

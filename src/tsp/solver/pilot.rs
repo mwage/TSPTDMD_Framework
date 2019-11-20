@@ -40,9 +40,8 @@ impl Solver for PilotSolver {
                 }
             }
 
-            results.sort_by(|a, b| a.3.cmp(&b.3));  // sort results by objective value
+               // sort results by objective value
             // println!("{:?}", results);
-
 
             // Select best beta and update solution accordingly.
 

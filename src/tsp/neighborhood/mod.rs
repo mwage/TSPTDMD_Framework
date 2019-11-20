@@ -1,10 +1,12 @@
 mod driver_flip;
 mod driver_swap;
 mod double_edge_exchange;
+mod triple_edge_exchange;
 
 pub use driver_flip::DriverFlip;
 pub use driver_swap::DriverSwap;
 pub use double_edge_exchange::DoubleEdgeExchange;
+pub use triple_edge_exchange::TripleEdgeExchange;
 
 
 

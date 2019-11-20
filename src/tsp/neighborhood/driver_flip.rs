@@ -13,6 +13,21 @@ impl DriverFlip {
     pub fn new() -> Self {
         DriverFlip {}
     }
+
+    pub fn apply(solution: &mut Solution, assignment: usize, new_driver: u32, delta: bool) {
+        let old_driver = solution.get_assignment(assignment).driver();
+        let vertex = solution.get_assignment(assignment).vertex();
+        solution.get_assignment_mut(assignment).set_driver(new_driver);
+
+        if !delta {
+            return;
+        }
+
+        let prev_vertex = solution.get_assignment(assignment - 1).vertex();
+        let distance = solution.instance().get_vertex(prev_vertex).get_weight(vertex) as isize;
+        solution.delta_evaluation(old_driver, distance);
+        solution.delta_evaluation(new_driver, -distance);
+    }
 }
 
 impl NeighborhoodImpl for DriverFlip {
