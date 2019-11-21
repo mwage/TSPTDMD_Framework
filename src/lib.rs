@@ -8,6 +8,7 @@ use tsp::TestRunner;
 use tsp::solver::GreedySolver;
 use tsp::solver::RandomGreedySolver;
 use tsp::solver::PilotSolver;
+use tsp::solver::LocalSearch;
 use tsp::neighborhood::NeighborhoodImpl;
 use tsp::neighborhood::DoubleEdgeExchange;
 use tsp::neighborhood::DriverFlip;
@@ -34,9 +35,17 @@ pub fn randomized_construction_heuristic(instance_name: Option<&str>, candidate_
     TestRunner::solve_instance(RandomGreedySolver::new(candidate_size), instance_name)
 }
 
-pub fn local_search(neighborhood: Neighborhood, stepFunction: StepFunction) {
-    // let neighborhoodImpl = selectNeighborhood(neighborhood);
-    // let stepFunctionImpl = selectStepFunction(stepFunction);
+pub fn local_search(neighborhood: Neighborhood, step_function: StepFunction, instance_name: Option<&str>) {
+    match neighborhood {
+        Neighborhood::DriverFlip => start_local_search(DriverFlip::new(), step_function, instance_name),
+        Neighborhood::DoubleEdgeExchange => start_local_search(DoubleEdgeExchange::new(5), step_function, instance_name),
+        Neighborhood::TripleEdgeExchange => start_local_search(TripleEdgeExchange::new(5), step_function, instance_name),
+        _ => unimplemented!()
+    };
+}
+
+fn start_local_search<N> (neighborhood: N, step_function: StepFunction, instance_name: Option<&str>) where N: NeighborhoodImpl {
+    TestRunner::solve_instance(LocalSearch::new(neighborhood, step_function), instance_name);
 }
 
 pub fn grasp(neighborhood: Neighborhood, stepFunction: StepFunction) {
@@ -49,13 +58,6 @@ pub fn vnd() {
 
 pub fn metaheuristic() {
 
-}
-
-fn selectNeighborhood(neighborhood: Neighborhood) -> impl NeighborhoodImpl {
-    match neighborhood {
-        Neighborhood::DriverFlip => DriverFlip::new(),
-        _ => unimplemented!()
-    }
 }
 
 pub fn test_delta() {

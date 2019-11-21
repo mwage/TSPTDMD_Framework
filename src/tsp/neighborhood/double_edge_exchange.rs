@@ -49,10 +49,10 @@ impl DoubleEdgeExchange {
 
 impl NeighborhoodImpl for DoubleEdgeExchange {
     fn get_random_neighbor(&self, solution: &mut Solution) {
-
+        println!("GET RANDOM NEIGHBOR");
     }
     fn get_best_improving_neighbor(&self, solution: &mut Solution) {
-
+        println!("GET BEST IMPROVEMENT");
     }
 }
 

@@ -14,22 +14,18 @@ use std::fmt;
 
 use crate::tsp::Solution;
 
-#[derive(Debug, Clone)]
-pub enum Neighborhood {
-    DriverFlip
-}
-
-impl fmt::Display for Neighborhood {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:?}", self)
-    }
-}
-
 pub trait NeighborhoodImpl {
     fn get_random_neighbor(&self, solution: &mut Solution);
     fn get_best_improving_neighbor(&self, solution: &mut Solution);
 }
 
+#[derive(Debug, Clone)]
+pub enum Neighborhood {
+    DoubleEdgeExchange,
+    DriverFlip,
+    TripleEdgeExchange,
+    DriverSwap
+}
 
 #[derive(Debug, Clone)]
 pub enum StepFunction {

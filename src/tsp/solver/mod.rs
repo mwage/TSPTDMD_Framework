@@ -1,10 +1,12 @@
 mod greedy;
 mod random_greedy;
 mod pilot;
+mod local_search;
 
 pub use greedy::GreedySolver;
 pub use random_greedy::RandomGreedySolver;
 pub use pilot::PilotSolver;
+pub use local_search::LocalSearch;
 
 use crate::tsp::TSPInstance;
 use crate::tsp::io::Logger;
