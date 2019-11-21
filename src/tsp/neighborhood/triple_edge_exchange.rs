@@ -72,7 +72,11 @@ impl NeighborhoodImpl for TripleEdgeExchange {
 
     }
     fn get_best_improving_neighbor(&self, solution: &mut Solution) {
-        
+
+    }
+
+    fn to_string(&self) -> String {
+        format!("TripleEdgeExchange.{}", self.max_length)
     }
 }
 

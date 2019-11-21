@@ -32,6 +32,8 @@ impl DriverSwap {
         //     second_idx = rand::thread_rng().gen_range(0, instance.number_of_vertices());
         // }
     }
+
+
 }
 
 // impl NeighborhoodImpl for DriverSwap {

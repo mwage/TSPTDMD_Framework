@@ -46,6 +46,10 @@ impl NeighborhoodImpl for DriverFlip {
     fn get_best_improving_neighbor(&self, solution: &mut Solution) {
 
     }
+
+    fn to_string(&self) -> String {
+        String::from("DriverFlip")
+    }
 }
 
 #[test]

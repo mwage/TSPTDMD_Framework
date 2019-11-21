@@ -17,6 +17,7 @@ use crate::tsp::Solution;
 pub trait NeighborhoodImpl {
     fn get_random_neighbor(&self, solution: &mut Solution);
     fn get_best_improving_neighbor(&self, solution: &mut Solution);
+    fn to_string(&self) -> String;    // Used for logging
 }
 
 #[derive(Debug, Clone)]

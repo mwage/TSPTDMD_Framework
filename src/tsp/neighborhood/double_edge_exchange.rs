@@ -54,6 +54,9 @@ impl NeighborhoodImpl for DoubleEdgeExchange {
     fn get_best_improving_neighbor(&self, solution: &mut Solution) {
         println!("GET BEST IMPROVEMENT");
     }
+    fn to_string(&self) -> String {
+        format!("DoubleEdgeExchange.{}", self.max_length)
+    }
 }
 
 #[test]
