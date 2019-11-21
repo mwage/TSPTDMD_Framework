@@ -34,14 +34,8 @@ impl DoubleEdgeExchange {
         }
 
         let prev_vertex = solution.get_assignment((start_idx - 1) % number_of_vertices).vertex();
-        // println!("Prev: {}", prev_vertex);
-        // println!("First: {}", copy[0].vertex());
-        // println!("Old distance: {}", solution.instance().get_vertex(prev_vertex).get_weight(copy[0].vertex()));
         let old_distance = solution.instance().get_vertex(prev_vertex).get_weight(copy[0].vertex()) as isize;   // Old distance of d0 to start vertex
-        // println!("New: {}", solution.get_assignment(start_idx).vertex());
-        // println!("First: {}", copy[0].vertex());
         let new_vertex = solution.get_assignment(start_idx).vertex();
-        // println!("New distance: {}", solution.instance().get_vertex(prev_vertex).get_weight(new_vertex));
         let new_distance = solution.instance().get_vertex(prev_vertex).get_weight(new_vertex) as isize;
         solution.delta_evaluation(solution.get_assignment(start_idx).driver(), old_distance - new_distance);
 

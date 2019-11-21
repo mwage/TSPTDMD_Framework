@@ -111,7 +111,7 @@ impl Solver for GreedySolver {
         logger.log_result(&self.current_solution());    // Log results
     }
 
-    fn to_string(&self) -> &str {
-        "Greedy"
+    fn to_string(&self) -> String {
+        String::from("Greedy")
     }
 }

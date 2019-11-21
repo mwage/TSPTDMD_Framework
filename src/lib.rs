@@ -9,22 +9,18 @@ use tsp::solver::GreedySolver;
 use tsp::solver::RandomGreedySolver;
 use tsp::solver::PilotSolver;
 use tsp::neighborhood::NeighborhoodImpl;
+use tsp::neighborhood::DoubleEdgeExchange;
 use tsp::neighborhood::DriverFlip;
-use tsp::step_function::StepFunctionImpl;
-use tsp::step_function::BestImprovement;
 use tsp::neighborhood::TripleEdgeExchange;
 
 
 use tsp::Solution;
-use tsp::neighborhood::DoubleEdgeExchange;
 use tsp::TSPInstance;
 use std::rc::Rc;
-use crate::rand::Rng;
-use rand::prelude::*;
 
 // exports
 pub use tsp::neighborhood::Neighborhood;
-pub use tsp::step_function::StepFunction;
+pub use tsp::neighborhood::StepFunction;
 
 pub fn pilot(instance_name: Option<&str>, beta: usize) {
     TestRunner::solve_instance(PilotSolver::new(beta), instance_name);
@@ -62,19 +58,13 @@ fn selectNeighborhood(neighborhood: Neighborhood) -> impl NeighborhoodImpl {
     }
 }
 
-fn selectStepFunction(stepFunction: StepFunction) -> impl StepFunctionImpl {
-    match stepFunction {
-        StepFunction::BestImprovement => BestImprovement::new(),
-        _ => unimplemented!()
-    }
-}
-
 pub fn test_delta() {
     let instance = Rc::new(TSPInstance::new_random(10, 4, 200, 100)); 
     let mut solution = Solution::new_random(Rc::clone(&instance));
 
     solution.calculate_objective_value();
     println!("Before: {}", solution.objective_value());
+
 
     DoubleEdgeExchange::apply(&mut solution, 1, 2, true);
     DriverFlip::apply(&mut solution, 2, 3, true);

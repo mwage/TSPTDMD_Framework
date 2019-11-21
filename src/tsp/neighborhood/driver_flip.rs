@@ -14,12 +14,12 @@ impl DriverFlip {
         DriverFlip {}
     }
 
-    pub fn apply(solution: &mut Solution, assignment: usize, new_driver: u32, delta: bool) {
+    pub fn apply(solution: &mut Solution, assignment: usize, new_driver: u32, delta_eval: bool) {
         let old_driver = solution.get_assignment(assignment).driver();
         let vertex = solution.get_assignment(assignment).vertex();
         solution.get_assignment_mut(assignment).set_driver(new_driver);
 
-        if !delta {
+        if !delta_eval {
             return;
         }
 

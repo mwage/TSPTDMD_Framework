@@ -13,5 +13,5 @@ use std::rc::Rc;
 
 pub trait Solver {
     fn solve(&mut self, instance: Rc<TSPInstance>, logger: Logger);   // Solve TSP instance
-    fn to_string(&self) -> &str;    // Used for logging
+    fn to_string(&self) -> String;    // Used for logging
 }

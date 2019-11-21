@@ -24,7 +24,20 @@ impl fmt::Display for Neighborhood {
         write!(f, "{:?}", self)
     }
 }
-    
+
 pub trait NeighborhoodImpl {
     fn apply_neighborhood(&self, solution: &mut Solution);
+}
+
+
+#[derive(Debug, Clone)]
+pub enum StepFunction {
+    Random,
+    BestImprovement
+}
+
+impl fmt::Display for StepFunction {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
 }

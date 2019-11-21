@@ -74,7 +74,7 @@ impl Solver for PilotSolver {
         logger.log_result(solution);
     }
 
-    fn to_string(&self) -> &str {
-        "Pilot"
+    fn to_string(&self) -> String {
+        format!("Pilot.{}", self.beta)
     }
 }

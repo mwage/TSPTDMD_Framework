@@ -97,7 +97,7 @@ impl Solver for RandomGreedySolver {
         logger.log_result(&self.current_solution());    // Log results
     }
 
-    fn to_string(&self) -> &str {
-        "RandomGreedy"
+    fn to_string(&self) -> String {
+        format!("RandomGreedy.{}", self.candidate_size)
     }
 }

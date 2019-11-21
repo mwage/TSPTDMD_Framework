@@ -13,22 +13,30 @@ impl DriverSwap {
     pub fn new() -> Self {
         DriverSwap {}
     }
+
+    fn apply(&self, solution: &mut Solution, first_assignment: usize, second_assignment: usize) {
+        let instance = solution.instance();
+        let idx = rand::thread_rng().gen_range(0, instance.number_of_vertices());
+
+
+        let first_driver = solution.get_assignment(first_assignment).driver();
+        let second_driver = solution.get_assignment(second_assignment).driver();
+
+        solution.get_assignment_mut(first_assignment).set_driver(second_driver);
+        solution.get_assignment_mut(second_assignment).set_driver(first_driver);
+    }
+
+    fn get_random_idx() {
+        // let mut second_idx = idx;
+        // while second_idx == idx {
+        //     second_idx = rand::thread_rng().gen_range(0, instance.number_of_vertices());
+        // }
+    }
 }
 
 impl NeighborhoodImpl for DriverSwap {
     fn apply_neighborhood(&self, solution: &mut Solution) {
-        let instance = solution.instance();
-        let idx = rand::thread_rng().gen_range(0, instance.number_of_vertices());
-        let mut second_idx = idx;
-        while second_idx == idx {
-            second_idx = rand::thread_rng().gen_range(0, instance.number_of_vertices());
-        }
 
-        let first_driver = solution.get_assignment(idx).driver();
-        let second_driver = solution.get_assignment(second_idx).driver();
-
-        solution.get_assignment_mut(idx).set_driver(second_driver);
-        solution.get_assignment_mut(second_idx).set_driver(first_driver);
     }
 }
 

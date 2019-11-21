@@ -1,6 +1,5 @@
 pub mod solver;
 pub mod neighborhood;
-pub mod step_function;
 pub mod io;
 
 mod instance;
