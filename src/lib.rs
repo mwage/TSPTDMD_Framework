@@ -23,6 +23,10 @@ use std::rc::Rc;
 pub use tsp::neighborhood::Neighborhood;
 pub use tsp::neighborhood::StepFunction;
 
+
+static TIME_LIMIT: u128 = 1000 * 60 * 15;
+
+
 pub fn pilot(instance_name: Option<&str>, beta: usize) {
     TestRunner::solve_instance(PilotSolver::new(beta), instance_name);
 }

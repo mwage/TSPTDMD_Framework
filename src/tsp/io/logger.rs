@@ -49,6 +49,7 @@ impl Logger {
         result_strings.push(solution.drivers_to_str());
         result_strings.push(format!("val: {}", solution.objective_value()));
         result_strings.push(format!("{}ms", self.get_elapsed()));
+        result_strings.push(format!("TODO: VALID"));
         self.to_file(result_strings).expect("Failed to log to file.");
     }
 

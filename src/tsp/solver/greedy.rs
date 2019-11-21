@@ -73,21 +73,25 @@ impl GreedySolver {
         self.instance = Some(Rc::clone(instance));  // Initialize tsp instance
     }
 
-    pub fn solve_from_solution(&mut self, base_solution: Solution, next_vertex: u32) -> &Solution {
+    pub fn solve_from_solution(&mut self, base_solution: Solution, next_vertex: u32, logger: &Logger) -> &Solution {
         self.current_solution = Some(base_solution);    // Initialize solution to the given one
         let next_driver = self.current_solution().get_smallest_driver();    // Find best driver
         let distance = self.instance().get_vertex(self.current_solution().get_last_vertex()).get_weight(next_vertex);  // Get distance between last vertex and chosen next vertex
         self.current_solution_mut().add_assignment(next_vertex, next_driver, distance); // Add the chosen vertex with the assigned driver to the solution
-        self.solve_greedy();    // Solve the instance
+        self.solve_greedy(logger);    // Solve the instance
         self.current_solution_mut().calculate_objective_value();    // Calculate the objective value of the solution
         self.current_solution() // return the solution
     }
 
-    fn solve_greedy(&mut self) {
+    fn solve_greedy(&mut self, logger: &Logger) {
         while !self.current_solution().is_complete() {  // Loop until only the home trip is left
             let next_driver = self.current_solution().get_smallest_driver();    // Find best driver
             let (best_vertex, distance) = self.get_best_vertex();   // Find next best vertex
             self.current_solution_mut().add_assignment(best_vertex, next_driver, distance); // Add new vertex to the solution
+
+            if logger.get_elapsed() >= crate::TIME_LIMIT {
+                return;
+            }
         }
         let next_driver = self.current_solution().get_smallest_driver();    // Find best driver
         let distance = self.instance().get_vertex(self.current_solution().get_last_vertex()).get_weight(0);    // distance between the last assigned vertex and vertex 0
@@ -96,11 +100,11 @@ impl GreedySolver {
 }
 
 impl Solver for GreedySolver {
-    fn solve(&mut self, instance: Rc<TSPInstance>, logger: Logger) {        
+    fn solve(&mut self, instance: Rc<TSPInstance>, logger: Logger) {
         self.instance = Some(Rc::clone(&instance)); // Initialize TSP instance
         self.current_solution = Some(Solution::new(Rc::clone(&instance)));  // Initialize solution
 
-        self.solve_greedy();    // Solve the remaining problem
+        self.solve_greedy(&logger);    // Solve the remaining problem
 
         // Logging
         self.current_solution_mut().calculate_objective_value();    // Calculate the objective value of the solution
