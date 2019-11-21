@@ -68,9 +68,11 @@ impl TripleEdgeExchange {
 }
 
 impl NeighborhoodImpl for TripleEdgeExchange {
-    fn apply_neighborhood(&self, solution: &mut Solution) {
-        let instance = solution.instance();
+    fn get_random_neighbor(&self, solution: &mut Solution) {
 
+    }
+    fn get_best_improving_neighbor(&self, solution: &mut Solution) {
+        
     }
 }
 

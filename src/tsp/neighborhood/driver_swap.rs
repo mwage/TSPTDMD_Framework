@@ -14,7 +14,7 @@ impl DriverSwap {
         DriverSwap {}
     }
 
-    fn apply(&self, solution: &mut Solution, first_assignment: usize, second_assignment: usize) {
+    fn apply(solution: &mut Solution, first_assignment: usize, second_assignment: usize, delta_eval: bool) {
         let instance = solution.instance();
         let idx = rand::thread_rng().gen_range(0, instance.number_of_vertices());
 
@@ -34,11 +34,9 @@ impl DriverSwap {
     }
 }
 
-impl NeighborhoodImpl for DriverSwap {
-    fn apply_neighborhood(&self, solution: &mut Solution) {
+// impl NeighborhoodImpl for DriverSwap {
 
-    }
-}
+// }
 
 #[test]
 fn test_driver_swap() {
@@ -49,7 +47,7 @@ fn test_driver_swap() {
     assert_eq!(solution.assignments().len(), 2);
     assert_eq!(solution.get_assignment(0).driver(), 0);
     assert_eq!(solution.get_assignment(1).driver(), 1);
-    DriverSwap::new().apply_neighborhood(&mut solution);
+    DriverSwap::apply(&mut solution, 0, 1, false);
     assert_eq!(solution.get_assignment(0).driver(), 1);
     assert_eq!(solution.get_assignment(1).driver(), 0);
 }

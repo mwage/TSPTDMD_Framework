@@ -26,7 +26,8 @@ impl fmt::Display for Neighborhood {
 }
 
 pub trait NeighborhoodImpl {
-    fn apply_neighborhood(&self, solution: &mut Solution);
+    fn get_random_neighbor(&self, solution: &mut Solution);
+    fn get_best_improving_neighbor(&self, solution: &mut Solution);
 }
 
 

@@ -10,7 +10,7 @@ use tsp_framework::test_delta;
 
 fn main() {
     // greedy(Some("berlin52_k2_2"));
-    pilot(Some("berlin52_k2_2"), 3);
+    pilot(Some("berlin52_k2_2"), 12);
     // randomized_construction_heuristic(Some("berlin52_k2_2"), 3);
     // test_delta();
     // tsp::local_search(Neighborhood::Flip, StepFunction::BestImprovement);

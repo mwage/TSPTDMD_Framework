@@ -35,16 +35,14 @@ impl Solver for PilotSolver {
                 let solution = &self.best_solutions[j];
                 for vertex in solution.unassigned_vertices() {  // Loop over all neighbors
                     let solution = self.greedy.solve_from_solution(solution.clone(), *vertex); // Use greedy algorithm to solve the branch
-                    // println!("{}: {}", solution.get_assignment(i).driver(), solution.drivers_to_str());
                     results.push((j, *vertex, solution.get_assignment(i).driver(), solution.objective_value()));  // Add the result to the list
                 }
             }
 
-               // sort results by objective value
-            // println!("{:?}", results);
+            // sort results by objective value
+            results.sort_by(|a, b| a.3.cmp(&b.3));  // sort results by objective value
 
             // Select best beta and update solution accordingly.
-
             let min = cmp::min(results.len(), self.beta);
             let mut new_best = Vec::new();
             for i in 0..min {
