@@ -1,5 +1,6 @@
 use std::rc::Rc;
 use std::cmp;
+use rand::prelude::*;
 
 use crate::tsp::TSPInstance;
 use super::Assignment;
@@ -22,6 +23,22 @@ impl Solution {
             instance,
             objective_value: usize::max_value()
         }
+    }
+
+    pub fn new_random(instance: Rc<TSPInstance>) -> Self {
+        let mut rng = rand::thread_rng();
+        let mut vertices: Vec<u32> = (1..instance.number_of_vertices() as u32).collect();
+        let mut solution = Solution::new(instance);
+        vertices.shuffle(&mut rng);
+        for vertex in vertices.iter() {
+            let driver = rand::thread_rng().gen_range(0, solution.instance().number_of_drivers() as u32);
+            let last_vertex = solution.get_last_vertex();
+            solution.add_assignment(*vertex, driver, solution.instance().get_vertex(*vertex).get_weight(last_vertex));
+        }
+        let driver = rand::thread_rng().gen_range(0, solution.instance().number_of_drivers() as u32);
+        let last_vertex = solution.get_last_vertex();
+        solution.add_assignment(0, driver, solution.instance().get_vertex(0).get_weight(last_vertex));
+        solution
     }
 
     pub fn unassigned_vertices(&self) -> &Vec<u32> {

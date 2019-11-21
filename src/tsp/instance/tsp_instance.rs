@@ -1,4 +1,6 @@
+use crate::rand::Rng;
 use super::Vertex;
+
 
 #[derive(Debug)]
 pub struct TSPInstance {
@@ -21,6 +23,18 @@ impl TSPInstance {
             desired_travel_distance,
             vertices
         }
+    }
+
+    pub fn new_random(number_of_vertices: usize, number_of_drivers: usize, desired_travel_distance: usize, max_distance : usize) -> Self {
+        let mut instance = TSPInstance::new(number_of_vertices, number_of_drivers, desired_travel_distance);
+
+        for i in 0..number_of_vertices as u32 {
+            for j in i..number_of_vertices as u32 {
+                instance.add_edge(i, j, rand::thread_rng().gen_range(0, max_distance));
+            }
+        }
+
+        instance
     }
 
     pub fn get_vertex(&self, idx: u32) -> &Vertex {
