@@ -20,12 +20,12 @@ impl<N> LocalSearch<N> where N: NeighborhoodImpl {
         }
     }
 
-    fn get_neighbor(&self, solution: &mut Solution) {
-        match self.step_function {
-            StepFunction::Random => self.neighborhood.get_random_neighbor(solution),
-            StepFunction::BestImprovement => self.neighborhood.get_best_improving_neighbor(solution),
-            _ => unimplemented!()
-        }
+    pub fn neighborhood_to_string(&self) -> String {
+        format!("{}.{}", self.step_function, self.neighborhood_to_string())
+    }
+
+    fn get_neighbor(&mut self, solution: &mut Solution) {
+        self.neighborhood.get_neighbor(solution, &self.step_function);
     }
 }
 
@@ -36,6 +36,6 @@ impl<N> Solver for LocalSearch<N> where N: NeighborhoodImpl {
     }
 
     fn to_string(&self) -> String {
-        format!("LocalSearch.{}.{}", self.step_function, self.neighborhood.to_string())
+        format!("LocalSearch.{}", self.neighborhood_to_string())
     }
 }

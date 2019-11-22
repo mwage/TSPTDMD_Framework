@@ -1,10 +1,12 @@
+mod grasp;
 mod greedy;
-mod pilot;
 mod local_search;
+mod pilot;
 
 pub use greedy::GreedySolver;
-pub use pilot::PilotSolver;
+pub use grasp::Grasp;
 pub use local_search::LocalSearch;
+pub use pilot::PilotSolver;
 
 use crate::tsp::TSPInstance;
 use crate::tsp::io::Logger;

@@ -22,7 +22,11 @@ impl GreedySolver {
             instance: None
         }
     }
-
+    
+    pub fn candidate_size(&self) -> usize {
+        self.candidate_size
+    }
+    
     pub fn current_solution(&self) -> &Solution {
         if let Some(solution) = &self.current_solution {
             solution
@@ -46,6 +50,7 @@ impl GreedySolver {
             panic!("Tried accessing uninitialized solution.");
         }
     }
+
 
     fn calculate_target_distance(&self) -> usize {
         let mut available_capacity = 0;
@@ -132,6 +137,6 @@ impl Solver for GreedySolver {
     }
 
     fn to_string(&self) -> String {
-        format!("RandomGreedy.{}", self.candidate_size)
+        format!("Greedy.{}", self.candidate_size)
     }
 }

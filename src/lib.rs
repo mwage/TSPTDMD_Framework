@@ -8,12 +8,13 @@ use tsp::TestRunner;
 use tsp::solver::GreedySolver;
 use tsp::solver::PilotSolver;
 use tsp::solver::LocalSearch;
+use tsp::solver::Grasp;
 use tsp::neighborhood::NeighborhoodImpl;
 use tsp::neighborhood::DoubleEdgeExchange;
 use tsp::neighborhood::DriverFlip;
 use tsp::neighborhood::TripleEdgeExchange;
 
-
+// TODO: Kill
 use tsp::Solution;
 use tsp::TSPInstance;
 use std::rc::Rc;
@@ -47,9 +48,20 @@ fn start_local_search<N> (neighborhood: N, step_function: StepFunction, instance
     TestRunner::solve_instance(LocalSearch::new(neighborhood, step_function), instance_name);
 }
 
-pub fn grasp(neighborhood: Neighborhood, stepFunction: StepFunction) {
-
+pub fn grasp(candidate_size: usize, neighborhood: Neighborhood, step_function: StepFunction, instance_name: Option<&str>) {
+    match neighborhood {
+        Neighborhood::DriverFlip => start_grasp(DriverFlip::new(), step_function, candidate_size, instance_name),
+        Neighborhood::DoubleEdgeExchange(x) => start_grasp(DoubleEdgeExchange::new(x), step_function, candidate_size, instance_name),
+        Neighborhood::TripleEdgeExchange(x) => start_grasp(TripleEdgeExchange::new(x), step_function, candidate_size, instance_name),
+        _ => unimplemented!()
+    };
 }
+
+fn start_grasp<N> (neighborhood: N, step_function: StepFunction, candidate_size: usize, instance_name: Option<&str>) where N: NeighborhoodImpl {
+    TestRunner::solve_instance(Grasp::new(neighborhood, step_function, candidate_size), instance_name);
+}
+
+
 
 pub fn vnd() {
 
@@ -59,6 +71,7 @@ pub fn metaheuristic() {
 
 }
 
+// TODO: Kill
 pub fn test_delta() {
     let instance = Rc::new(TSPInstance::new_random(10, 4, 200, 100)); 
     let mut solution = Solution::new_random(Rc::clone(&instance));
