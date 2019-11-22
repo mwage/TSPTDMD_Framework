@@ -19,7 +19,7 @@ impl PilotSolver {
         PilotSolver {
             beta,
             best_solutions: Vec::with_capacity(beta),
-            greedy: GreedySolver::new()
+            greedy: GreedySolver::new(1)
         }
     }
 }

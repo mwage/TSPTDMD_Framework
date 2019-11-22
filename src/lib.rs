@@ -6,7 +6,6 @@ mod tsp;
 
 use tsp::TestRunner;
 use tsp::solver::GreedySolver;
-use tsp::solver::RandomGreedySolver;
 use tsp::solver::PilotSolver;
 use tsp::solver::LocalSearch;
 use tsp::neighborhood::NeighborhoodImpl;
@@ -31,12 +30,8 @@ pub fn pilot(instance_name: Option<&str>, beta: usize) {
     TestRunner::solve_instance(PilotSolver::new(beta), instance_name);
 }
 
-pub fn greedy(instance_name: Option<&str>) {
-    TestRunner::solve_instance(GreedySolver::new(), instance_name);
-}
-
-pub fn random_greedy(instance_name: Option<&str>, candidate_size: usize) {
-    TestRunner::solve_instance(RandomGreedySolver::new(candidate_size), instance_name)
+pub fn greedy(instance_name: Option<&str>, candidate_size: usize) {
+    TestRunner::solve_instance(GreedySolver::new(candidate_size), instance_name);
 }
 
 pub fn local_search(neighborhood: Neighborhood, step_function: StepFunction, instance_name: Option<&str>) {

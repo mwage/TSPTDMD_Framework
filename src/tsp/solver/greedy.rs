@@ -1,19 +1,23 @@
-use super::Solver;
+use std::rc::Rc;
+use std::cmp;
 
 use crate::tsp::io::Logger;
 use crate::tsp::TSPInstance;
 use crate::tsp::Solution;
+use crate::rand::Rng;
+use super::Solver;
 
-use std::rc::Rc;
 
 pub struct GreedySolver {
+    candidate_size: usize,
     current_solution: Option<Solution>,
     instance: Option<Rc<TSPInstance>>
 }
 
 impl GreedySolver {
-    pub fn new() -> GreedySolver {
+    pub fn new(candidate_size: usize) -> GreedySolver {
         GreedySolver {
+            candidate_size,
             current_solution: None,
             instance: None
         }
@@ -68,6 +72,18 @@ impl GreedySolver {
 
         (best_vertex, self.instance().get_vertex(last_vertex).get_weight(best_vertex))
     }
+    
+    fn get_random_best_vertex(&self) -> (u32, usize) {
+        let mut differences = Vec::new();
+        let target_distance = self.calculate_target_distance(); // Total available capacity / unvisited vertices
+        let last_vertex = self.current_solution().get_last_vertex();
+        for i in self.current_solution().unassigned_vertices() {   // Find vertex closest to the target distance
+            differences.push((i, (self.instance().get_vertex(last_vertex).get_weight(*i) as isize - target_distance as isize).abs() as usize)); 
+        }
+        differences.sort_by(|a, b| a.1.cmp(&b.1));
+        let vertex = *differences[rand::thread_rng().gen_range(0, cmp::min(differences.len(), self.candidate_size))].0;
+        (vertex, self.instance().get_vertex(last_vertex).get_weight(vertex))
+    }
 
     pub fn set_instance(&mut self, instance: &Rc<TSPInstance>) {
         self.instance = Some(Rc::clone(instance));  // Initialize tsp instance
@@ -86,7 +102,7 @@ impl GreedySolver {
     fn solve_greedy(&mut self, logger: &Logger) {
         while !self.current_solution().is_complete() {  // Loop until only the home trip is left
             let next_driver = self.current_solution().get_smallest_driver();    // Find best driver
-            let (best_vertex, distance) = self.get_best_vertex();   // Find next best vertex
+            let (best_vertex, distance) = if self.candidate_size > 1 { self.get_random_best_vertex() } else { self.get_best_vertex() };   // Find next best vertex
             self.current_solution_mut().add_assignment(best_vertex, next_driver, distance); // Add new vertex to the solution
 
             if logger.get_elapsed() >= crate::TIME_LIMIT {
@@ -100,7 +116,7 @@ impl GreedySolver {
 }
 
 impl Solver for GreedySolver {
-    fn solve(&mut self, instance: Rc<TSPInstance>, logger: Logger) {
+    fn solve(&mut self, instance: Rc<TSPInstance>, logger: Logger) {        
         self.instance = Some(Rc::clone(&instance)); // Initialize TSP instance
         self.current_solution = Some(Solution::new(Rc::clone(&instance)));  // Initialize solution
 
@@ -116,6 +132,6 @@ impl Solver for GreedySolver {
     }
 
     fn to_string(&self) -> String {
-        String::from("Greedy")
+        format!("RandomGreedy.{}", self.candidate_size)
     }
 }
