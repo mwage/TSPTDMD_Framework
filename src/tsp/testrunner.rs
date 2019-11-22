@@ -21,7 +21,13 @@ impl TestRunner {
         let paths = fs::read_dir("instances").unwrap(); // Get all file paths in the instances folder
         for path in paths {
             let path_buff = path.unwrap().path();   // Get path
-            let instance_name = path_buff.to_str().unwrap().split('\\').last().unwrap().split('.').next().unwrap();    // Get instance name from path
+            let instance_name = path_buff.to_str().unwrap(); // Get instance name from path            
+            let separator = if instance_name.contains("\\") {
+                '\\'
+            } else {
+                '/'
+            };
+            let instance_name = instance_name.split(separator).last().unwrap().split('.').next().unwrap();
             TestRunner::run_instance(&mut solver, instance_name);   // Solve the given instance
         }
     }

@@ -25,7 +25,7 @@ fn main() {
 
 fn all_from_env() {
     let args: Vec<String> = env::args().collect();
-    assert!(args.len() > 2);
+    assert!(args.len() >= 2);
     match &args[1][..] {
         "greedy" => greedy(None),
         "random_greedy" => random_greedy(None, args[2].parse::<usize>().unwrap()),
