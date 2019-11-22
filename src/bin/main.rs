@@ -11,7 +11,7 @@ use tsp_framework::test_delta;
 fn main() {
     // greedy(Some("3000_k2"));
     // pilot(Some("berlin52_k2_2"), 15);
-    pilot(Some("3000_k2"), 1);
+    pilot(Some("0010_k1"), 100);
     // randomized_construction_heuristic(Some("berlin52_k2_2"), 3);
     // test_delta();
     // local_search(Neighborhood::DoubleEdgeExchange, StepFunction::BestImprovement, Some("berlin52_k2_2"));

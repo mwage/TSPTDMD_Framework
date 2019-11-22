@@ -7,7 +7,8 @@ pub struct TSPInstance {
     number_of_vertices: usize,
     number_of_drivers: usize, 
     desired_travel_distance: usize,
-    vertices: Vec<Vertex>
+    vertices: Vec<Vertex>,
+    invalid_weight: Option<usize>
 }
 
 impl TSPInstance {
@@ -21,7 +22,8 @@ impl TSPInstance {
             number_of_vertices,
             number_of_drivers,
             desired_travel_distance,
-            vertices
+            vertices,
+            invalid_weight: None
         }
     }
 
@@ -53,12 +55,24 @@ impl TSPInstance {
         self.desired_travel_distance
     }
 
+    pub fn has_only_feasible_edges(&self) -> bool {
+        self.invalid_weight == None
+    }
+
+    pub fn is_valid(&self, first_vertex: u32, second_vertex: u32) -> bool {
+        match self.invalid_weight {
+            Some(x) => self.get_vertex(first_vertex).get_weight(second_vertex) != x,
+            None => true
+        }        
+    }
+
     pub fn add_edge(&mut self, first: u32, second: u32, weight: usize) {
         self.vertices[first as usize].add_edge(second, weight);
         self.vertices[second as usize].add_edge(first, weight);
     }
 
     pub fn complete_graph(&mut self, m: usize) {
+        self.invalid_weight = Some(m);
         for i in 0..self.number_of_vertices {
             for j in 0..self.number_of_vertices {
                 if i == j {
@@ -67,13 +81,5 @@ impl TSPInstance {
                 self.vertices[i].add_edge(j as u32, m);
             }
         }
-    }
-
-    pub fn new_test_instance() -> Self {
-        let mut instance = TSPInstance::new(3, 2, 5);
-        instance.add_edge(0, 1, 2);
-        instance.add_edge(1, 2, 2);
-        instance.add_edge(2, 0, 1);
-        instance
     }
 }

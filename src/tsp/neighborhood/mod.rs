@@ -22,9 +22,9 @@ pub trait NeighborhoodImpl {
 
 #[derive(Debug, Clone)]
 pub enum Neighborhood {
-    DoubleEdgeExchange,
+    DoubleEdgeExchange(usize),
     DriverFlip,
-    TripleEdgeExchange,
+    TripleEdgeExchange(usize),
     DriverSwap
 }
 

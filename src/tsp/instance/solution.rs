@@ -128,6 +128,31 @@ impl Solution {
         self.objective_value = self.driver_distances.iter().map(|x| (self.instance.desired_travel_distance() as isize - *x as isize).pow(2) as usize).collect::<Vec<usize>>().iter().sum();
     }
 
+    
+    pub fn is_feasible(&self) -> String {
+        if self.assignments.len() < self.instance.number_of_vertices() {
+            return String::from("INFEASIBLE");
+        }
+
+        if self.instance.has_only_feasible_edges() {
+            return String::from("FEASIBLE")
+        }
+
+        let mut feasible = true;
+        for i in 0..self.assignments.len() {
+            let first_vertex = if i == 0 { 0 } else { self.assignments[i-1].vertex() };
+            let second_vertex = self.assignments[i].vertex();
+            if !self.instance.is_valid(first_vertex, second_vertex) {
+                feasible = false;
+            }
+        }
+        if feasible {
+            String::from("FEASIBLE")
+        } else {
+            String::from("INFEASIBLE")
+        }
+    }
+
     pub fn vertices_to_str(&self) -> String {
         let mut result = String::from("0");
         let min = cmp::min(self.instance.number_of_vertices() - 1, self.number_of_assignments());
@@ -148,7 +173,6 @@ impl Solution {
         result
     }
 
-
     pub fn print_assignments(&self) {
         println!("{:?}", self.assignments);
     }
@@ -156,7 +180,11 @@ impl Solution {
 
 #[test]
 fn test_obj_function() {
-    let instance = TSPInstance::new_test_instance();
+    let mut instance = TSPInstance::new(3, 2, 5);
+    instance.add_edge(0, 1, 2);
+    instance.add_edge(1, 2, 2);
+    instance.add_edge(2, 0, 1);
+
     let mut solution = Solution::new(Rc::new(instance));
     solution.calculate_objective_value();
     assert_eq!(solution.objective_value, 50);

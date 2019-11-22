@@ -42,8 +42,8 @@ pub fn randomized_construction_heuristic(instance_name: Option<&str>, candidate_
 pub fn local_search(neighborhood: Neighborhood, step_function: StepFunction, instance_name: Option<&str>) {
     match neighborhood {
         Neighborhood::DriverFlip => start_local_search(DriverFlip::new(), step_function, instance_name),
-        Neighborhood::DoubleEdgeExchange => start_local_search(DoubleEdgeExchange::new(5), step_function, instance_name),
-        Neighborhood::TripleEdgeExchange => start_local_search(TripleEdgeExchange::new(5), step_function, instance_name),
+        Neighborhood::DoubleEdgeExchange(x) => start_local_search(DoubleEdgeExchange::new(x), step_function, instance_name),
+        Neighborhood::TripleEdgeExchange(x) => start_local_search(TripleEdgeExchange::new(x), step_function, instance_name),
         _ => unimplemented!()
     };
 }
