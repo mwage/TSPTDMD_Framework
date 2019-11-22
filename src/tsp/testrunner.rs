@@ -9,15 +9,15 @@ pub struct TestRunner {
 }
 
 impl TestRunner {
-    pub fn solve_instance<T: Solver>(mut solver: T, instance_name: Option<&str>) {
+    pub fn solve_instance<T: Solver>(mut solver: T, instance_name: Option<&str>, runs: usize) {
         if let Some(instance) = instance_name {
-            TestRunner::run_instance(&mut solver, instance)  // Solve a given instance
+            TestRunner::run_instance(&mut solver, instance, runs)  // Solve a given instance
         } else {
-            TestRunner::run_all_instances(solver); // Solve all instances
+            TestRunner::run_all_instances(solver, runs); // Solve all instances
         }
     }
 
-    fn run_all_instances<T: Solver>(mut solver: T) {
+    fn run_all_instances<T: Solver>(mut solver: T, runs: usize) {
         let paths = fs::read_dir("instances").unwrap(); // Get all file paths in the instances folder
         for path in paths {
             let path_buff = path.unwrap().path();   // Get path
@@ -28,21 +28,23 @@ impl TestRunner {
                 '/'
             };
             let instance_name = instance_name.split(separator).last().unwrap().split('.').next().unwrap();
-            TestRunner::run_instance(&mut solver, instance_name);   // Solve the given instance
+            TestRunner::run_instance(&mut solver, instance_name, runs);   // Solve the given instance
         }
     }
 
-    fn run_instance<T: Solver>(solver: &mut T, instance_name: &str) {
-        let logger = Logger::new(solver, instance_name);    // Initialize logger, starts the timer
-        let instance = match InstanceParser::get_instance(instance_name) // Parse the instance from file
-        {
-            Ok(x) => x,
-            Err(_) => {
-                println!("Skipping {}.txt: Failed to read instance.", instance_name);
-                return;
-            },
-        };
-        println!("Solve instance: {}", instance_name);
-        solver.solve(Rc::new(instance), logger);   // Solve TSP instance with selected solver    
+    fn run_instance<T: Solver>(solver: &mut T, instance_name: &str, runs: usize) {
+        for _ in 0..runs {
+            let logger = Logger::new(solver, instance_name);    // Initialize logger, starts the timer
+            let instance = match InstanceParser::get_instance(instance_name) // Parse the instance from file
+            {
+                Ok(x) => x,
+                Err(_) => {
+                    println!("Skipping {}.txt: Failed to read instance.", instance_name);
+                    return;
+                },
+            };
+            println!("Solve instance: {}", instance_name);
+            solver.solve(Rc::new(instance), logger);   // Solve TSP instance with selected solver    
+        }
     }
 }

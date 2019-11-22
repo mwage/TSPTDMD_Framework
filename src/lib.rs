@@ -28,38 +28,38 @@ pub use tsp::neighborhood::StepFunction;
 static TIME_LIMIT: u128 = 1000 * 60 * 15;
 
 
-pub fn pilot(instance_name: Option<&str>, beta: usize) {
-    TestRunner::solve_instance(PilotSolver::new(beta), instance_name);
+pub fn pilot(instance_name: Option<&str>, beta: usize, runs: usize) {
+    TestRunner::solve_instance(PilotSolver::new(beta), instance_name, runs);
 }
 
-pub fn greedy(instance_name: Option<&str>, candidate_size: usize) {
-    TestRunner::solve_instance(GreedySolver::new(candidate_size), instance_name);
+pub fn greedy(instance_name: Option<&str>, candidate_size: usize, runs: usize) {
+    TestRunner::solve_instance(GreedySolver::new(candidate_size), instance_name, runs);
 }
 
-pub fn local_search(instance_name: Option<&str>, neighborhood: Neighborhood, step_function: StepFunction) {
+pub fn local_search(instance_name: Option<&str>, neighborhood: Neighborhood, step_function: StepFunction, runs: usize) {
     match neighborhood {
-        Neighborhood::DriverFlip => start_local_search(DriverFlip::new(), step_function, instance_name),
-        Neighborhood::DoubleEdgeExchange(x) => start_local_search(DoubleEdgeExchange::new(x), step_function, instance_name),
-        Neighborhood::TripleEdgeExchange(x) => start_local_search(TripleEdgeExchange::new(x), step_function, instance_name),
+        Neighborhood::DriverFlip => start_local_search(DriverFlip::new(), step_function, instance_name, runs),
+        Neighborhood::DoubleEdgeExchange(x) => start_local_search(DoubleEdgeExchange::new(x), step_function, instance_name, runs),
+        Neighborhood::TripleEdgeExchange(x) => start_local_search(TripleEdgeExchange::new(x), step_function, instance_name, runs),
         _ => unimplemented!()
     };
 }
 
-fn start_local_search<N> (neighborhood: N, step_function: StepFunction, instance_name: Option<&str>) where N: NeighborhoodImpl {
-    TestRunner::solve_instance(LocalSearch::new(neighborhood, step_function), instance_name);
+fn start_local_search<N> (neighborhood: N, step_function: StepFunction, instance_name: Option<&str>, runs: usize) where N: NeighborhoodImpl {
+    TestRunner::solve_instance(LocalSearch::new(neighborhood, step_function), instance_name, runs);
 }
 
-pub fn grasp(instance_name: Option<&str>, candidate_size: usize, neighborhood: Neighborhood, step_function: StepFunction) {
+pub fn grasp(instance_name: Option<&str>, candidate_size: usize, neighborhood: Neighborhood, step_function: StepFunction, runs: usize) {
     match neighborhood {
-        Neighborhood::DriverFlip => start_grasp(DriverFlip::new(), step_function, candidate_size, instance_name),
-        Neighborhood::DoubleEdgeExchange(x) => start_grasp(DoubleEdgeExchange::new(x), step_function, candidate_size, instance_name),
-        Neighborhood::TripleEdgeExchange(x) => start_grasp(TripleEdgeExchange::new(x), step_function, candidate_size, instance_name),
+        Neighborhood::DriverFlip => start_grasp(DriverFlip::new(), step_function, candidate_size, instance_name, runs),
+        Neighborhood::DoubleEdgeExchange(x) => start_grasp(DoubleEdgeExchange::new(x), step_function, candidate_size, instance_name, runs),
+        Neighborhood::TripleEdgeExchange(x) => start_grasp(TripleEdgeExchange::new(x), step_function, candidate_size, instance_name, runs),
         _ => unimplemented!()
     };
 }
 
-fn start_grasp<N> (neighborhood: N, step_function: StepFunction, candidate_size: usize, instance_name: Option<&str>) where N: NeighborhoodImpl {
-    TestRunner::solve_instance(Grasp::new(neighborhood, step_function, candidate_size), instance_name);
+fn start_grasp<N> (neighborhood: N, step_function: StepFunction, candidate_size: usize, instance_name: Option<&str>, runs: usize) where N: NeighborhoodImpl {
+    TestRunner::solve_instance(Grasp::new(neighborhood, step_function, candidate_size), instance_name, runs);
 }
 
 
@@ -68,8 +68,8 @@ pub fn vnd() {
 
 }
 
-pub fn simulated_annealing(instance_name: Option<&str>, neighborhoods: Vec<Neighborhood>, step_functions: Vec<StepFunction>) {
-    TestRunner::solve_instance(SimulatedAnnealing::new(neighborhoods.iter().map(|x| get_neighborhood_impl(x)).collect(), step_functions), instance_name);
+pub fn simulated_annealing(instance_name: Option<&str>, neighborhoods: Vec<Neighborhood>, step_functions: Vec<StepFunction>, runs: usize) {
+    TestRunner::solve_instance(SimulatedAnnealing::new(neighborhoods.iter().map(|x| get_neighborhood_impl(x)).collect(), step_functions), instance_name, runs);
 }
 
 fn get_neighborhood_impl(neighborhood: &Neighborhood) -> Box<dyn NeighborhoodImpl> {

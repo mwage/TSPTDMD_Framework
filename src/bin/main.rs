@@ -11,8 +11,8 @@ use tsp_framework::test_delta;
 
 
 fn main() {
-    // all_from_env();
-    greedy(Some("berlin52_k2_2"), 3);
+    all_from_env();
+    // greedy(Some("berlin52_k2_2"), 3, 1);
     // pilot(Some("berlin52_k2_2"), 15);
     // pilot(Some("0010_k1"), 100);
     // greedy(Some("berlin52_k2_2"), 3);
@@ -21,12 +21,12 @@ fn main() {
     // test_all_local_searches();
 }
 
-fn all_from_env() {
+fn all_from_env( ) {
     let args: Vec<String> = env::args().collect();
     assert!(args.len() >= 3);
     match &args[1][..] {
-        "greedy" => greedy(None, args[2].parse::<usize>().unwrap()),
-        "pilot" => pilot(None, args[2].parse::<usize>().unwrap()),
+        "greedy" => greedy(None, args[2].parse::<usize>().unwrap(), 1),
+        "pilot" => pilot(None, args[2].parse::<usize>().unwrap(), 1),
         _ => unimplemented!()
     };
 }
@@ -36,7 +36,7 @@ fn test_all_local_searches(instance: Option<&str>) {
     let step_functions = vec![StepFunction::BestImprovement];
     for neighborhood in neighborhoods.iter() {
         for stepfunction in step_functions.iter() {
-            local_search(neighborhood.to_owned(), stepfunction.to_owned(), instance);
+            local_search(instance, neighborhood.to_owned(), stepfunction.to_owned(), 1);
         }
     }
 }
