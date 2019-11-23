@@ -14,7 +14,7 @@ impl DriverFlip {
         DriverFlip {}
     }
 
-    pub fn apply(solution: &mut Solution, assignment: usize, new_driver: u32, delta_eval: bool) {
+    fn apply(solution: &mut Solution, assignment: usize, new_driver: u32, delta_eval: bool) {
         let old_driver = solution.get_assignment(assignment).driver();
         let vertex = solution.get_assignment(assignment).vertex();
         solution.get_assignment_mut(assignment).set_driver(new_driver);
@@ -31,8 +31,7 @@ impl DriverFlip {
 }
 
 impl NeighborhoodImpl for DriverFlip {
-    fn get_random_neighbor(&self, solution: &mut Solution) {
-        // TODO: Check + fix
+    fn get_random_neighbor(&self, solution: &mut Solution, delta_eval: bool) {
         let instance = solution.instance();
         let idx = rand::thread_rng().gen_range(0, instance.number_of_vertices());
         let old_driver = solution.get_assignment(idx).driver();
@@ -40,10 +39,10 @@ impl NeighborhoodImpl for DriverFlip {
         while new_driver == old_driver {
             new_driver = rand::thread_rng().gen_range(0, instance.number_of_drivers()) as u32;
         }
-        solution.get_assignment_mut(idx).set_driver(new_driver);
+        DriverFlip::apply(solution, idx, new_driver, delta_eval);
     }
 
-    fn get_best_improving_neighbor(&self, solution: &mut Solution) {
+    fn get_best_improving_neighbor(&self, solution: &mut Solution, delta_eval: bool) {
 
     }
 

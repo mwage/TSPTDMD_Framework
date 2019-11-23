@@ -3,6 +3,7 @@ use std::rc::Rc;
 use super::NeighborhoodImpl;
 use crate::tsp::Solution;
 use crate::tsp::TSPInstance;
+use crate::rand::Rng;
 
 pub struct DoubleEdgeExchange {
     max_length: usize
@@ -48,10 +49,13 @@ impl DoubleEdgeExchange {
 }
 
 impl NeighborhoodImpl for DoubleEdgeExchange {
-    fn get_random_neighbor(&self, solution: &mut Solution) {
-        println!("GET RANDOM NEIGHBOR");
+    fn get_random_neighbor(&self, solution: &mut Solution, delta_eval: bool) {
+        let start = rand::thread_rng().gen_range(0, solution.instance().number_of_vertices());
+        let length = rand::thread_rng().gen_range(1, self.max_length + 1);
+        DoubleEdgeExchange::apply(solution, start, length, delta_eval);
     }
-    fn get_best_improving_neighbor(&self, solution: &mut Solution) {
+    
+    fn get_best_improving_neighbor(&self, solution: &mut Solution, delta_eval: bool) {
         println!("GET BEST IMPROVEMENT");
     }
     fn to_string(&self) -> String {

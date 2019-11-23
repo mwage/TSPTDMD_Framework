@@ -90,9 +90,9 @@ pub fn test_delta() {
     println!("Before: {}", solution.objective_value());
 
 
-    DoubleEdgeExchange::apply(&mut solution, 1, 2, true);
-    DriverFlip::apply(&mut solution, 2, 3, true);
-    TripleEdgeExchange::apply(&mut solution, 4, 3, 3, true);
+    // DoubleEdgeExchange::apply(&mut solution, 1, 2, true);
+    // DriverFlip::apply(&mut solution, 2, 3, true);
+    // TripleEdgeExchange::apply(&mut solution, 4, 3, 3, true);
     let x = solution.objective_value();
     solution.calculate_objective_value();
     println!("With Delta: {}", x);

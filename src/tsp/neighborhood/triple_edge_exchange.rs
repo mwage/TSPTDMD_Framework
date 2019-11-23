@@ -3,6 +3,7 @@ use std::rc::Rc;
 use super::NeighborhoodImpl;
 use crate::tsp::Solution;
 use crate::tsp::TSPInstance;
+use crate::rand::Rng;
 
 pub struct TripleEdgeExchange {
     max_length: usize
@@ -15,7 +16,7 @@ impl TripleEdgeExchange {
         }
     }
 
-    pub fn apply(solution: &mut Solution, start_idx: usize, first_block_length: usize, second_block_length: usize, delta_eval: bool) {
+    fn apply(solution: &mut Solution, start_idx: usize, first_block_length: usize, second_block_length: usize, delta_eval: bool) {
         let number_of_vertices = solution.instance().number_of_vertices();
         let total_length = first_block_length + second_block_length;
         assert!(total_length < number_of_vertices);
@@ -68,10 +69,14 @@ impl TripleEdgeExchange {
 }
 
 impl NeighborhoodImpl for TripleEdgeExchange {
-    fn get_random_neighbor(&self, solution: &mut Solution) {
-
+    fn get_random_neighbor(&self, solution: &mut Solution, delta_eval: bool) {
+        let start = rand::thread_rng().gen_range(0, solution.instance().number_of_vertices());
+        let first_length = rand::thread_rng().gen_range(1, self.max_length + 1);
+        let second_length = rand::thread_rng().gen_range(1, self.max_length + 1);
+        TripleEdgeExchange::apply(solution, start, first_length, second_length, delta_eval);
     }
-    fn get_best_improving_neighbor(&self, solution: &mut Solution) {
+
+    fn get_best_improving_neighbor(&self, solution: &mut Solution, delta_eval: bool) {
 
     }
 

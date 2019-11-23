@@ -25,7 +25,7 @@ impl<N> LocalSearch<N> where N: NeighborhoodImpl {
     }
 
     fn get_neighbor(&mut self, solution: &mut Solution) {
-        self.neighborhood.get_neighbor(solution, &self.step_function);
+        self.neighborhood.get_neighbor(solution, &self.step_function, true);
     }
 }
 
