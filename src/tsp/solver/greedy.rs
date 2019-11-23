@@ -35,7 +35,7 @@ impl GreedySolver {
         }
     }
 
-    fn current_solution_mut(&mut self) -> &mut Solution {
+    pub fn current_solution_mut(&mut self) -> &mut Solution {
         if let Some(solution) = &mut self.current_solution {
             solution
         } else {

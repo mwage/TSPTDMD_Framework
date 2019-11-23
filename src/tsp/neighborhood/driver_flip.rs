@@ -4,6 +4,7 @@ use crate::rand::Rng;
 use crate::tsp::Solution;
 use crate::tsp::TSPInstance;
 use super::NeighborhoodImpl;
+use crate::modulo;
 
 pub struct DriverFlip {
 
@@ -23,7 +24,7 @@ impl DriverFlip {
             return;
         }
 
-        let prev_vertex = solution.get_assignment(assignment - 1).vertex();
+        let prev_vertex = solution.get_assignment(modulo(assignment as isize - 1, solution.instance().number_of_vertices())).vertex();
         let distance = solution.instance().get_vertex(prev_vertex).get_weight(vertex) as isize;
         solution.delta_evaluation(old_driver, distance);
         solution.delta_evaluation(new_driver, -distance);

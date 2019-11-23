@@ -4,6 +4,7 @@ use super::NeighborhoodImpl;
 use crate::tsp::Solution;
 use crate::tsp::TSPInstance;
 use crate::rand::Rng;
+use crate::modulo;
 
 pub struct TripleEdgeExchange {
     max_length: usize
@@ -16,7 +17,7 @@ impl TripleEdgeExchange {
         }
     }
 
-    fn apply(solution: &mut Solution, start_idx: usize, first_block_length: usize, second_block_length: usize, delta_eval: bool) {
+    pub fn apply(solution: &mut Solution, start_idx: usize, first_block_length: usize, second_block_length: usize, delta_eval: bool) {
         let number_of_vertices = solution.instance().number_of_vertices();
         let total_length = first_block_length + second_block_length;
         assert!(total_length < number_of_vertices);
@@ -57,14 +58,71 @@ impl TripleEdgeExchange {
         let old_distance = solution.instance().get_vertex(first_vertex).get_weight(old_destination) as isize;
         let new_distance = solution.instance().get_vertex(first_vertex).get_weight(new_destination) as isize;
         solution.delta_evaluation(driver, old_distance - new_distance);
-                
+        
+
+
         let driver = copy[total_length].driver();
         let first_vertex = copy[total_length - 1].vertex();
+        println!("first_vertex: {}", first_vertex);
         let old_destination = copy[total_length].vertex();
+        println!("old_dest: {}", old_destination);
         let new_destination = solution.get_assignment((start_idx + first_block_length) % number_of_vertices).vertex();
+        println!("new_dest: {}", new_destination);
         let old_distance = solution.instance().get_vertex(first_vertex).get_weight(old_destination) as isize;
         let new_distance = solution.instance().get_vertex(first_vertex).get_weight(new_destination) as isize;
         solution.delta_evaluation(driver, old_distance - new_distance);
+    }
+
+    pub fn get_delta(solution: &Solution, start_idx: usize, first_block_length: usize, second_block_length: usize) -> isize {
+        let number_of_vertices = solution.instance().number_of_vertices();
+        let total_length = first_block_length + second_block_length;
+        let ass_0 = solution.get_assignment((start_idx + total_length) % number_of_vertices);
+        let ass_1 = solution.get_assignment(modulo(start_idx as isize - 1, number_of_vertices));
+        let ass_2 = solution.get_assignment(start_idx);
+        let ass_3 = solution.get_assignment((start_idx + first_block_length - 1) % number_of_vertices);
+        let ass_4 = solution.get_assignment((start_idx + first_block_length) % number_of_vertices);
+        let ass_5 = solution.get_assignment((start_idx + total_length - 1) % number_of_vertices);
+        
+        println!("v1: {}, v2: {}", ass_1.vertex(), ass_2.vertex());
+        let e_1 = solution.instance().get_vertex(ass_1.vertex()).get_weight(ass_2.vertex()) as isize;
+        let e_2 = solution.instance().get_vertex(ass_3.vertex()).get_weight(ass_4.vertex()) as isize;
+        let e_3 = solution.instance().get_vertex(ass_5.vertex()).get_weight(ass_0.vertex()) as isize;
+        let e_4 = solution.instance().get_vertex(ass_1.vertex()).get_weight(ass_4.vertex()) as isize;
+        let e_5 = solution.instance().get_vertex(ass_3.vertex()).get_weight(ass_0.vertex()) as isize;
+        let e_6 = solution.instance().get_vertex(ass_2.vertex()).get_weight(ass_5.vertex()) as isize;
+        println!("e_1: {}", e_1);
+        println!("e_2: {}", e_2);
+        println!("e_3: {}", e_3);
+        println!("e_4: {}", e_4);
+        println!("e_5: {}", e_5);
+        println!("e_6: {}", e_6);
+
+        let desired = solution.instance().desired_travel_distance() as isize;
+
+        let driver_1 = solution.get_driver_distance(ass_2.driver() as usize) as isize;
+        let driver_2 = solution.get_driver_distance(ass_4.driver() as usize) as isize;
+        let driver_3 = solution.get_driver_distance(ass_0.driver() as usize) as isize;
+        println!("driver_1: {}", driver_1);
+        println!("driver_2: {}", driver_2);
+        println!("driver_3: {}", driver_3);
+
+        let mut driver_distances = solution.driver_distances().clone();
+        driver_distances[ass_2.driver() as usize] = (driver_distances[ass_2.driver() as usize] as isize - e_1 + e_4) as usize;
+        driver_distances[ass_4.driver() as usize] = (driver_distances[ass_4.driver() as usize] as isize - e_2 + e_5) as usize;
+        driver_distances[ass_0.driver() as usize] = (driver_distances[ass_0.driver() as usize] as isize - e_3 + e_6) as usize;
+        
+        let mut delta = 0;
+        for i in 0..driver_distances.len() {
+            delta += (desired - driver_distances[i] as isize).pow(2) - 
+                (desired - solution.get_driver_distance(i) as isize).pow(2);
+        }
+        delta
+
+
+
+        // (desired - (driver_1 - e_1 + e_4)).pow(2) + (desired - (driver_2 - e_2 + e_5)).pow(2)
+        //  + (desired - (driver_3 - e_3 + e_6)).pow(2)
+        //     - ((desired - driver_1).pow(2) + (desired - driver_2).pow(2) + (desired - driver_3).pow(2))
     }
 }
 
@@ -79,7 +137,7 @@ impl NeighborhoodImpl for TripleEdgeExchange {
     fn get_best_improving_neighbor(&self, solution: &mut Solution, delta_eval: bool) {
 
     }
-    
+
     fn get_first_improving_neighbor(&self, solution: &mut Solution, delta_eval: bool) {
         
     }
@@ -162,3 +220,16 @@ impl NeighborhoodImpl for TripleEdgeExchange {
 //     solution.calculate_objective_value();
 //     assert_eq!(x, solution.objective_value());
 // }
+
+#[test]
+fn test_delta() {
+    let instance = TSPInstance::new_random(10, 10, 100, 50);
+    let mut solution = Solution::new_random(Rc::new(instance));
+    solution.calculate_objective_value();
+    let start = rand::thread_rng().gen_range(0, solution.instance().number_of_vertices());
+    let first_length = rand::thread_rng().gen_range(1, 4);
+    let second_length = rand::thread_rng().gen_range(1, 4);
+    let new_val = TripleEdgeExchange::get_delta(&solution, start, first_length, second_length) + solution.objective_value() as isize;
+    TripleEdgeExchange::apply(&mut solution, start, first_length, second_length, true);
+    assert_eq!(new_val, solution.objective_value() as isize);
+}

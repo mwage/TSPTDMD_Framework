@@ -21,6 +21,7 @@ use tsp::TSPInstance;
 use std::rc::Rc;
 use rand::Rng;
 use tsp::io::Logger;
+use tsp::io::InstanceParser;
 use tsp::solver::Solver;
 
 // exports
@@ -86,40 +87,51 @@ fn get_neighborhood_impl(neighborhood: &Neighborhood) -> Box<dyn NeighborhoodImp
 
 // TODO: Kill
 pub fn test_delta() {
-    // let instance = Rc::new(TSPInstance::new_random(10, 4, 200, 100)); 
-    // let mut solution = Solution::new_random(Rc::clone(&instance));
 
-    let mut instance =  TSPInstance::new(3, 2, 10);
-    instance.add_edge(0, 1, 5);
-    instance.add_edge(0, 2, 7);
-    instance.add_edge(1, 2, 10);
+    let mut instance =  TSPInstance::new(6, 2, 0);
+    instance.add_edge(0, 1, 1);
+    instance.add_edge(0, 2, 20);
+    instance.add_edge(0, 3, 4);
+    instance.add_edge(0, 4, 5);
+    instance.add_edge(0, 5, 6);
+    instance.add_edge(1, 2, 2);
+    instance.add_edge(1, 3, 4);
+    instance.add_edge(1, 4, 5);
+    instance.add_edge(1, 5, 6);
+    instance.add_edge(2, 3, 3);
+    instance.add_edge(2, 4, 5);
+    instance.add_edge(2, 5, 6);
+    instance.add_edge(3, 4, 4);
+    instance.add_edge(3, 5, 6);
+    instance.add_edge(4, 5, 5);
+
+    // let instance = InstanceParser::get_instance("").unwrap();
 
     let instance = Rc::new(instance);
     let mut greedy = GreedySolver::new(1);
     let logger = Logger::new(&greedy, "");
     greedy.solve(Rc::clone(&instance), logger);
 
-    // println!("{:?}", greedy.current_solution());
+    println!("{:?}", greedy.current_solution());
+    // return;
 
+    // let instance = TSPInstance::new_random(10, 3, 100, 50);
+    // let mut solution = Solution::new_random(Rc::new(instance));
     greedy.current_solution_mut().calculate_objective_value();
+    println!("{:?}", greedy.current_solution().driver_distances());
     println!("Before: {}", greedy.current_solution().objective_value());
+    let start = 1;
+    let length = 2;
+    let length_2 = 1;
+    println!("Delta: {}", TripleEdgeExchange::get_delta(greedy.current_solution(), start, length, length_2));
+    let new_val = TripleEdgeExchange::get_delta(&greedy.current_solution(), start, length, length_2) + greedy.current_solution().objective_value() as isize;
+    TripleEdgeExchange::apply(greedy.current_solution_mut(), start, length, length_2, true);
+    println!("{:?}", greedy.current_solution().driver_distances());
+    println!("{:?}", greedy.current_solution());
+    println!("{}, {}", new_val, greedy.current_solution().objective_value());
+    greedy.current_solution_mut().calculate_objective_value();
+    println!("obj {}", greedy.current_solution().objective_value());
 
-    let idx = 1;
-    let old_driver = greedy.current_solution().get_assignment(idx).driver();
-    assert_eq!(old_driver, 1);
-    let new_driver = 0;
-    // println!("Delta: {}", DriverFlip::get_delta(greedy.current_solution(), idx, new_driver));
-    // let new_val = DriverFlip::get_delta(greedy.current_solution() ,idx, new_driver) + greedy.current_solution().objective_value() as isize;
-
-    // DoubleEdgeExchange::apply(&mut solution, 1, 2, true);
-    DriverFlip::apply(greedy.current_solution_mut(), idx, new_driver, true);
-    // TripleEdgeExchange::apply(&mut solution, 4, 3, 3, true);
-
-    
-    let x = greedy.current_solution().objective_value();
-    // solution.calculate_objective_value();
-    println!("With Delta: {}", x);
-    // println!("From distances: {}, {}", solution.objective_value(), new_val);
 }
 
 pub fn modulo(number: isize, module: usize) -> usize {
