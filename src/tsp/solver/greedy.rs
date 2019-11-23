@@ -53,40 +53,33 @@ impl GreedySolver {
 
 
     fn calculate_target_distance(&self) -> usize {
-        let mut available_capacity = 0;
-        for distance in self.current_solution().driver_distances() {    // Calculate the sum of available capacity
-            if *distance < self.instance().desired_travel_distance() {
-                available_capacity += self.instance().desired_travel_distance() - *distance;
-            }
-        }
-        available_capacity / (self.instance().number_of_vertices() - self.current_solution().number_of_assignments())   // Return total capacity / number of unvisited vertices
+        // Calculate available capacity as the sum of the missing distances
+        let available_capacity = self.current_solution().driver_distances().iter().filter(|x| **x < self.instance().desired_travel_distance())
+            .fold(0, |acc, x| acc + self.instance().desired_travel_distance() - *x);
+
+        // Return total capacity / number of unvisited vertices
+        available_capacity / (self.instance().number_of_vertices() - self.current_solution().number_of_assignments())   
     }
 
     fn get_best_vertex(&self) -> (u32, usize) {
-        let mut min_difference = usize::max_value();
-        let mut best_vertex = 0;
         let target_distance = self.calculate_target_distance(); // Total available capacity / unvisited vertices
         let last_vertex = self.current_solution().get_last_vertex();
-        for i in self.current_solution().unassigned_vertices() {   // Find vertex closest to the target distance
-            let difference = (self.instance().get_vertex(last_vertex).get_weight(*i) as isize - target_distance as isize).abs() as usize; 
-            if difference < min_difference {
-                min_difference = difference;
-                best_vertex = *i;
-            }
-        }
+        let best_vertex = *(self.current_solution().unassigned_vertices().iter()  // Find vertex who's distance is closest to target distance
+            .min_by_key(|x| (self.instance().get_vertex(last_vertex).get_weight(**x) as isize - target_distance as isize).abs() as usize).unwrap());
 
         (best_vertex, self.instance().get_vertex(last_vertex).get_weight(best_vertex))
     }
     
     fn get_random_best_vertex(&self) -> (u32, usize) {
-        let mut differences = Vec::new();
         let target_distance = self.calculate_target_distance(); // Total available capacity / unvisited vertices
         let last_vertex = self.current_solution().get_last_vertex();
-        for i in self.current_solution().unassigned_vertices() {   // Find vertex closest to the target distance
-            differences.push((i, (self.instance().get_vertex(last_vertex).get_weight(*i) as isize - target_distance as isize).abs() as usize)); 
-        }
+
+        // Calculate the deviation from the target distance for all unassinged vertices
+        let mut differences: Vec<(u32, usize)> = self.current_solution().unassigned_vertices().iter()  
+            .map(|i| (*i, (self.instance().get_vertex(last_vertex).get_weight(*i) as isize - target_distance as isize).abs() as usize)).collect();
         differences.sort_by(|a, b| a.1.cmp(&b.1));
-        let vertex = *differences[rand::thread_rng().gen_range(0, cmp::min(differences.len(), self.candidate_size))].0;
+        let vertex = differences[rand::thread_rng().gen_range(0, cmp::min(differences.len(), self.candidate_size))].0;
+
         (vertex, self.instance().get_vertex(last_vertex).get_weight(vertex))
     }
 
