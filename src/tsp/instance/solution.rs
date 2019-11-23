@@ -4,8 +4,9 @@ use rand::prelude::*;
 
 use crate::tsp::TSPInstance;
 use super::Assignment;
+use crate::modulo;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Solution {
     assignments: Vec<Assignment>,
     unassigned_vertices: Vec<u32>,
@@ -80,10 +81,16 @@ impl Solution {
     pub fn assignments(&mut self) -> &mut Vec<Assignment> {
         &mut self.assignments
     }
+
+    pub fn get_distance(&self, idx: usize) -> usize {
+        let first = self.get_assignment(idx).vertex();
+        let prev = self.get_assignment(modulo(idx as isize - 1, self.instance.number_of_vertices())).vertex();
+        self.instance.get_vertex(first).get_weight(prev)
+    }
     
     /// Calculates the change in objective value given a
     /// delta: change in distance for driver (old - new)
-    pub fn delta_evaluation(&mut self, driver: u32, delta: isize) {  
+    pub fn delta_evaluation(&mut self, driver: u32, delta: isize) {
         let new_distance = self.driver_distances[driver as usize] as isize - delta;
         let x = self.objective_value() as isize - delta * (-2 * self.instance().desired_travel_distance() as isize + self.driver_distances[driver as usize] as isize + new_distance as isize);
         self.objective_value = x as usize;

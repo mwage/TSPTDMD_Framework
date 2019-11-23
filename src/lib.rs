@@ -19,6 +19,9 @@ use tsp::neighborhood::TripleEdgeExchange;
 use tsp::Solution;
 use tsp::TSPInstance;
 use std::rc::Rc;
+use rand::Rng;
+use tsp::io::Logger;
+use tsp::solver::Solver;
 
 // exports
 pub use tsp::neighborhood::Neighborhood;
@@ -83,18 +86,48 @@ fn get_neighborhood_impl(neighborhood: &Neighborhood) -> Box<dyn NeighborhoodImp
 
 // TODO: Kill
 pub fn test_delta() {
-    let instance = Rc::new(TSPInstance::new_random(10, 4, 200, 100)); 
-    let mut solution = Solution::new_random(Rc::clone(&instance));
+    // let instance = Rc::new(TSPInstance::new_random(10, 4, 200, 100)); 
+    // let mut solution = Solution::new_random(Rc::clone(&instance));
 
-    solution.calculate_objective_value();
-    println!("Before: {}", solution.objective_value());
+    let mut instance =  TSPInstance::new(3, 2, 10);
+    instance.add_edge(0, 1, 5);
+    instance.add_edge(0, 2, 7);
+    instance.add_edge(1, 2, 10);
 
+    let instance = Rc::new(instance);
+    let mut greedy = GreedySolver::new(1);
+    let logger = Logger::new(&greedy, "");
+    greedy.solve(Rc::clone(&instance), logger);
+
+    // println!("{:?}", greedy.current_solution());
+
+    greedy.current_solution_mut().calculate_objective_value();
+    println!("Before: {}", greedy.current_solution().objective_value());
+
+    let idx = 1;
+    let old_driver = greedy.current_solution().get_assignment(idx).driver();
+    assert_eq!(old_driver, 1);
+    let new_driver = 0;
+    // println!("Delta: {}", DriverFlip::get_delta(greedy.current_solution(), idx, new_driver));
+    // let new_val = DriverFlip::get_delta(greedy.current_solution() ,idx, new_driver) + greedy.current_solution().objective_value() as isize;
 
     // DoubleEdgeExchange::apply(&mut solution, 1, 2, true);
-    // DriverFlip::apply(&mut solution, 2, 3, true);
+    DriverFlip::apply(greedy.current_solution_mut(), idx, new_driver, true);
     // TripleEdgeExchange::apply(&mut solution, 4, 3, 3, true);
-    let x = solution.objective_value();
-    solution.calculate_objective_value();
+
+    
+    let x = greedy.current_solution().objective_value();
+    // solution.calculate_objective_value();
     println!("With Delta: {}", x);
-    println!("From distances: {}", solution.objective_value());
+    // println!("From distances: {}, {}", solution.objective_value(), new_val);
+}
+
+pub fn modulo(number: isize, module: usize) -> usize {
+    let module = module as isize;
+    let x = number % module;
+    if x < 0 {
+        (x + module) as usize
+    } else {
+        x as usize
+    }
 }

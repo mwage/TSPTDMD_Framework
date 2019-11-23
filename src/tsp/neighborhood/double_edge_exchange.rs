@@ -4,6 +4,7 @@ use super::NeighborhoodImpl;
 use crate::tsp::Solution;
 use crate::tsp::TSPInstance;
 use crate::rand::Rng;
+use crate::modulo;
 
 pub struct DoubleEdgeExchange {
     max_length: usize
@@ -16,7 +17,7 @@ impl DoubleEdgeExchange {
         }
     }
 
-    pub fn apply(solution: &mut Solution, start_idx: usize, length: usize, delta_eval: bool) {
+    fn apply(solution: &mut Solution, start_idx: usize, length: usize, delta_eval: bool) {
         let number_of_vertices = solution.instance().number_of_vertices();
         assert!(length != 0);
         let mut copy = Vec::with_capacity(length + 1);
@@ -30,11 +31,12 @@ impl DoubleEdgeExchange {
             }
             solution.get_assignment_mut((start_idx + length - i) % number_of_vertices).set_driver(copy[i + 1].driver());
         }
+
         if !delta_eval {
             return;
         }
 
-        let prev_vertex = solution.get_assignment((start_idx - 1) % number_of_vertices).vertex();
+        let prev_vertex = solution.get_assignment(modulo(start_idx as isize - 1, number_of_vertices)).vertex();
         let old_distance = solution.instance().get_vertex(prev_vertex).get_weight(copy[0].vertex()) as isize;   // Old distance of d0 to start vertex
         let new_vertex = solution.get_assignment(start_idx).vertex();
         let new_distance = solution.instance().get_vertex(prev_vertex).get_weight(new_vertex) as isize;
@@ -42,9 +44,27 @@ impl DoubleEdgeExchange {
 
         let next_vertex = solution.get_assignment((start_idx + length + 1) % number_of_vertices).vertex();
         let old_distance = solution.instance().get_vertex(next_vertex).get_weight(copy[copy.len() - 1].vertex()) as isize;   // Old distance of d0 to start vertex
-        let new_vertex = solution.get_assignment(start_idx + length).vertex();
+        let new_vertex = solution.get_assignment((start_idx + length) % number_of_vertices).vertex();
         let new_distance = solution.instance().get_vertex(next_vertex).get_weight(new_vertex) as isize;
-        solution.delta_evaluation(solution.get_assignment(start_idx + length + 1).driver(), old_distance - new_distance);
+        solution.delta_evaluation(solution.get_assignment((start_idx + length + 1) % number_of_vertices).driver(), old_distance - new_distance);
+    }
+
+    pub fn get_delta(solution: &Solution, start_idx: usize, length: usize) -> isize {
+        let number_of_vertices = solution.instance().number_of_vertices();
+        let prev_ass = solution.get_assignment(modulo(start_idx as isize - 1, number_of_vertices));
+        let start_ass = solution.get_assignment(start_idx);
+        let end_ass = solution.get_assignment((start_idx + length) % number_of_vertices);
+        let next_ass = solution.get_assignment((start_idx + length + 1) % number_of_vertices);
+        let first_driver = solution.get_driver_distance(start_ass.driver() as usize) as isize;
+        let second_driver = solution.get_driver_distance(next_ass.driver() as usize) as isize;
+        let e_1 = solution.get_distance(start_ass.vertex() as usize) as isize;
+        let e_2 = solution.get_distance(next_ass.vertex() as usize) as isize;
+        let e_3 = solution.instance().get_vertex(prev_ass.vertex()).get_weight(end_ass.vertex()) as isize;
+        let e_4 = solution.instance().get_vertex(start_ass.vertex()).get_weight(next_ass.vertex()) as isize;
+        let desired = solution.instance().desired_travel_distance() as isize;
+
+        (desired - (first_driver - e_1 + e_3)).pow(2) + (desired - (second_driver - e_2 + e_4)).pow(2)
+            - ((desired - first_driver).pow(2) + (desired - second_driver).pow(2))
     }
 }
 
@@ -54,12 +74,16 @@ impl NeighborhoodImpl for DoubleEdgeExchange {
         let length = rand::thread_rng().gen_range(1, self.max_length + 1);
         DoubleEdgeExchange::apply(solution, start, length, delta_eval);
     }
-    
+
     fn get_best_improving_neighbor(&self, solution: &mut Solution, delta_eval: bool) {
         println!("GET BEST IMPROVEMENT");
     }
     fn to_string(&self) -> String {
         format!("DoubleEdgeExchange.{}", self.max_length)
+    }
+
+    fn get_first_improving_neighbor(&self, solution: &mut Solution, delta_eval: bool) {
+
     }
 }
 
@@ -135,4 +159,18 @@ fn test_delta_eval() {
     let x = solution.objective_value();
     solution.calculate_objective_value();
     assert_eq!(x, solution.objective_value());
+}
+
+
+#[test]
+fn test_delta() {
+    let instance = TSPInstance::new_random(10, 3, 100, 50);
+    let mut solution = Solution::new_random(Rc::new(instance));
+    solution.calculate_objective_value();
+    // let start = rand::thread_rng().gen_range(0, solution.instance().number_of_vertices());
+    let start = 9;
+    let length = rand::thread_rng().gen_range(1, 4);
+    let new_val = DoubleEdgeExchange::get_delta(&solution, start, length) + solution.objective_value() as isize;
+    DoubleEdgeExchange::apply(&mut solution, start, length, true);
+    assert_eq!(new_val, solution.objective_value() as isize);
 }

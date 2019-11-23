@@ -2,7 +2,7 @@ use crate::rand::Rng;
 use super::Vertex;
 
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TSPInstance {
     number_of_vertices: usize,
     number_of_drivers: usize, 
