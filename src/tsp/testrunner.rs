@@ -10,6 +10,7 @@ pub struct TestRunner {
 
 impl TestRunner {
     pub fn solve_instance<T: Solver>(mut solver: T, instance_name: Option<&str>, runs: usize) {
+
         if let Some(instance) = instance_name {
             TestRunner::run_instance(&mut solver, instance, runs)  // Solve a given instance
         } else {

@@ -58,18 +58,15 @@ impl<N> LocalSearch<N> where N: NeighborhoodImpl {
     }
 
     pub fn neighborhood_to_string(&self) -> String {
-        format!("{}.{}", self.step_function, self.neighborhood_to_string())
-    }
-
-    fn get_neighbor(&mut self, solution: &mut Solution) {
-        self.neighborhood.get_neighbor(solution, &self.step_function, true);
+        format!("{}.{}", self.step_function, self.neighborhood.to_string())
     }
 }
 
 impl<N> Solver for LocalSearch<N> where N: NeighborhoodImpl {
     fn solve(&mut self, instance: Rc<TSPInstance>, logger: Logger) {
         let mut solution = Solution::new_random(instance.clone());
-        self.get_neighbor(&mut solution);
+        self.local_search(&mut solution);
+        logger.log_result(&solution);
     }
 
     fn to_string(&self) -> String {

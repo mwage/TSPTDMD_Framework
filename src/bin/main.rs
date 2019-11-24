@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 extern crate tsp_framework;
 
 use std::env;
@@ -7,8 +9,8 @@ use tsp_framework::StepFunction;
 use tsp_framework::greedy;
 use tsp_framework::pilot;
 use tsp_framework::local_search;
-use tsp_framework::test_delta;
-use tsp_framework::grasp;
+// use tsp_framework::test_delta;
+// use tsp_framework::grasp;
 
 
 fn main() {
@@ -17,8 +19,8 @@ fn main() {
     // pilot(Some("berlin52_k2_2"), 15, 1);
     // pilot(Some("0010_k1"), 100);
     // greedy(Some("berlin52_k2_2"), 3);
-    test_delta();
-    // local_search(Some("berlin52_k2_2"), Neighborhood::DoubleEdgeExchange(4), StepFunction::BestImprovement, 100, 1);
+    // test_delta();
+    local_search(Some("berlin52_k2_2"), Neighborhood::DoubleEdgeExchange(4), StepFunction::BestImprovement, 100, 1);
     // test_all_local_searches();
     
     // grasp(Some("berlin52_k2_2"), 3, Neighborhood::DriverFlip, StepFunction::BestImprovement, 1000, 1000, 1);

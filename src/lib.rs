@@ -50,8 +50,7 @@ pub fn local_search(instance_name: Option<&str>, neighborhood: Neighborhood, ste
 }
 
 fn start_local_search<N> (neighborhood: N, step_function: StepFunction, iteration_limit: usize, instance_name: Option<&str>, runs: usize) where N: NeighborhoodImpl {
-    let ls = LocalSearch::new(neighborhood, step_function, iteration_limit);
-    TestRunner::solve_instance(ls, instance_name, runs);
+    TestRunner::solve_instance(LocalSearch::new(neighborhood, step_function, iteration_limit), instance_name, runs);
 }
 
 pub fn grasp(instance_name: Option<&str>, candidate_size: usize, neighborhood: Neighborhood, step_function: StepFunction, iteration_limit: usize, ls_iteration_limit: usize, runs: usize) {
