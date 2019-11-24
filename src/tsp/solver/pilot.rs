@@ -37,7 +37,7 @@ impl Solver for PilotSolver {
                     let solution = self.greedy.solve_from_solution(solution.clone(), *vertex, &logger); // Use greedy algorithm to solve the branch
                     results.push((j, *vertex, solution.get_assignment(i).driver(), solution.objective_value()));  // Add the result to the list
 
-                    if logger.get_elapsed() >= crate::TIME_LIMIT {
+                    if logger.get_elapsed() >= crate::TIME_LIMIT {  // Time termination
                         logger.log_result(solution);
                         return;
                     }
@@ -60,7 +60,7 @@ impl Solver for PilotSolver {
                 new_best.push(solution);
             }
             self.best_solutions = new_best;
-            results = Vec::new();   // Reset results
+            results = Vec::new();   // Reset results vector
         }
 
         // Finish solution

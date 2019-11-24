@@ -117,24 +117,14 @@ impl Solution {
         }
     }
 
-    pub fn get_smallest_driver(&self) -> u32 {
-        let mut min_distance = usize::max_value();        
-        let mut best_driver = u32::max_value();
-        for i in 0..self.instance.number_of_drivers() { // TODO: Look into enumerate + min_by + fold.
-            let distance = self.get_driver_distance(i);
-            if distance < min_distance {
-                min_distance = distance;
-                best_driver = i as u32;
-            }
-        }
-
-        best_driver
+    pub fn get_smallest_driver(&self) -> u32 {  // Get driver with smallest distance
+        let (best_driver, _) = self.driver_distances.iter().enumerate().min_by_key(|(_, x)| *x).unwrap();
+        best_driver as u32
     }
     
     pub fn calculate_objective_value(&mut self) {
         self.objective_value = self.driver_distances.iter().map(|x| (self.instance.desired_travel_distance() as isize - *x as isize).pow(2) as usize).collect::<Vec<usize>>().iter().sum();
     }
-
     
     pub fn is_feasible(&self) -> String {
         if self.assignments.len() < self.instance.number_of_vertices() {
