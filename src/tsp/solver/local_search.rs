@@ -23,11 +23,10 @@ impl<N> LocalSearch<N> where N: NeighborhoodImpl {
     }
 
     pub fn local_search(&self, solution: &mut Solution) {
-        // if self.step_function == StepFunction::Random {
-        //     self.search_random(solution)
-        // } else {
-        //     self.search_deterministic(solution)
-        // }
+        match self.step_function {
+            StepFunction::Random => self.search_random(solution),
+            _ => self.search_deterministic(solution)
+        };
     }
     
     fn search_deterministic(&self, solution: &mut Solution) {
