@@ -52,31 +52,31 @@ impl GreedySolver {
     }
 
 
-    fn calculate_target_distance(&self) -> usize {
+    fn calculate_target_distance(&self) -> isize {
         // Calculate available capacity as the sum of the missing distances
         let available_capacity = self.current_solution().driver_distances().iter().filter(|x| **x < self.instance().desired_travel_distance())
             .fold(0, |acc, x| acc + self.instance().desired_travel_distance() - *x);
 
         // Return total capacity / number of unvisited vertices
-        available_capacity / (self.instance().number_of_vertices() - self.current_solution().number_of_assignments())   
+        available_capacity / (self.instance().number_of_vertices() - self.current_solution().number_of_assignments()) as isize   
     }
 
-    fn get_best_vertex(&self) -> (u32, usize) {
+    fn get_best_vertex(&self) -> (usize, isize) {
         let target_distance = self.calculate_target_distance(); // Total available capacity / unvisited vertices
         let last_vertex = self.current_solution().get_last_vertex();
         let best_vertex = *(self.current_solution().unassigned_vertices().iter()  // Find vertex who's distance is closest to target distance
-            .min_by_key(|x| (self.instance().get_vertex(last_vertex).get_weight(**x) as isize - target_distance as isize).abs() as usize).unwrap());
+            .min_by_key(|x| (self.instance().get_vertex(last_vertex).get_weight(**x) - target_distance).abs()).unwrap());
 
         (best_vertex, self.instance().get_vertex(last_vertex).get_weight(best_vertex))
     }
     
-    fn get_random_best_vertex(&self) -> (u32, usize) {
+    fn get_random_best_vertex(&self) -> (usize, isize) {
         let target_distance = self.calculate_target_distance(); // Total available capacity / unvisited vertices
         let last_vertex = self.current_solution().get_last_vertex();
 
         // Calculate the deviation from the target distance for all unassinged vertices
-        let mut differences: Vec<(u32, usize)> = self.current_solution().unassigned_vertices().iter()  
-            .map(|i| (*i, (self.instance().get_vertex(last_vertex).get_weight(*i) as isize - target_distance as isize).abs() as usize)).collect();
+        let mut differences: Vec<(usize, isize)> = self.current_solution().unassigned_vertices().iter()  
+            .map(|i| (*i, (self.instance().get_vertex(last_vertex).get_weight(*i) - target_distance).abs())).collect();
         differences.sort_by(|a, b| a.1.cmp(&b.1));
         let vertex = differences[rand::thread_rng().gen_range(0, cmp::min(differences.len(), self.candidate_size))].0;
 
@@ -87,7 +87,7 @@ impl GreedySolver {
         self.instance = Some(Rc::clone(instance));  // Initialize tsp instance
     }
 
-    pub fn solve_from_solution(&mut self, base_solution: Solution, next_vertex: u32, logger: &Logger) -> &Solution {
+    pub fn solve_from_solution(&mut self, base_solution: Solution, next_vertex: usize, logger: &Logger) -> &Solution {
         self.current_solution = Some(base_solution);    // Initialize solution to the given one
         let next_driver = self.current_solution().get_smallest_driver();    // Find best driver
         let distance = self.instance().get_vertex(self.current_solution().get_last_vertex()).get_weight(next_vertex);  // Get distance between last vertex and chosen next vertex

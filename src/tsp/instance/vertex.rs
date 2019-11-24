@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
 pub struct Vertex {
-    edges: HashMap<u32, usize>
+    edges: HashMap<usize, isize>
 }
 
 impl Vertex {
@@ -12,11 +12,11 @@ impl Vertex {
         }
     }
 
-    pub fn add_edge(&mut self, idx: u32, weight: usize) {
+    pub fn add_edge(&mut self, idx: usize, weight: isize) {
         self.edges.entry(idx).or_insert(weight);
     }
 
-    pub fn get_weight(&self, idx: u32) -> usize {
+    pub fn get_weight(&self, idx: usize) -> isize {
         self.edges[&idx]
     }
 }

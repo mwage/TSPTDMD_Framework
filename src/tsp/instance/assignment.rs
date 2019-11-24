@@ -1,22 +1,22 @@
 #[derive(Debug, Copy, Clone)]
 pub struct Assignment {
-    vertex: u32,
-    driver: u32
+    vertex: usize,
+    driver: usize
 }
 
 impl Assignment {
-    pub fn new(vertex: u32, driver: u32) -> Self {
+    pub fn new(vertex: usize, driver: usize) -> Self {
         Assignment {
             vertex,
             driver
         }
     }
 
-    pub fn vertex(&self) -> u32 {
+    pub fn vertex(&self) -> usize {
         self.vertex
     }
 
-    pub fn driver(&self) -> u32 {
+    pub fn driver(&self) -> usize {
         self.driver
     }
 
@@ -25,11 +25,11 @@ impl Assignment {
         self.driver = other.driver();
     }
     
-    pub fn set_vertex(&mut self, vertex: u32) {
+    pub fn set_vertex(&mut self, vertex: usize) {
         self.vertex = vertex;
     }
 
-    pub fn set_driver(&mut self, driver: u32) {
+    pub fn set_driver(&mut self, driver: usize) {
         self.driver = driver;
     }
 }

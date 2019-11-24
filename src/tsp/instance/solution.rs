@@ -4,57 +4,57 @@ use rand::prelude::*;
 
 use crate::tsp::TSPInstance;
 use super::Assignment;
-use crate::modulo;
+use crate::modulo_pos;
 
 #[derive(Clone, Debug)]
 pub struct Solution {
     assignments: Vec<Assignment>,
-    unassigned_vertices: Vec<u32>,
-    driver_distances: Vec<usize>,
+    unassigned_vertices: Vec<usize>,
+    driver_distances: Vec<isize>,
     instance: Rc<TSPInstance>,
-    objective_value: usize
+    objective_value: isize
 }
 
 impl Solution {
     pub fn new(instance: Rc<TSPInstance>) -> Self {
         Solution {
             assignments: Vec::with_capacity(instance.number_of_vertices()),
-            unassigned_vertices: (1..instance.number_of_vertices() as u32).collect(),
+            unassigned_vertices: (1..instance.number_of_vertices()).collect(),
             driver_distances: vec![0; instance.number_of_drivers()],
             instance,
-            objective_value: usize::max_value()
+            objective_value: isize::max_value()
         }
     }
 
     pub fn new_random(instance: Rc<TSPInstance>) -> Self {
         let mut rng = rand::thread_rng();
-        let mut vertices: Vec<u32> = (1..instance.number_of_vertices() as u32).collect();
+        let mut vertices: Vec<usize> = (1..instance.number_of_vertices()).collect();
         let mut solution = Solution::new(instance);
         vertices.shuffle(&mut rng);
         for vertex in vertices.iter() {
-            let driver = rand::thread_rng().gen_range(0, solution.instance().number_of_drivers() as u32);
+            let driver = rand::thread_rng().gen_range(0, solution.instance().number_of_drivers());
             let last_vertex = solution.get_last_vertex();
             solution.add_assignment(*vertex, driver, solution.instance().get_vertex(*vertex).get_weight(last_vertex));
         }
-        let driver = rand::thread_rng().gen_range(0, solution.instance().number_of_drivers() as u32);
+        let driver = rand::thread_rng().gen_range(0, solution.instance().number_of_drivers());
         let last_vertex = solution.get_last_vertex();
         solution.add_assignment(0, driver, solution.instance().get_vertex(0).get_weight(last_vertex));
         solution
     }
 
-    pub fn unassigned_vertices(&self) -> &Vec<u32> {
+    pub fn unassigned_vertices(&self) -> &Vec<usize> {
         &self.unassigned_vertices
     }
 
-    pub fn objective_value(&self) -> usize {
+    pub fn objective_value(&self) -> isize {
         self.objective_value
     }
 
-    pub fn driver_distances(&self) -> &Vec<usize> {
+    pub fn driver_distances(&self) -> &Vec<isize> {
         &self.driver_distances
     }
 
-    pub fn get_driver_distance(&self, idx: usize) -> usize {
+    pub fn get_driver_distance(&self, idx: usize) -> isize {
         self.driver_distances[idx]
     }
 
@@ -82,27 +82,26 @@ impl Solution {
         &mut self.assignments
     }
 
-    pub fn get_distance(&self, idx: usize) -> usize {
+    pub fn get_distance(&self, idx: usize) -> isize {
         let first = self.get_assignment(idx).vertex();
-        let prev = self.get_assignment(modulo(idx as isize - 1, self.instance.number_of_vertices())).vertex();
+        let prev = self.get_assignment(modulo_pos(idx as isize - 1, self.instance.number_of_vertices())).vertex();
         self.instance.get_vertex(first).get_weight(prev)
     }
     
     /// Calculates the change in objective value given a
     /// delta: change in distance for driver (old - new)
-    pub fn delta_evaluation(&mut self, driver: u32, delta: isize) {
-        let new_distance = self.driver_distances[driver as usize] as isize - delta;
-        let x = self.objective_value() as isize - delta * (-2 * self.instance().desired_travel_distance() as isize + self.driver_distances[driver as usize] as isize + new_distance as isize);
-        self.objective_value = x as usize;
-        self.driver_distances[driver as usize] = new_distance as usize;
+    pub fn delta_evaluation(&mut self, driver: usize, delta: isize) {
+        let new_distance = self.driver_distances[driver] - delta;
+        self.objective_value -= delta * (-2 * self.instance().desired_travel_distance() + self.driver_distances[driver] + new_distance);
+        self.driver_distances[driver] = new_distance;
     }
 
-    pub fn add_assignment(&mut self, vertex: u32, driver: u32, distance: usize) {
+    pub fn add_assignment(&mut self, vertex: usize, driver: usize, distance: isize) {
         if self.assignments.len() > self.instance.number_of_vertices() {
             panic!("Exceeded maximum number of assignments.");
         }
         self.assignments.push(Assignment::new(vertex, driver));        
-        self.driver_distances[driver as usize] += distance;
+        self.driver_distances[driver] += distance;
 
         if vertex != 0 {
             let idx = self.unassigned_vertices.iter().position(|x| *x == vertex).unwrap();  // Remove vertex out of unassigned
@@ -110,20 +109,22 @@ impl Solution {
         }
     }
 
-    pub fn get_last_vertex(&self) -> u32 {
+    pub fn get_last_vertex(&self) -> usize {
         match self.assignments.last() {
             Some(x) => x.vertex(),
             None => 0
         }
     }
 
-    pub fn get_smallest_driver(&self) -> u32 {  // Get driver with smallest distance
+    pub fn get_smallest_driver(&self) -> usize {  // Get driver with smallest distance
         let (best_driver, _) = self.driver_distances.iter().enumerate().min_by_key(|(_, x)| *x).unwrap();
-        best_driver as u32
+        best_driver
     }
     
     pub fn calculate_objective_value(&mut self) {
-        self.objective_value = self.driver_distances.iter().map(|x| (self.instance.desired_travel_distance() as isize - *x as isize).pow(2) as usize).collect::<Vec<usize>>().iter().sum();
+        self.objective_value = self.driver_distances.iter()
+            .map(|x| (self.instance.desired_travel_distance() - *x).pow(2))
+            .collect::<Vec<isize>>().iter().sum();
     }
     
     pub fn is_feasible(&self) -> String {

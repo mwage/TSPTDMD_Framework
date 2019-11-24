@@ -30,7 +30,7 @@ impl InstanceParser {
             if line.is_empty() {
                 continue;
             }
-            let vec: Vec<i32> = line.split(' ').map(|x| x.parse().unwrap()).collect();
+            let vec: Vec<isize> = line.split(' ').map(|x| x.parse().unwrap()).collect();
             points.push(Point::new(vec[0], vec[1]));    // Add point to the list
         }
 
@@ -39,13 +39,11 @@ impl InstanceParser {
                 if i == j {
                     continue;
                 }
-                let first = &points[i as usize];
-                let second = &points[j as usize];
-                instance.add_edge(i as u32, j as u32, first.calculate_distance(second));  // Add edges between all points using the calculated distance
+                let first = &points[i];
+                let second = &points[j];
+                instance.add_edge(i, j, first.calculate_distance(second));  // Add edges between all points using the calculated distance
             }
         }
-
-        // println!("{:?}", instance);
 
         instance
     }
@@ -64,16 +62,14 @@ impl InstanceParser {
                 continue;
             }
             let vec: Vec<usize> = line.split(' ').map(|x| x.parse().unwrap()).collect();
-            instance.add_edge(vec[0] as u32, vec[1] as u32, vec[2]);    // Add an edge for each line in the file
+            instance.add_edge(vec[0], vec[1], vec[2] as isize);    // Add an edge for each line in the file
             
             if vec[2] > max {
                 max = vec[2];
             }
         }
 
-        instance.complete_graph(number_of_vertices * max + 1);  // Set weight for all unspecified edges
-
-        // println!("{:?}", instance);
+        instance.complete_graph((number_of_vertices * max + 1) as isize);  // Set weight for all unspecified edges
 
         instance
     }

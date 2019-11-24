@@ -12,8 +12,8 @@ use tsp_framework::test_delta;
 
 fn main() {
     // all_from_env();
-    greedy(Some("berlin52_k2_2"), 1, 1);
-    // pilot(Some("berlin52_k2_2"), 15);
+    // greedy(Some("berlin52_k2_2"), 1, 1);
+    pilot(Some("berlin52_k2_2"), 15, 1);
     // pilot(Some("0010_k1"), 100);
     // greedy(Some("berlin52_k2_2"), 3);
     // test_delta();

@@ -4,7 +4,7 @@ use super::NeighborhoodImpl;
 use crate::tsp::Solution;
 use crate::tsp::TSPInstance;
 use crate::rand::Rng;
-use crate::modulo;
+use crate::modulo_pos;
 
 pub struct DoubleEdgeExchange {
     max_length: usize
@@ -19,7 +19,7 @@ impl DoubleEdgeExchange {
 
     pub fn apply(solution: &mut Solution, start_idx: usize, length: usize, delta_eval: bool) {
         let number_of_vertices = solution.instance().number_of_vertices();
-        let start_idx = modulo(start_idx as isize - 1, number_of_vertices);
+        let start_idx = modulo_pos(start_idx as isize - 1, number_of_vertices);
         assert!(length != 0);
         let mut copy = Vec::with_capacity(length + 1);
         for i in start_idx..start_idx + length + 1 {
@@ -37,41 +37,41 @@ impl DoubleEdgeExchange {
             return;
         }
 
-        let prev_vertex = solution.get_assignment(modulo(start_idx as isize - 1, number_of_vertices)).vertex();
-        let old_distance = solution.instance().get_vertex(prev_vertex).get_weight(copy[0].vertex()) as isize;   // Old distance of d0 to start vertex
+        let prev_vertex = solution.get_assignment(modulo_pos(start_idx as isize - 1, number_of_vertices)).vertex();
+        let old_distance = solution.instance().get_vertex(prev_vertex).get_weight(copy[0].vertex());   // Old distance of d0 to start vertex
         let new_vertex = solution.get_assignment(start_idx).vertex();
-        let new_distance = solution.instance().get_vertex(prev_vertex).get_weight(new_vertex) as isize;
+        let new_distance = solution.instance().get_vertex(prev_vertex).get_weight(new_vertex);
         solution.delta_evaluation(solution.get_assignment(start_idx).driver(), old_distance - new_distance);
 
         let next_vertex = solution.get_assignment((start_idx + length + 1) % number_of_vertices).vertex();
-        let old_distance = solution.instance().get_vertex(next_vertex).get_weight(copy[copy.len() - 1].vertex()) as isize;   // Old distance of d0 to start vertex
+        let old_distance = solution.instance().get_vertex(next_vertex).get_weight(copy[copy.len() - 1].vertex());   // Old distance of d0 to start vertex
         let new_vertex = solution.get_assignment((start_idx + length) % number_of_vertices).vertex();
-        let new_distance = solution.instance().get_vertex(next_vertex).get_weight(new_vertex) as isize;
+        let new_distance = solution.instance().get_vertex(next_vertex).get_weight(new_vertex);
         solution.delta_evaluation(solution.get_assignment((start_idx + length + 1) % number_of_vertices).driver(), old_distance - new_distance);
     }
 
     pub fn get_delta(solution: &Solution, start_idx: usize, length: usize) -> isize {
         let number_of_vertices = solution.instance().number_of_vertices();
-        let start_idx = modulo(start_idx as isize - 1, number_of_vertices);
-        let prev_ass = solution.get_assignment(modulo(start_idx as isize - 1, number_of_vertices));
+        let start_idx = modulo_pos(start_idx as isize - 1, number_of_vertices);
+        let prev_ass = solution.get_assignment(modulo_pos(start_idx as isize - 1, number_of_vertices));
         let start_ass = solution.get_assignment(start_idx);
         let end_ass = solution.get_assignment((start_idx + length) % number_of_vertices);
         let next_ass = solution.get_assignment((start_idx + length + 1) % number_of_vertices);
         
-        let e_1 = solution.instance().get_vertex(prev_ass.vertex()).get_weight(start_ass.vertex()) as isize;
-        let e_2 = solution.instance().get_vertex(next_ass.vertex()).get_weight(end_ass.vertex()) as isize;
-        let e_3 = solution.instance().get_vertex(prev_ass.vertex()).get_weight(end_ass.vertex()) as isize;
-        let e_4 = solution.instance().get_vertex(start_ass.vertex()).get_weight(next_ass.vertex()) as isize;
-        let desired = solution.instance().desired_travel_distance() as isize;
+        let e_1 = solution.instance().get_vertex(prev_ass.vertex()).get_weight(start_ass.vertex());
+        let e_2 = solution.instance().get_vertex(next_ass.vertex()).get_weight(end_ass.vertex());
+        let e_3 = solution.instance().get_vertex(prev_ass.vertex()).get_weight(end_ass.vertex());
+        let e_4 = solution.instance().get_vertex(start_ass.vertex()).get_weight(next_ass.vertex());
+        let desired = solution.instance().desired_travel_distance();
 
         let mut driver_distances = solution.driver_distances().clone();
-        driver_distances[start_ass.driver() as usize] = (driver_distances[start_ass.driver() as usize] as isize - e_1 + e_3) as usize;
-        driver_distances[next_ass.driver() as usize] = (driver_distances[next_ass.driver() as usize] as isize - e_2 + e_4) as usize;
+        driver_distances[start_ass.driver()] = driver_distances[start_ass.driver()] - e_1 + e_3;
+        driver_distances[next_ass.driver()] = driver_distances[next_ass.driver()] - e_2 + e_4;
         
         let mut delta = 0;
         for i in 0..driver_distances.len() {
-            delta += (desired - driver_distances[i] as isize).pow(2) - 
-                (desired - solution.get_driver_distance(i) as isize).pow(2);
+            delta += (desired - driver_distances[i]).pow(2) - 
+                (desired - solution.get_driver_distance(i)).pow(2);
         }
         delta
     }
@@ -158,10 +158,10 @@ fn test_delta_eval() {
     instance.add_edge(3, 4, 47);
 
     let mut solution = Solution::new(Rc::new(instance));
-    for i in 0..vertices as u32 {
+    for i in 0..vertices {
         solution.add_assignment(i, i, 10);
-        assert_eq!(solution.get_assignment(i as usize).driver(), i);
-        assert_eq!(solution.get_assignment(i as usize).vertex(), i);
+        assert_eq!(solution.get_assignment(i).driver(), i);
+        assert_eq!(solution.get_assignment(i).vertex(), i);
     }
     solution.calculate_objective_value();
     DoubleEdgeExchange::apply(&mut solution, 1, 2, true);
@@ -181,7 +181,7 @@ fn test_delta() {
     println!("start: {}", start);
     println!("length: {}", length);
 
-    let new_val = DoubleEdgeExchange::get_delta(&solution, start, length) + solution.objective_value() as isize;
+    let new_val = DoubleEdgeExchange::get_delta(&solution, start, length) + solution.objective_value();
     DoubleEdgeExchange::apply(&mut solution, start, length, true);
-    assert_eq!(new_val, solution.objective_value() as isize);
+    assert_eq!(new_val, solution.objective_value());
 }

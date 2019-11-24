@@ -113,10 +113,7 @@ pub fn test_delta() {
     greedy.solve(Rc::clone(&instance), logger);
 
     println!("{:?}", greedy.current_solution());
-    // return;
 
-    // let instance = TSPInstance::new_random(10, 3, 100, 50);
-    // let mut solution = Solution::new_random(Rc::new(instance));
     greedy.current_solution_mut().calculate_objective_value();
     println!("{:?}", greedy.current_solution().driver_distances());
     println!("Before: {}", greedy.current_solution().objective_value());
@@ -124,7 +121,7 @@ pub fn test_delta() {
     let length = 2;
     let length_2 = 1;
     println!("Delta: {}", TripleEdgeExchange::get_delta(greedy.current_solution(), start, length, length_2));
-    let new_val = TripleEdgeExchange::get_delta(&greedy.current_solution(), start, length, length_2) + greedy.current_solution().objective_value() as isize;
+    let new_val = TripleEdgeExchange::get_delta(&greedy.current_solution(), start, length, length_2) + greedy.current_solution().objective_value();
     TripleEdgeExchange::apply(greedy.current_solution_mut(), start, length, length_2, true);
     println!("{:?}", greedy.current_solution().driver_distances());
     println!("{:?}", greedy.current_solution());
@@ -134,7 +131,8 @@ pub fn test_delta() {
 
 }
 
-pub fn modulo(number: isize, module: usize) -> usize {
+// Returns positive modulo
+pub fn modulo_pos(number: isize, module: usize) -> usize {
     let module = module as isize;
     let x = number % module;
     if x < 0 {

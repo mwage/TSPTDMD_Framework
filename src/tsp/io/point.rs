@@ -1,21 +1,21 @@
 #[derive(Debug)]
 pub struct Point {
-    x: i32,
-    y: i32
+    x: isize,
+    y: isize
 }
 
 impl Point {
-    pub fn new(x: i32, y: i32) -> Self{
+    pub fn new(x: isize, y: isize) -> Self{
         Point {
             x,
             y
         }
     }
 
-    pub fn calculate_distance(&self, point: &Point) -> usize {  // Calculates the cartesian distance between two points
+    pub fn calculate_distance(&self, point: &Point) -> isize {  // Calculates the cartesian distance between two points
         let a = ((self.x - point.x) as f64).powf(2f64);
         let b = ((self.y - point.y) as f64).powf(2f64);
-        let dist = (a + b).sqrt().round() as usize;
+        let dist = (a + b).sqrt().round() as isize;
         dist
     }
 }

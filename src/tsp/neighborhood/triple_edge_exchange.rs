@@ -4,7 +4,7 @@ use super::NeighborhoodImpl;
 use crate::tsp::Solution;
 use crate::tsp::TSPInstance;
 use crate::rand::Rng;
-use crate::modulo;
+use crate::modulo_pos;
 
 pub struct TripleEdgeExchange {
     max_length: usize
@@ -46,8 +46,8 @@ impl TripleEdgeExchange {
         let first_vertex = solution.get_assignment((start_idx - 1) % number_of_vertices).vertex();
         let old_destination = copy[0].vertex();
         let new_destination = solution.get_assignment(start_idx).vertex();
-        let old_distance = solution.instance().get_vertex(first_vertex).get_weight(old_destination) as isize;
-        let new_distance = solution.instance().get_vertex(first_vertex).get_weight(new_destination) as isize;
+        let old_distance = solution.instance().get_vertex(first_vertex).get_weight(old_destination);
+        let new_distance = solution.instance().get_vertex(first_vertex).get_weight(new_destination);
         solution.delta_evaluation(driver, old_distance - new_distance);
 
         
@@ -55,8 +55,8 @@ impl TripleEdgeExchange {
         let first_vertex = copy[first_block_length - 1].vertex();
         let old_destination = copy[first_block_length].vertex();
         let new_destination = solution.get_assignment((start_idx + total_length) % number_of_vertices).vertex();
-        let old_distance = solution.instance().get_vertex(first_vertex).get_weight(old_destination) as isize;
-        let new_distance = solution.instance().get_vertex(first_vertex).get_weight(new_destination) as isize;
+        let old_distance = solution.instance().get_vertex(first_vertex).get_weight(old_destination);
+        let new_distance = solution.instance().get_vertex(first_vertex).get_weight(new_destination);
         solution.delta_evaluation(driver, old_distance - new_distance);
         
 
@@ -68,8 +68,8 @@ impl TripleEdgeExchange {
         println!("old_dest: {}", old_destination);
         let new_destination = solution.get_assignment((start_idx + first_block_length) % number_of_vertices).vertex();
         println!("new_dest: {}", new_destination);
-        let old_distance = solution.instance().get_vertex(first_vertex).get_weight(old_destination) as isize;
-        let new_distance = solution.instance().get_vertex(first_vertex).get_weight(new_destination) as isize;
+        let old_distance = solution.instance().get_vertex(first_vertex).get_weight(old_destination);
+        let new_distance = solution.instance().get_vertex(first_vertex).get_weight(new_destination);
         solution.delta_evaluation(driver, old_distance - new_distance);
     }
 
@@ -77,19 +77,19 @@ impl TripleEdgeExchange {
         let number_of_vertices = solution.instance().number_of_vertices();
         let total_length = first_block_length + second_block_length;
         let ass_0 = solution.get_assignment((start_idx + total_length) % number_of_vertices);
-        let ass_1 = solution.get_assignment(modulo(start_idx as isize - 1, number_of_vertices));
+        let ass_1 = solution.get_assignment(modulo_pos(start_idx as isize - 1, number_of_vertices));
         let ass_2 = solution.get_assignment(start_idx);
         let ass_3 = solution.get_assignment((start_idx + first_block_length - 1) % number_of_vertices);
         let ass_4 = solution.get_assignment((start_idx + first_block_length) % number_of_vertices);
         let ass_5 = solution.get_assignment((start_idx + total_length - 1) % number_of_vertices);
         
         println!("v1: {}, v2: {}", ass_1.vertex(), ass_2.vertex());
-        let e_1 = solution.instance().get_vertex(ass_1.vertex()).get_weight(ass_2.vertex()) as isize;
-        let e_2 = solution.instance().get_vertex(ass_3.vertex()).get_weight(ass_4.vertex()) as isize;
-        let e_3 = solution.instance().get_vertex(ass_5.vertex()).get_weight(ass_0.vertex()) as isize;
-        let e_4 = solution.instance().get_vertex(ass_1.vertex()).get_weight(ass_4.vertex()) as isize;
-        let e_5 = solution.instance().get_vertex(ass_3.vertex()).get_weight(ass_0.vertex()) as isize;
-        let e_6 = solution.instance().get_vertex(ass_2.vertex()).get_weight(ass_5.vertex()) as isize;
+        let e_1 = solution.instance().get_vertex(ass_1.vertex()).get_weight(ass_2.vertex());
+        let e_2 = solution.instance().get_vertex(ass_3.vertex()).get_weight(ass_4.vertex());
+        let e_3 = solution.instance().get_vertex(ass_5.vertex()).get_weight(ass_0.vertex());
+        let e_4 = solution.instance().get_vertex(ass_1.vertex()).get_weight(ass_4.vertex());
+        let e_5 = solution.instance().get_vertex(ass_3.vertex()).get_weight(ass_0.vertex());
+        let e_6 = solution.instance().get_vertex(ass_2.vertex()).get_weight(ass_5.vertex());
         println!("e_1: {}", e_1);
         println!("e_2: {}", e_2);
         println!("e_3: {}", e_3);
@@ -97,32 +97,26 @@ impl TripleEdgeExchange {
         println!("e_5: {}", e_5);
         println!("e_6: {}", e_6);
 
-        let desired = solution.instance().desired_travel_distance() as isize;
+        let desired = solution.instance().desired_travel_distance();
 
-        let driver_1 = solution.get_driver_distance(ass_2.driver() as usize) as isize;
-        let driver_2 = solution.get_driver_distance(ass_4.driver() as usize) as isize;
-        let driver_3 = solution.get_driver_distance(ass_0.driver() as usize) as isize;
+        let driver_1 = solution.get_driver_distance(ass_2.driver());
+        let driver_2 = solution.get_driver_distance(ass_4.driver());
+        let driver_3 = solution.get_driver_distance(ass_0.driver());
         println!("driver_1: {}", driver_1);
         println!("driver_2: {}", driver_2);
         println!("driver_3: {}", driver_3);
 
         let mut driver_distances = solution.driver_distances().clone();
-        driver_distances[ass_2.driver() as usize] = (driver_distances[ass_2.driver() as usize] as isize - e_1 + e_4) as usize;
-        driver_distances[ass_4.driver() as usize] = (driver_distances[ass_4.driver() as usize] as isize - e_2 + e_5) as usize;
-        driver_distances[ass_0.driver() as usize] = (driver_distances[ass_0.driver() as usize] as isize - e_3 + e_6) as usize;
+        driver_distances[ass_2.driver()] = driver_distances[ass_2.driver()] - e_1 + e_4;
+        driver_distances[ass_4.driver()] = driver_distances[ass_4.driver()] - e_2 + e_5;
+        driver_distances[ass_0.driver()] = driver_distances[ass_0.driver()] - e_3 + e_6;
         
         let mut delta = 0;
         for i in 0..driver_distances.len() {
-            delta += (desired - driver_distances[i] as isize).pow(2) - 
-                (desired - solution.get_driver_distance(i) as isize).pow(2);
+            delta += (desired - driver_distances[i]).pow(2) - 
+                (desired - solution.get_driver_distance(i)).pow(2);
         }
         delta
-
-
-
-        // (desired - (driver_1 - e_1 + e_4)).pow(2) + (desired - (driver_2 - e_2 + e_5)).pow(2)
-        //  + (desired - (driver_3 - e_3 + e_6)).pow(2)
-        //     - ((desired - driver_1).pow(2) + (desired - driver_2).pow(2) + (desired - driver_3).pow(2))
     }
 }
 
@@ -229,7 +223,7 @@ fn test_delta() {
     let start = rand::thread_rng().gen_range(0, solution.instance().number_of_vertices());
     let first_length = rand::thread_rng().gen_range(1, 4);
     let second_length = rand::thread_rng().gen_range(1, 4);
-    let new_val = TripleEdgeExchange::get_delta(&solution, start, first_length, second_length) + solution.objective_value() as isize;
+    let new_val = TripleEdgeExchange::get_delta(&solution, start, first_length, second_length) + solution.objective_value();
     TripleEdgeExchange::apply(&mut solution, start, first_length, second_length, true);
-    assert_eq!(new_val, solution.objective_value() as isize);
+    assert_eq!(new_val, solution.objective_value());
 }
