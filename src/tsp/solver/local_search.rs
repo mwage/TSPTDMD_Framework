@@ -22,12 +22,36 @@ impl<N> LocalSearch<N> where N: NeighborhoodImpl {
         }
     }
 
-    pub fn search(&self, solution: &mut Solution) {
+    pub fn local_search(&self, solution: &mut Solution) {
+        // if self.step_function == StepFunction::Random {
+        //     self.search_random(solution)
+        // } else {
+        //     self.search_deterministic(solution)
+        // }
+    }
+    
+    fn search_deterministic(&self, solution: &mut Solution) {
         let mut counter = 0;
         loop {
             let improved = self.neighborhood.get_neighbor(solution, &self.step_function, true);    // TODO: Set delta eval
 
             if !improved || counter >= self.iteration_limit {
+                break;
+            }
+            counter += 1;
+        }
+    }
+
+    fn search_random(&self, solution: &mut Solution) {
+        let mut counter = 0;
+        let mut best_solution = solution.clone();
+        loop {
+            self.neighborhood.get_neighbor(solution, &self.step_function, true);    // TODO: Set delta eval
+
+            if solution.objective_value() < best_solution.objective_value() {
+                best_solution = solution.clone();
+            }
+            if counter >= self.iteration_limit {
                 break;
             }
             counter += 1;

@@ -94,6 +94,8 @@ impl TripleEdgeExchange {
     }
 
     pub fn get_delta(solution: &Solution, start_idx: usize, first_block_length: usize, second_block_length: usize) -> isize {
+        println!("Start of delta!");
+        // let start_idx = start_idx - 1;
         let number_of_vertices = solution.instance().number_of_vertices();
         let total_length = first_block_length + second_block_length;
         let ass_0 = solution.get_assignment((start_idx + total_length) % number_of_vertices);
@@ -102,19 +104,24 @@ impl TripleEdgeExchange {
         let ass_3 = solution.get_assignment((start_idx + first_block_length - 1) % number_of_vertices);
         let ass_4 = solution.get_assignment((start_idx + first_block_length) % number_of_vertices);
         let ass_5 = solution.get_assignment((start_idx + total_length - 1) % number_of_vertices);
-        
+        println!("ass_1: {:?}", ass_1);
+        println!("ass_2: {:?}", ass_2);
+        println!("ass_3: {:?}", ass_3);
+        println!("ass_4: {:?}", ass_4);
+        println!("ass_5: {:?}", ass_5);
+        println!("ass_0: {:?}", ass_0);
         println!("v1: {}, v2: {}", ass_1.vertex(), ass_2.vertex());
         let e_1 = solution.instance().get_vertex(ass_1.vertex()).get_weight(ass_2.vertex());
-        let e_2 = solution.instance().get_vertex(ass_3.vertex()).get_weight(ass_4.vertex());
-        let e_3 = solution.instance().get_vertex(ass_5.vertex()).get_weight(ass_0.vertex());
-        let e_4 = solution.instance().get_vertex(ass_1.vertex()).get_weight(ass_4.vertex());
-        let e_5 = solution.instance().get_vertex(ass_3.vertex()).get_weight(ass_0.vertex());
-        let e_6 = solution.instance().get_vertex(ass_2.vertex()).get_weight(ass_5.vertex());
         println!("e_1: {}", e_1);
+        let e_2 = solution.instance().get_vertex(ass_3.vertex()).get_weight(ass_4.vertex());
         println!("e_2: {}", e_2);
+        let e_3 = solution.instance().get_vertex(ass_5.vertex()).get_weight(ass_0.vertex());
         println!("e_3: {}", e_3);
+        let e_4 = solution.instance().get_vertex(ass_1.vertex()).get_weight(ass_4.vertex());
         println!("e_4: {}", e_4);
+        let e_5 = solution.instance().get_vertex(ass_3.vertex()).get_weight(ass_0.vertex());
         println!("e_5: {}", e_5);
+        let e_6 = solution.instance().get_vertex(ass_2.vertex()).get_weight(ass_5.vertex());
         println!("e_6: {}", e_6);
 
         let desired = solution.instance().desired_travel_distance();
@@ -188,7 +195,7 @@ impl NeighborhoodImpl for TripleEdgeExchange {
                 }
             }
         }
-        
+
         false
     }
 

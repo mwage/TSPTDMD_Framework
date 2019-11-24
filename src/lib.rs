@@ -50,7 +50,8 @@ pub fn local_search(instance_name: Option<&str>, neighborhood: Neighborhood, ste
 }
 
 fn start_local_search<N> (neighborhood: N, step_function: StepFunction, iteration_limit: usize, instance_name: Option<&str>, runs: usize) where N: NeighborhoodImpl {
-    TestRunner::solve_instance(LocalSearch::new(neighborhood, step_function, iteration_limit), instance_name, runs);
+    let ls = LocalSearch::new(neighborhood, step_function, iteration_limit);
+    TestRunner::solve_instance(ls, instance_name, runs);
 }
 
 pub fn grasp(instance_name: Option<&str>, candidate_size: usize, neighborhood: Neighborhood, step_function: StepFunction, iteration_limit: usize, ls_iteration_limit: usize, runs: usize) {
@@ -105,11 +106,12 @@ pub fn test_delta() {
     instance.add_edge(4, 5, 5);
 
     // let instance = InstanceParser::get_instance("").unwrap();
-
+    
     let instance = Rc::new(instance);
     let mut greedy = GreedySolver::new(1);
-    let logger = Logger::new(&greedy, "");
+    let logger = Logger::new(&greedy, "test");
     let mut solution = Solution::new(Rc::clone(&instance));
+    greedy.set_instance(&instance);
     greedy.solve_greedy(&mut solution, &logger);
 
     println!("{:?}", solution);
@@ -128,7 +130,6 @@ pub fn test_delta() {
     println!("{}, {}", new_val, solution.objective_value());
     solution.calculate_objective_value();
     println!("obj {}", solution.objective_value());
-
 }
 
 // Returns positive modulo

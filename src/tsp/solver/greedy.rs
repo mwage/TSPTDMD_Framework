@@ -29,10 +29,9 @@ impl GreedySolver {
         if let Some(instance) = &self.instance {
             instance
         } else {
-            panic!("Tried accessing uninitialized solution.");
+            panic!("Tried accessing uninitialized instance.");
         }
     }
-
 
     fn calculate_target_distance(&self, solution: &Solution) -> isize {
         // Calculate available capacity as the sum of the missing distances
