@@ -85,16 +85,42 @@ impl NeighborhoodImpl for DoubleEdgeExchange {
     }
 
     fn get_best_improving_neighbor(&self, solution: &mut Solution, delta_eval: bool) {
-        println!("GET BEST IMPROVEMENT");
+        let number_of_vertices = solution.instance().number_of_vertices();
+        let mut best_solution: (usize, usize, isize) = (0, 0, 0);
+        for start_idx in 0..number_of_vertices {
+            for block_length in 1..self.max_length {
+                let delta = DoubleEdgeExchange::get_delta(solution, start_idx, block_length);
+                if delta < best_solution.2 {
+                    best_solution = (start_idx, block_length, delta);
+                }
+            }
+        }
+
+        if best_solution.2 > 0 {
+            DoubleEdgeExchange::apply(
+                solution, best_solution.0, best_solution.1, delta_eval);
+        }
     }
+    
+    fn get_first_improving_neighbor(&self, solution: &mut Solution, delta_eval: bool) {
+        let number_of_vertices = solution.instance().number_of_vertices();
+        for start_idx in 0..number_of_vertices {
+            for block_length in 1..self.max_length {
+                let delta = DoubleEdgeExchange::get_delta(solution, start_idx, block_length);
+                if delta < 0 {
+                    DoubleEdgeExchange::apply(
+                        solution, start_idx, block_length, delta_eval);
+                    return;
+                }
+            }
+        }
+    }
+
     fn to_string(&self) -> String {
         format!("DoubleEdgeExchange.{}", self.max_length)
     }
-
-    fn get_first_improving_neighbor(&self, solution: &mut Solution, delta_eval: bool) {
-
-    }
 }
+    
 
 // #[test]
 // fn test_double_edge_thingy() {

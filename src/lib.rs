@@ -87,7 +87,6 @@ fn get_neighborhood_impl(neighborhood: &Neighborhood) -> Box<dyn NeighborhoodImp
 
 // TODO: Kill
 pub fn test_delta() {
-
     let mut instance =  TSPInstance::new(6, 2, 0);
     instance.add_edge(0, 1, 1);
     instance.add_edge(0, 2, 20);
@@ -117,9 +116,9 @@ pub fn test_delta() {
     greedy.current_solution_mut().calculate_objective_value();
     println!("{:?}", greedy.current_solution().driver_distances());
     println!("Before: {}", greedy.current_solution().objective_value());
-    let start = 1;
-    let length = 2;
-    let length_2 = 1;
+    let start = 2;
+    let length = 1;
+    let length_2 = 0;
     println!("Delta: {}", TripleEdgeExchange::get_delta(greedy.current_solution(), start, length, length_2));
     let new_val = TripleEdgeExchange::get_delta(&greedy.current_solution(), start, length, length_2) + greedy.current_solution().objective_value();
     TripleEdgeExchange::apply(greedy.current_solution_mut(), start, length, length_2, true);

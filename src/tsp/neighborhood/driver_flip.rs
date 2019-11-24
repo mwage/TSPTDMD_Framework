@@ -41,21 +41,60 @@ impl DriverFlip {
 impl NeighborhoodImpl for DriverFlip {
     fn get_random_neighbor(&self, solution: &mut Solution, delta_eval: bool) {
         let instance = solution.instance();
+        if instance.number_of_drivers() == 1 {
+            return;
+        }
         let idx = rand::thread_rng().gen_range(0, instance.number_of_vertices());
         let old_driver = solution.get_assignment(idx).driver();
-        let mut new_driver = old_driver;
-        while new_driver == old_driver {
-            new_driver = rand::thread_rng().gen_range(0, instance.number_of_drivers());
+        let mut new_driver = rand::thread_rng().gen_range(0, instance.number_of_drivers() - 1);
+        if new_driver >= old_driver {
+            new_driver += 1;
         }
         DriverFlip::apply(solution, idx, new_driver, delta_eval);
     }
 
     fn get_best_improving_neighbor(&self, solution: &mut Solution, delta_eval: bool) {
+        if solution.instance().number_of_drivers() == 1 {
+            return;
+        }
+        let number_of_vertices = solution.instance().number_of_vertices();
+        let mut best_solution: (usize, isize) = (0, 0);
+        let (smallest_driver, _) = solution.driver_distances().iter().enumerate()
+            .min_by_key(|(_, dist)| *dist).unwrap();    // Get driver with smallest distance driven
+        for i in 0..number_of_vertices {
+            if solution.get_assignment(i).driver() == smallest_driver {
+                continue;
+            }
 
-    }    
+            let delta = DriverFlip::get_delta(solution, i, smallest_driver);
+            if delta < best_solution.1 {
+                best_solution = (i, delta);
+            }
+        }
+
+        if best_solution.1 < 0 {
+            DriverFlip::apply(solution, best_solution.0, smallest_driver, delta_eval)
+        }
+    }
 
     fn get_first_improving_neighbor(&self, solution: &mut Solution, delta_eval: bool) {
-        
+        if solution.instance().number_of_drivers() == 1 {
+            return;
+        }
+        let number_of_vertices = solution.instance().number_of_vertices();
+        let (smallest_driver, _) = solution.driver_distances().iter().enumerate()
+            .min_by_key(|(_, dist)| *dist).unwrap();    // Get driver with smallest distance driven
+        for i in 0..number_of_vertices {
+            if solution.get_assignment(i).driver() == smallest_driver {
+                continue;
+            }
+
+            let delta = DriverFlip::get_delta(solution, i, smallest_driver);
+            if delta < 0 {
+                DriverFlip::apply(solution, i, smallest_driver, delta_eval);
+                return;
+            }
+        }
     }
 
     fn to_string(&self) -> String {
