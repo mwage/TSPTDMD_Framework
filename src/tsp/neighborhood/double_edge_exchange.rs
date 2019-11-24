@@ -18,6 +18,8 @@ impl DoubleEdgeExchange {
     }
 
     pub fn apply(solution: &mut Solution, start_idx: usize, length: usize, delta_eval: bool) {
+
+        // TODO: Only set instance, calc distances on the fly
         let number_of_vertices = solution.instance().number_of_vertices();
         let start_idx = modulo_pos(start_idx as isize - 1, number_of_vertices);
         assert!(length != 0);
@@ -78,13 +80,14 @@ impl DoubleEdgeExchange {
 }
 
 impl NeighborhoodImpl for DoubleEdgeExchange {
-    fn get_random_neighbor(&self, solution: &mut Solution, delta_eval: bool) {
+    fn get_random_neighbor(&self, solution: &mut Solution, delta_eval: bool) -> bool {
         let start = rand::thread_rng().gen_range(0, solution.instance().number_of_vertices());
         let length = rand::thread_rng().gen_range(1, self.max_length + 1);
         DoubleEdgeExchange::apply(solution, start, length, delta_eval);
+        true
     }
 
-    fn get_best_improving_neighbor(&self, solution: &mut Solution, delta_eval: bool) {
+    fn get_best_improving_neighbor(&self, solution: &mut Solution, delta_eval: bool) -> bool {
         let number_of_vertices = solution.instance().number_of_vertices();
         let mut best_solution: (usize, usize, isize) = (0, 0, 0);
         for start_idx in 0..number_of_vertices {
@@ -99,10 +102,13 @@ impl NeighborhoodImpl for DoubleEdgeExchange {
         if best_solution.2 > 0 {
             DoubleEdgeExchange::apply(
                 solution, best_solution.0, best_solution.1, delta_eval);
+            return true;
         }
+
+        false
     }
     
-    fn get_first_improving_neighbor(&self, solution: &mut Solution, delta_eval: bool) {
+    fn get_first_improving_neighbor(&self, solution: &mut Solution, delta_eval: bool) -> bool {
         let number_of_vertices = solution.instance().number_of_vertices();
         for start_idx in 0..number_of_vertices {
             for block_length in 1..self.max_length {
@@ -110,10 +116,11 @@ impl NeighborhoodImpl for DoubleEdgeExchange {
                 if delta < 0 {
                     DoubleEdgeExchange::apply(
                         solution, start_idx, block_length, delta_eval);
-                    return;
+                    return true;
                 }
             }
         }
+        false
     }
 
     fn to_string(&self) -> String {

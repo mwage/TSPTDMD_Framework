@@ -34,11 +34,12 @@ impl Solver for PilotSolver {
             for j in 0..self.best_solutions.len() {
                 let solution = &self.best_solutions[j];
                 for vertex in solution.unassigned_vertices() {  // Loop over all neighbors
-                    let solution = self.greedy.solve_from_solution(solution.clone(), *vertex, &logger); // Use greedy algorithm to solve the branch
+                    let mut solution = solution.clone();
+                    self.greedy.solve_from_solution(&mut solution, *vertex, &logger); // Use greedy algorithm to solve the branch
                     results.push((j, *vertex, solution.get_assignment(i).driver(), solution.objective_value()));  // Add the result to the list
 
                     if logger.get_elapsed() >= crate::TIME_LIMIT {  // Time termination
-                        logger.log_result(solution);
+                        logger.log_result(&solution);
                         return;
                     }
                 }

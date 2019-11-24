@@ -40,30 +40,30 @@ pub fn greedy(instance_name: Option<&str>, candidate_size: usize, runs: usize) {
     TestRunner::solve_instance(GreedySolver::new(candidate_size), instance_name, runs);
 }
 
-pub fn local_search(instance_name: Option<&str>, neighborhood: Neighborhood, step_function: StepFunction, runs: usize) {
+pub fn local_search(instance_name: Option<&str>, neighborhood: Neighborhood, step_function: StepFunction, iteration_limit: usize, runs: usize) {
     match neighborhood {
-        Neighborhood::DriverFlip => start_local_search(DriverFlip::new(), step_function, instance_name, runs),
-        Neighborhood::DoubleEdgeExchange(x) => start_local_search(DoubleEdgeExchange::new(x), step_function, instance_name, runs),
-        Neighborhood::TripleEdgeExchange(x) => start_local_search(TripleEdgeExchange::new(x), step_function, instance_name, runs),
+        Neighborhood::DriverFlip => start_local_search(DriverFlip::new(), step_function, iteration_limit, instance_name, runs),
+        Neighborhood::DoubleEdgeExchange(x) => start_local_search(DoubleEdgeExchange::new(x), step_function, iteration_limit, instance_name, runs),
+        Neighborhood::TripleEdgeExchange(x) => start_local_search(TripleEdgeExchange::new(x), step_function, iteration_limit, instance_name, runs),
         _ => unimplemented!()
     };
 }
 
-fn start_local_search<N> (neighborhood: N, step_function: StepFunction, instance_name: Option<&str>, runs: usize) where N: NeighborhoodImpl {
-    TestRunner::solve_instance(LocalSearch::new(neighborhood, step_function), instance_name, runs);
+fn start_local_search<N> (neighborhood: N, step_function: StepFunction, iteration_limit: usize, instance_name: Option<&str>, runs: usize) where N: NeighborhoodImpl {
+    TestRunner::solve_instance(LocalSearch::new(neighborhood, step_function, iteration_limit), instance_name, runs);
 }
 
-pub fn grasp(instance_name: Option<&str>, candidate_size: usize, neighborhood: Neighborhood, step_function: StepFunction, runs: usize) {
+pub fn grasp(instance_name: Option<&str>, candidate_size: usize, neighborhood: Neighborhood, step_function: StepFunction, iteration_limit: usize, ls_iteration_limit: usize, runs: usize) {
     match neighborhood {
-        Neighborhood::DriverFlip => start_grasp(DriverFlip::new(), step_function, candidate_size, instance_name, runs),
-        Neighborhood::DoubleEdgeExchange(x) => start_grasp(DoubleEdgeExchange::new(x), step_function, candidate_size, instance_name, runs),
-        Neighborhood::TripleEdgeExchange(x) => start_grasp(TripleEdgeExchange::new(x), step_function, candidate_size, instance_name, runs),
+        Neighborhood::DriverFlip => start_grasp(DriverFlip::new(), step_function, candidate_size, iteration_limit, ls_iteration_limit, instance_name, runs),
+        Neighborhood::DoubleEdgeExchange(x) => start_grasp(DoubleEdgeExchange::new(x), step_function, candidate_size, iteration_limit, ls_iteration_limit, instance_name, runs),
+        Neighborhood::TripleEdgeExchange(x) => start_grasp(TripleEdgeExchange::new(x), step_function, candidate_size, iteration_limit, ls_iteration_limit, instance_name, runs),
         _ => unimplemented!()
     };
 }
 
-fn start_grasp<N> (neighborhood: N, step_function: StepFunction, candidate_size: usize, instance_name: Option<&str>, runs: usize) where N: NeighborhoodImpl {
-    TestRunner::solve_instance(Grasp::new(neighborhood, step_function, candidate_size), instance_name, runs);
+fn start_grasp<N> (neighborhood: N, step_function: StepFunction, candidate_size: usize, iteration_limit: usize, ls_iteration_limit: usize, instance_name: Option<&str>, runs: usize) where N: NeighborhoodImpl {
+    TestRunner::solve_instance(Grasp::new(neighborhood, step_function, candidate_size, iteration_limit, ls_iteration_limit), instance_name, runs);
 }
 
 
@@ -109,24 +109,25 @@ pub fn test_delta() {
     let instance = Rc::new(instance);
     let mut greedy = GreedySolver::new(1);
     let logger = Logger::new(&greedy, "");
-    greedy.solve(Rc::clone(&instance), logger);
+    let mut solution = Solution::new(Rc::clone(&instance));
+    greedy.solve_greedy(&mut solution, &logger);
 
-    println!("{:?}", greedy.current_solution());
+    println!("{:?}", solution);
 
-    greedy.current_solution_mut().calculate_objective_value();
-    println!("{:?}", greedy.current_solution().driver_distances());
-    println!("Before: {}", greedy.current_solution().objective_value());
+    solution.calculate_objective_value();
+    println!("{:?}", solution.driver_distances());
+    println!("Before: {}", solution.objective_value());
     let start = 2;
     let length = 1;
     let length_2 = 0;
-    println!("Delta: {}", TripleEdgeExchange::get_delta(greedy.current_solution(), start, length, length_2));
-    let new_val = TripleEdgeExchange::get_delta(&greedy.current_solution(), start, length, length_2) + greedy.current_solution().objective_value();
-    TripleEdgeExchange::apply(greedy.current_solution_mut(), start, length, length_2, true);
-    println!("{:?}", greedy.current_solution().driver_distances());
-    println!("{:?}", greedy.current_solution());
-    println!("{}, {}", new_val, greedy.current_solution().objective_value());
-    greedy.current_solution_mut().calculate_objective_value();
-    println!("obj {}", greedy.current_solution().objective_value());
+    println!("Delta: {}", TripleEdgeExchange::get_delta(&solution, start, length, length_2));
+    let new_val = TripleEdgeExchange::get_delta(&solution, start, length, length_2) + solution.objective_value();
+    TripleEdgeExchange::apply(&mut solution, start, length, length_2, true);
+    println!("{:?}", solution.driver_distances());
+    println!("{:?}", solution);
+    println!("{}, {}", new_val, solution.objective_value());
+    solution.calculate_objective_value();
+    println!("obj {}", solution.objective_value());
 
 }
 

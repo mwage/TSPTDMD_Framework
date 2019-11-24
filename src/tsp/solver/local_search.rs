@@ -9,14 +9,28 @@ use crate::StepFunction;
 
 pub struct LocalSearch<N: NeighborhoodImpl> {
     neighborhood: N,
-    step_function: StepFunction
+    step_function: StepFunction,
+    iteration_limit: usize
 }
 
 impl<N> LocalSearch<N> where N: NeighborhoodImpl {
-    pub fn new(neighborhood: N, step_function: StepFunction) -> Self {
+    pub fn new(neighborhood: N, step_function: StepFunction, iteration_limit: usize) -> Self {
         LocalSearch {
             neighborhood,
-            step_function
+            step_function,
+            iteration_limit
+        }
+    }
+
+    pub fn search(&self, solution: &mut Solution) {
+        let mut counter = 0;
+        loop {
+            let improved = self.neighborhood.get_neighbor(solution, &self.step_function, true);    // TODO: Set delta eval
+
+            if !improved || counter >= self.iteration_limit {
+                break;
+            }
+            counter += 1;
         }
     }
 

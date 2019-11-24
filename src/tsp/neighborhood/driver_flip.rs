@@ -39,10 +39,10 @@ impl DriverFlip {
 } 
 
 impl NeighborhoodImpl for DriverFlip {
-    fn get_random_neighbor(&self, solution: &mut Solution, delta_eval: bool) {
+    fn get_random_neighbor(&self, solution: &mut Solution, delta_eval: bool) -> bool {
         let instance = solution.instance();
         if instance.number_of_drivers() == 1 {
-            return;
+            return false;
         }
         let idx = rand::thread_rng().gen_range(0, instance.number_of_vertices());
         let old_driver = solution.get_assignment(idx).driver();
@@ -51,11 +51,12 @@ impl NeighborhoodImpl for DriverFlip {
             new_driver += 1;
         }
         DriverFlip::apply(solution, idx, new_driver, delta_eval);
+        true
     }
 
-    fn get_best_improving_neighbor(&self, solution: &mut Solution, delta_eval: bool) {
+    fn get_best_improving_neighbor(&self, solution: &mut Solution, delta_eval: bool) -> bool {
         if solution.instance().number_of_drivers() == 1 {
-            return;
+            return false;
         }
         let number_of_vertices = solution.instance().number_of_vertices();
         let mut best_solution: (usize, isize) = (0, 0);
@@ -73,13 +74,15 @@ impl NeighborhoodImpl for DriverFlip {
         }
 
         if best_solution.1 < 0 {
-            DriverFlip::apply(solution, best_solution.0, smallest_driver, delta_eval)
+            DriverFlip::apply(solution, best_solution.0, smallest_driver, delta_eval);
+            return true;
         }
+        false
     }
 
-    fn get_first_improving_neighbor(&self, solution: &mut Solution, delta_eval: bool) {
+    fn get_first_improving_neighbor(&self, solution: &mut Solution, delta_eval: bool) -> bool {
         if solution.instance().number_of_drivers() == 1 {
-            return;
+            return false;
         }
         let number_of_vertices = solution.instance().number_of_vertices();
         let (smallest_driver, _) = solution.driver_distances().iter().enumerate()
@@ -92,9 +95,10 @@ impl NeighborhoodImpl for DriverFlip {
             let delta = DriverFlip::get_delta(solution, i, smallest_driver);
             if delta < 0 {
                 DriverFlip::apply(solution, i, smallest_driver, delta_eval);
-                return;
+                return true;
             }
         }
+        false
     }
 
     fn to_string(&self) -> String {

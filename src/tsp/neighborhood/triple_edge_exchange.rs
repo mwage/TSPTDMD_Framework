@@ -141,15 +141,17 @@ impl TripleEdgeExchange {
 }
 
 impl NeighborhoodImpl for TripleEdgeExchange {
-    fn get_random_neighbor(&self, solution: &mut Solution, delta_eval: bool) {
+    fn get_random_neighbor(&self, solution: &mut Solution, delta_eval: bool) -> bool {
         let start = rand::thread_rng().gen_range(0, solution.instance().number_of_vertices());
         let first_length = rand::thread_rng().gen_range(1, self.max_length + 1);
         // TODO: get max_length from instance size?
         let second_length = rand::thread_rng().gen_range(1, self.max_length + 1);
         TripleEdgeExchange::apply(solution, start, first_length, second_length, delta_eval);
+
+        true
     }
 
-    fn get_best_improving_neighbor(&self, solution: &mut Solution, delta_eval: bool) {
+    fn get_best_improving_neighbor(&self, solution: &mut Solution, delta_eval: bool) -> bool {
         let number_of_vertices = solution.instance().number_of_vertices();
         let mut best_solution: (usize, usize, usize, isize) = (0, 0, 0, 0);
         for start_idx in 0..number_of_vertices {
@@ -166,10 +168,13 @@ impl NeighborhoodImpl for TripleEdgeExchange {
         if best_solution.3 > 0 {
             TripleEdgeExchange::apply(
                 solution, best_solution.0, best_solution.1, best_solution.2, delta_eval);
+            return true;
         }
+
+        false
     }
 
-    fn get_first_improving_neighbor(&self, solution: &mut Solution, delta_eval: bool) {
+    fn get_first_improving_neighbor(&self, solution: &mut Solution, delta_eval: bool) -> bool {
         let number_of_vertices = solution.instance().number_of_vertices();
         for start_idx in 0..number_of_vertices {
             for first_block_length in 1..self.max_length {
@@ -178,11 +183,13 @@ impl NeighborhoodImpl for TripleEdgeExchange {
                     if delta < 0 {
                         TripleEdgeExchange::apply(
                             solution, start_idx, first_block_length, second_block_length, delta_eval);
-                        return;                 
+                        return true;                 
                     }
                 }
             }
         }
+        
+        false
     }
 
     fn to_string(&self) -> String {

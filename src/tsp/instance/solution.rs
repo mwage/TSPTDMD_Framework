@@ -122,6 +122,7 @@ impl Solution {
     }
     
     pub fn calculate_objective_value(&mut self) {
+        // TODO: Calculate all driver distances
         self.objective_value = self.driver_distances.iter()
             .map(|x| (self.instance.desired_travel_distance() - *x).pow(2))
             .collect::<Vec<isize>>().iter().sum();
