@@ -82,19 +82,24 @@ impl Solution {
         &mut self.assignments
     }
 
+    pub fn delta_evaluation(&mut self, delta: isize, distances: Vec<isize>) {
+        self.objective_value += delta;
+        self.driver_distances = distances;
+    }
+
     pub fn get_distance(&self, idx: usize) -> isize {
         let first = self.get_assignment(idx).vertex();
         let prev = self.get_assignment(modulo_pos(idx as isize - 1, self.instance.number_of_vertices())).vertex();
         self.instance.get_vertex(first).get_weight(prev)
     }
     
-    /// Calculates the change in objective value given a
-    /// delta: change in distance for driver (old - new)
-    pub fn delta_evaluation(&mut self, driver: usize, delta: isize) {
-        let new_distance = self.driver_distances[driver] - delta;
-        self.objective_value -= delta * (-2 * self.instance().desired_travel_distance() + self.driver_distances[driver] + new_distance);
-        self.driver_distances[driver] = new_distance;
-    }
+    // /// Calculates the change in objective value given a
+    // /// delta: change in distance for driver (old - new)
+    // pub fn delta_evaluation(&mut self, driver: usize, delta: isize) {
+    //     let new_distance = self.driver_distances[driver] - delta;
+    //     self.objective_value -= delta * (-2 * self.instance().desired_travel_distance() + self.driver_distances[driver] + new_distance);
+    //     self.driver_distances[driver] = new_distance;
+    // }
 
     pub fn add_assignment(&mut self, vertex: usize, driver: usize, distance: isize) {
         if self.assignments.len() > self.instance.number_of_vertices() {

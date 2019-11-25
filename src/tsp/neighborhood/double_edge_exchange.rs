@@ -7,58 +7,71 @@ use crate::rand::Rng;
 use crate::modulo_pos;
 
 pub struct DoubleEdgeExchange {
-    max_length: usize
+    max_length: usize,
+    stored_move: Option<DEMove>
 }
 
 impl DoubleEdgeExchange {
     pub fn new(max_length: usize) -> Self {
         DoubleEdgeExchange {
-            max_length
+            max_length,
+            stored_move: None
         }
     }
 
-    pub fn apply(solution: &mut Solution, start_idx: usize, length: usize, delta_eval: bool) {
+    pub fn delta(&self) -> Option<isize> {
+        match self.stored_move {
+            Some(x) => Some(x.delta),
+            None => None
+        }
+    }
 
+    pub fn apply(&mut self, solution: &Solution, delta_eval: bool) {
+        let DEMove { start_idx, block_length, delta, distances } = self.stored_move.expect("Attempted to set non-initialized neighbor.");
         // TODO: Only set instance, calc distances on the fly
         let number_of_vertices = solution.instance().number_of_vertices();
         let start_idx = modulo_pos(start_idx as isize - 1, number_of_vertices);
-        assert!(length != 0);
-        let mut copy = Vec::with_capacity(length + 1);
-        for i in start_idx..start_idx + length + 1 {
+
+        let mut copy = Vec::with_capacity(block_length + 1);
+        for i in start_idx..start_idx + block_length + 1 {
             copy.push(solution.get_assignment(i % number_of_vertices).clone());
         }
         for i in 0..copy.len() {
-            solution.get_assignment_mut((start_idx + length - i) % number_of_vertices).set_vertex(copy[i].vertex());
+            solution.get_assignment_mut((start_idx + block_length - i) % number_of_vertices).set_vertex(copy[i].vertex());
             if i == copy.len() - 1 {
                 continue;
             }
-            solution.get_assignment_mut((start_idx + length - i) % number_of_vertices).set_driver(copy[i + 1].driver());
+            solution.get_assignment_mut((start_idx + block_length - i) % number_of_vertices).set_driver(copy[i + 1].driver());
         }
 
-        if !delta_eval {
-            return;
+        if delta_eval {
+            solution.delta_evaluation(delta, distances);
         }
 
-        let prev_vertex = solution.get_assignment(modulo_pos(start_idx as isize - 1, number_of_vertices)).vertex();
-        let old_distance = solution.instance().get_vertex(prev_vertex).get_weight(copy[0].vertex());   // Old distance of d0 to start vertex
-        let new_vertex = solution.get_assignment(start_idx).vertex();
-        let new_distance = solution.instance().get_vertex(prev_vertex).get_weight(new_vertex);
-        solution.delta_evaluation(solution.get_assignment(start_idx).driver(), old_distance - new_distance);
 
-        let next_vertex = solution.get_assignment((start_idx + length + 1) % number_of_vertices).vertex();
-        let old_distance = solution.instance().get_vertex(next_vertex).get_weight(copy[copy.len() - 1].vertex());   // Old distance of d0 to start vertex
-        let new_vertex = solution.get_assignment((start_idx + length) % number_of_vertices).vertex();
-        let new_distance = solution.instance().get_vertex(next_vertex).get_weight(new_vertex);
-        solution.delta_evaluation(solution.get_assignment((start_idx + length + 1) % number_of_vertices).driver(), old_distance - new_distance);
+
+        // let prev_vertex = solution.get_assignment(modulo_pos(start_idx as isize - 1, number_of_vertices)).vertex();
+        // let old_distance = solution.instance().get_vertex(prev_vertex).get_weight(copy[0].vertex());   // Old distance of d0 to start vertex
+        // let new_vertex = solution.get_assignment(start_idx).vertex();
+        // let new_distance = solution.instance().get_vertex(prev_vertex).get_weight(new_vertex);
+        // solution.delta_evaluation(solution.get_assignment(start_idx).driver(), old_distance - new_distance);
+
+        // let next_vertex = solution.get_assignment((start_idx + block_length + 1) % number_of_vertices).vertex();
+        // let old_distance = solution.instance().get_vertex(next_vertex).get_weight(copy[copy.len() - 1].vertex());   // Old distance of d0 to start vertex
+        // let new_vertex = solution.get_assignment((start_idx + block_length) % number_of_vertices).vertex();
+        // let new_distance = solution.instance().get_vertex(next_vertex).get_weight(new_vertex);
+        // solution.delta_evaluation(solution.get_assignment((start_idx + block_length + 1) % number_of_vertices).driver(), old_distance - new_distance);
     }
 
-    pub fn get_delta(solution: &Solution, start_idx: usize, length: usize) -> isize {
+    pub fn get_delta(solution: &Solution, start_idx: usize, block_length: usize) -> DEMove {
+        assert!(block_length != 0);
+
         let number_of_vertices = solution.instance().number_of_vertices();
         let start_idx = modulo_pos(start_idx as isize - 1, number_of_vertices);
         let prev_ass = solution.get_assignment(modulo_pos(start_idx as isize - 1, number_of_vertices));
         let start_ass = solution.get_assignment(start_idx);
-        let end_ass = solution.get_assignment((start_idx + length) % number_of_vertices);
-        let next_ass = solution.get_assignment((start_idx + length + 1) % number_of_vertices);
+        let end_ass = solution.get_assignment((start_idx + block_length) % number_of_vertices);
+        let next_ass = solution.get_assignment((start_idx + block_length + 1) % number_of_vertices);
         
         let e_1 = solution.instance().get_vertex(prev_ass.vertex()).get_weight(start_ass.vertex());
         let e_2 = solution.instance().get_vertex(next_ass.vertex()).get_weight(end_ass.vertex());
@@ -75,47 +88,48 @@ impl DoubleEdgeExchange {
             delta += (desired - driver_distances[i]).pow(2) - 
                 (desired - solution.get_driver_distance(i)).pow(2);
         }
-        delta
+        DEMove::new(start_idx, block_length, delta, driver_distances)
     }
 }
 
 impl NeighborhoodImpl for DoubleEdgeExchange {
-    fn get_random_neighbor(&self, solution: &mut Solution, delta_eval: bool) -> bool {
-        let start = rand::thread_rng().gen_range(0, solution.instance().number_of_vertices());
-        let length = rand::thread_rng().gen_range(1, self.max_length + 1);
-        DoubleEdgeExchange::apply(solution, start, length, delta_eval);
+    fn get_random_neighbor(&mut self, solution: &Solution, delta_eval: bool) -> bool {
+        let start_idx = rand::thread_rng().gen_range(0, solution.instance().number_of_vertices());
+        let block_length = rand::thread_rng().gen_range(1, self.max_length + 1);
+        self.stored_move = Some(DoubleEdgeExchange::get_delta(solution, start_idx, block_length));
         true
     }
 
-    fn get_best_improving_neighbor(&self, solution: &mut Solution, delta_eval: bool) -> bool {
+    fn get_best_improving_neighbor(&mut self, solution: &Solution, delta_eval: bool) -> bool {
         let number_of_vertices = solution.instance().number_of_vertices();
-        let mut best_solution: (usize, usize, isize) = (0, 0, 0);
         for start_idx in 0..number_of_vertices {
             for block_length in 1..self.max_length {
-                let delta = DoubleEdgeExchange::get_delta(solution, start_idx, block_length);
-                if delta < best_solution.2 {
-                    best_solution = (start_idx, block_length, delta);
+                let de_move = DoubleEdgeExchange::get_delta(solution, start_idx, block_length);
+
+                // If move is not set or delta < delta of stored solution => update stored move
+                if let Some(delta) = self.delta() {  
+                    if de_move.delta() >= delta {
+                        continue;
+                    }
                 }
+
+                self.stored_move = Some(de_move);
             }
         }
 
-        if best_solution.2 > 0 {
-            DoubleEdgeExchange::apply(
-                solution, best_solution.0, best_solution.1, delta_eval);
-            return true;
+        match self.stored_move {
+            Some(_) => true,
+            None => false
         }
-
-        false
     }
     
-    fn get_first_improving_neighbor(&self, solution: &mut Solution, delta_eval: bool) -> bool {
+    fn get_first_improving_neighbor(&mut self, solution: &Solution, delta_eval: bool) -> bool {
         let number_of_vertices = solution.instance().number_of_vertices();
         for start_idx in 0..number_of_vertices {
             for block_length in 1..self.max_length {
-                let delta = DoubleEdgeExchange::get_delta(solution, start_idx, block_length);
-                if delta < 0 {
-                    DoubleEdgeExchange::apply(
-                        solution, start_idx, block_length, delta_eval);
+                let de_move = DoubleEdgeExchange::get_delta(solution, start_idx, block_length);
+                if de_move.delta() < 0 {
+                    self.stored_move = Some(de_move);
                     return true;
                 }
             }
@@ -123,8 +137,35 @@ impl NeighborhoodImpl for DoubleEdgeExchange {
         false
     }
 
+    fn set_neighbor(&mut self, solution: &mut Solution, delta_eval: bool) {
+        self.apply(solution, delta_eval);
+        self.stored_move = None;
+    }
+
     fn to_string(&self) -> String {
         format!("DoubleEdgeExchange.{}", self.max_length)
+    }
+}
+
+struct DEMove {
+    start_idx: usize,
+    block_length: usize,
+    delta: isize,
+    distances: Vec<isize>
+}
+
+impl DEMove {
+    pub fn new(start_idx: usize, block_length: usize, delta: isize, distances: Vec<isize>) -> Self {
+        DEMove {
+            start_idx,
+            block_length,
+            delta,
+            distances
+        }
+    }
+
+    pub fn delta(&self) -> isize {
+        self.delta
     }
 }
     
@@ -196,8 +237,10 @@ fn test_delta_eval() {
         assert_eq!(solution.get_assignment(i).driver(), i);
         assert_eq!(solution.get_assignment(i).vertex(), i);
     }
+    let mut double_edge_exchange = DoubleEdgeExchange::new(4);
     solution.calculate_objective_value();
-    DoubleEdgeExchange::apply(&mut solution, 1, 2, true);
+    double_edge_exchange.stored_move = Some(DoubleEdgeExchange::get_delta(&solution, 1, 2));
+    double_edge_exchange.apply(&mut solution, true);
     let x = solution.objective_value();
     solution.calculate_objective_value();
     assert_eq!(x, solution.objective_value());
@@ -214,7 +257,9 @@ fn test_delta() {
     println!("start: {}", start);
     println!("length: {}", length);
 
-    let new_val = DoubleEdgeExchange::get_delta(&solution, start, length) + solution.objective_value();
-    DoubleEdgeExchange::apply(&mut solution, start, length, true);
+    let mut double_edge_exchange = DoubleEdgeExchange::new(4);
+    double_edge_exchange.stored_move = Some(DoubleEdgeExchange::get_delta(&solution, start, length));
+    let new_val = double_edge_exchange.stored_move.unwrap().delta() + solution.objective_value();
+    double_edge_exchange.apply(&mut solution, true);
     assert_eq!(new_val, solution.objective_value());
 }

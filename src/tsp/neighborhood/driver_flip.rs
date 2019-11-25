@@ -7,39 +7,52 @@ use super::NeighborhoodImpl;
 use crate::modulo_pos;
 
 pub struct DriverFlip {
-
+    stored_move: Option<DFMove>
 }
 
 impl DriverFlip {
     pub fn new() -> Self {
-        DriverFlip {}
+        DriverFlip {
+            stored_move: None
+        }
     }
 
-    pub fn apply(solution: &mut Solution, assignment: usize, new_driver: usize, delta_eval: bool) {
-        let old_driver = solution.get_assignment(assignment).driver();
-        let vertex = solution.get_assignment(assignment).vertex();
-        solution.get_assignment_mut(assignment).set_driver(new_driver);
+    pub fn delta(&self) -> Option<isize> {
+        match self.stored_move {
+            Some(x) => Some(x.delta),
+            None => None
+        }
+    }
 
-        if !delta_eval {
-            return;
+    pub fn apply(&mut self, solution: &mut Solution, delta_eval: bool) {
+        let DFMove { idx, new_driver, delta, distances } = self.stored_move.expect("Attempted to set non-initialized neighbor.");
+        let old_driver = solution.get_assignment(idx).driver();
+        let vertex = solution.get_assignment(idx).vertex();
+        solution.get_assignment_mut(idx).set_driver(new_driver);
+
+        if delta_eval {
+            solution.delta_evaluation(delta, distances);
         }
 
-        let prev_vertex = solution.get_assignment(modulo_pos(assignment as isize - 1, solution.instance().number_of_vertices())).vertex();
-        let distance = solution.instance().get_vertex(prev_vertex).get_weight(vertex);
-        solution.delta_evaluation(old_driver, distance);
-        solution.delta_evaluation(new_driver, -distance);
+        // let prev_vertex = solution.get_assignment(modulo_pos(idx as isize - 1, solution.instance().number_of_vertices())).vertex();
+        // let distance = solution.instance().get_vertex(prev_vertex).get_weight(vertex);
+        // solution.delta_evaluation(old_driver, distance);
+        // solution.delta_evaluation(new_driver, -distance);
     }
 
-    pub fn get_delta(solution: &Solution, assignment: usize, new_driver: usize) -> isize {
-        let distance = solution.get_distance(assignment);
-        let old_driver_distance = solution.get_driver_distance(solution.get_assignment(assignment).driver()) - distance;
+    pub fn get_delta(solution: &Solution, idx: usize, new_driver: usize) -> DFMove {
+        let distance = solution.get_distance(idx);
+        let old_driver_distance = solution.get_driver_distance(solution.get_assignment(idx).driver()) - distance;
         let new_driver_distance = solution.get_driver_distance(new_driver);
-        2 * distance * (new_driver_distance - old_driver_distance)
+        let delta = 2 * distance * (new_driver_distance - old_driver_distance);
+
+        DFMove::new(idx, new_driver, delta, Vec::new())
+        // TODO: calculate distances
     }
 } 
 
 impl NeighborhoodImpl for DriverFlip {
-    fn get_random_neighbor(&self, solution: &mut Solution, delta_eval: bool) -> bool {
+    fn get_random_neighbor(&mut self, solution: &Solution, delta_eval: bool) -> bool {
         let instance = solution.instance();
         if instance.number_of_drivers() == 1 {
             return false;
@@ -50,16 +63,15 @@ impl NeighborhoodImpl for DriverFlip {
         if new_driver >= old_driver {
             new_driver += 1;
         }
-        DriverFlip::apply(solution, idx, new_driver, delta_eval);
+        self.stored_move = Some(DriverFlip::get_delta(solution, idx, new_driver));
         true
     }
 
-    fn get_best_improving_neighbor(&self, solution: &mut Solution, delta_eval: bool) -> bool {
+    fn get_best_improving_neighbor(&mut self, solution: &Solution, delta_eval: bool) -> bool {
         if solution.instance().number_of_drivers() == 1 {
             return false;
         }
         let number_of_vertices = solution.instance().number_of_vertices();
-        let mut best_solution: (usize, isize) = (0, 0);
         let (smallest_driver, _) = solution.driver_distances().iter().enumerate()
             .min_by_key(|(_, dist)| *dist).unwrap();    // Get driver with smallest distance driven
         for i in 0..number_of_vertices {
@@ -67,20 +79,25 @@ impl NeighborhoodImpl for DriverFlip {
                 continue;
             }
 
-            let delta = DriverFlip::get_delta(solution, i, smallest_driver);
-            if delta < best_solution.1 {
-                best_solution = (i, delta);
+            let df_move = DriverFlip::get_delta(solution, i, smallest_driver);
+
+            // If move is not set or delta < delta of stored solution => update stored move
+            if let Some(delta) = self.delta() {  
+                if df_move.delta() >= delta {
+                    continue;
+                }
             }
+
+            self.stored_move = Some(df_move);
         }
 
-        if best_solution.1 < 0 {
-            DriverFlip::apply(solution, best_solution.0, smallest_driver, delta_eval);
-            return true;
+        match self.stored_move {
+            Some(_) => true,
+            None => false
         }
-        false
     }
 
-    fn get_first_improving_neighbor(&self, solution: &mut Solution, delta_eval: bool) -> bool {
+    fn get_first_improving_neighbor(&mut self, solution: &Solution, delta_eval: bool) -> bool {
         if solution.instance().number_of_drivers() == 1 {
             return false;
         }
@@ -101,8 +118,35 @@ impl NeighborhoodImpl for DriverFlip {
         false
     }
 
+    fn set_neighbor(&mut self, solution: &mut Solution, delta_eval: bool) {
+        self.apply(solution, delta_eval);
+        self.stored_move = None;
+    }
+
     fn to_string(&self) -> String {
         String::from("DriverFlip")
+    }
+}
+
+struct DFMove {
+    idx: usize,
+    new_driver: usize,
+    delta: isize,
+    distances: Vec<isize>
+}
+
+impl DFMove {
+    pub fn new(idx: usize, new_driver: usize, delta: isize, distances: Vec<isize>) -> Self {
+        DFMove {
+            idx,
+            new_driver,
+            delta,
+            distances
+        }
+    }
+
+    pub fn delta(&self) -> isize {
+        self.delta
     }
 }
 

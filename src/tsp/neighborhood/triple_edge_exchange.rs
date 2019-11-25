@@ -203,6 +203,11 @@ impl NeighborhoodImpl for TripleEdgeExchange {
         false
     }
 
+    fn set_neighbor(&mut self, solution: &mut Solution, delta_eval: bool) {
+        self.apply(solution, delta_eval);
+        self.stored_move = None;
+    }
+
     fn to_string(&self) -> String {
         format!("TripleEdgeExchange.{}", self.max_length)
     }

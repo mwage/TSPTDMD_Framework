@@ -13,9 +13,10 @@ use std::fmt;
 use crate::tsp::Solution;
 
 pub trait NeighborhoodImpl {
-    fn get_random_neighbor(&self, solution: &mut Solution, delta_eval: bool) -> bool;
-    fn get_best_improving_neighbor(&self, solution: &mut Solution, delta_eval: bool) -> bool;
-    fn get_first_improving_neighbor(&self, solution: &mut Solution, delta_eval: bool) -> bool;
+    fn get_random_neighbor(&mut self, solution: &Solution, delta_eval: bool) -> bool;
+    fn get_best_improving_neighbor(&mut self, solution: &Solution, delta_eval: bool) -> bool;
+    fn get_first_improving_neighbor(&mut self, solution: &Solution, delta_eval: bool) -> bool;
+    fn set_neighbor(&mut self, solution: &mut Solution, delta_eval: bool);
     fn to_string(&self) -> String;    // Used for logging
 
     fn get_neighbor(&self, solution: &mut Solution, step_function: &StepFunction, delta_eval: bool) -> bool {  // Match stepfunction
