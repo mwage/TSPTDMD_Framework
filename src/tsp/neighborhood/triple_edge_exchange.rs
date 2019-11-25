@@ -95,9 +95,12 @@ impl TripleEdgeExchange {
 
     pub fn get_delta(solution: &Solution, start_idx: usize, first_block_length: usize, second_block_length: usize) -> isize {
         println!("Start of delta!");
-        // let start_idx = start_idx - 1;
+        let start_idx = start_idx - 1;        
         let number_of_vertices = solution.instance().number_of_vertices();
+        let first_block_length = first_block_length + 1;    // Transform number of edges to number of nodes
+        let second_block_length = second_block_length + 1;  // for easier indexing
         let total_length = first_block_length + second_block_length;
+
         let ass_0 = solution.get_assignment((start_idx + total_length) % number_of_vertices);
         let ass_1 = solution.get_assignment(modulo_pos(start_idx as isize - 1, number_of_vertices));
         let ass_2 = solution.get_assignment(start_idx);
@@ -138,6 +141,7 @@ impl TripleEdgeExchange {
         updated_driver_distances[ass_4.driver()] = updated_driver_distances[ass_4.driver()] - e_2 + e_5;
         updated_driver_distances[ass_0.driver()] = updated_driver_distances[ass_0.driver()] - e_3 + e_6;
         
+        println!("{:?}", updated_driver_distances);
         let mut delta = 0;
         for i in 0..updated_driver_distances.len() {
             delta += (desired - updated_driver_distances[i]).pow(2) - 
