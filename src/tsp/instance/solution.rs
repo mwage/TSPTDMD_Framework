@@ -17,13 +17,15 @@ pub struct Solution {
 
 impl Solution {
     pub fn new(instance: Rc<TSPInstance>) -> Self {
-        Solution {
+        let sol = Solution {
             assignments: Vec::with_capacity(instance.number_of_vertices()),
             unassigned_vertices: (1..instance.number_of_vertices()).collect(),
             driver_distances: vec![0; instance.number_of_drivers()],
             instance,
             objective_value: isize::max_value()
-        }
+        };
+        println!("{:?}", sol.driver_distances());
+        sol
     }
 
     pub fn new_random(instance: Rc<TSPInstance>) -> Self {
@@ -128,15 +130,20 @@ impl Solution {
     }
     
     // Calculates objective value from driver distances
-    pub fn calculate_objective_value(&mut self) {   
+    pub fn calculate_objective_value(&mut self) {
         self.objective_value = self.driver_distances.iter()
             .map(|x| (self.instance.desired_travel_distance() - *x).pow(2))
             .collect::<Vec<isize>>().iter().sum();
     }    
     
     // Calculates objective value by recalculating driver distances
-    pub fn calculate_objective_value_from_scratch(&mut self) {  
-        // TODO: Calculate all driver distances
+    pub fn calculate_objective_value_from_scratch(&mut self) {
+        self.driver_distances = vec![0; self.instance.number_of_drivers()];
+        for i in 0..self.assignments.len() {
+            let assignment = &self.assignments[i];
+            let prev = &self.assignments[modulo_pos(i as isize - 1, self.assignments.len())];
+            self.driver_distances[assignment.driver()] += self.instance.get_vertex(assignment.vertex()).get_weight(prev.vertex());
+        }
         self.calculate_objective_value();
     }
     

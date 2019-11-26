@@ -46,14 +46,18 @@ impl DriverFlip {
         // solution.delta_evaluation(new_driver, -distance);
     }
 
-    pub fn evaluate_move(&self, solution: &Solution, idx: usize, new_driver: usize) -> DFMove {
+    fn evaluate_move(&self, solution: &Solution, idx: usize, new_driver: usize) -> DFMove {
         let distance = solution.get_distance(idx);
-        let old_driver_distance = solution.get_driver_distance(solution.get_assignment(idx).driver()) - distance;
+        let old_driver = solution.get_assignment(idx).driver();
+        let old_driver_distance = solution.get_driver_distance(old_driver) - distance;
         let new_driver_distance = solution.get_driver_distance(new_driver);
         let delta = 2 * distance * (new_driver_distance - old_driver_distance);
 
-        DFMove::new(idx, new_driver, delta, Vec::new())
-        // TODO: calculate distances
+        let mut distances = solution.driver_distances().clone();
+        distances[old_driver] = old_driver_distance;
+        distances[new_driver] = new_driver_distance + distance;
+        
+        DFMove::new(idx, new_driver, delta, distances)
     }
 } 
 
@@ -184,8 +188,8 @@ fn test_delta() {
     let new_driver = (old_driver + 1) % 3;
     let mut driver_flip = DriverFlip::new();
     driver_flip.stored_move = Some(driver_flip.evaluate_move(&solution, idx, new_driver));
-    let new_val = driver_flip.delta().unwrap() + solution.objective_value();
     driver_flip.apply(&mut solution, true);
-
+    let new_val = solution.objective_value();
+    solution.calculate_objective_value_from_scratch();
     assert_eq!(new_val, solution.objective_value());
 }

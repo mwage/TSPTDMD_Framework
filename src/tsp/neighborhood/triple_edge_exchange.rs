@@ -39,7 +39,7 @@ impl TripleEdgeExchange {
 
     pub fn apply(&mut self, solution: &mut Solution, delta_eval: bool) {
         let (start_idx, first_block_length, second_block_length, delta, distances) = self.stored_move().to_tuple();
-        let start_idx = start_idx - 1;
+        let start_idx = start_idx - 1;  // TODO: Kill, as it can lead to subtract with overflow
         let number_of_vertices = solution.instance().number_of_vertices();
         let first_block_length = first_block_length + 1;    // Transform number of edges to number of nodes
         let second_block_length = second_block_length + 1;  // for easier indexing
@@ -116,7 +116,7 @@ impl TripleEdgeExchange {
 
     pub fn evaluate_move(&self, solution: &Solution, start_idx: usize, first_block_length: usize, second_block_length: usize) -> TEMove {
         println!("Start of delta!");
-        let start_idx = start_idx - 1;        
+        let start_idx = start_idx - 1;  // TODO: Kill, as it can lead to subtract with overflow
         let number_of_vertices = solution.instance().number_of_vertices();
         let first_block_length = first_block_length + 1;    // Transform number of edges to number of nodes
         let second_block_length = second_block_length + 1;  // for easier indexing
