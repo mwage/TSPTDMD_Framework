@@ -121,9 +121,12 @@ pub fn test_delta() {
     let start = 2;
     let length = 1;
     let length_2 = 0;
-    println!("Delta: {}", TripleEdgeExchange::get_delta(&solution, start, length, length_2));
-    let new_val = TripleEdgeExchange::get_delta(&solution, start, length, length_2) + solution.objective_value();
-    TripleEdgeExchange::apply(&mut solution, start, length, length_2, true);
+    let mut triple_edge_exchange = TripleEdgeExchange::new(5);
+    triple_edge_exchange.set_move(triple_edge_exchange.evaluate_move(&solution, start, length, length_2));
+    println!("Delta: {}", triple_edge_exchange.stored_move().delta());
+
+    let new_val = triple_edge_exchange.delta().unwrap() + solution.objective_value();
+    triple_edge_exchange.apply(&mut solution, true);
     println!("{:?}", solution.driver_distances());
     println!("{:?}", solution);
     println!("{}, {}", new_val, solution.objective_value());

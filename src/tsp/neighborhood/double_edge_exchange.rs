@@ -26,7 +26,7 @@ impl DoubleEdgeExchange {
         }
     }
 
-    pub fn apply(&mut self, solution: &Solution, delta_eval: bool) {
+    pub fn apply(&mut self, solution: &mut Solution, delta_eval: bool) {
         let DEMove { start_idx, block_length, delta, distances } = self.stored_move.expect("Attempted to set non-initialized neighbor.");
         // TODO: Only set instance, calc distances on the fly
         let number_of_vertices = solution.instance().number_of_vertices();
@@ -63,7 +63,7 @@ impl DoubleEdgeExchange {
         // solution.delta_evaluation(solution.get_assignment((start_idx + block_length + 1) % number_of_vertices).driver(), old_distance - new_distance);
     }
 
-    pub fn get_delta(solution: &Solution, start_idx: usize, block_length: usize) -> DEMove {
+    pub fn evaluate_move(&self, solution: &Solution, start_idx: usize, block_length: usize) -> DEMove {
         assert!(block_length != 0);
 
         let number_of_vertices = solution.instance().number_of_vertices();
@@ -96,7 +96,7 @@ impl NeighborhoodImpl for DoubleEdgeExchange {
     fn get_random_neighbor(&mut self, solution: &Solution, delta_eval: bool) -> bool {
         let start_idx = rand::thread_rng().gen_range(0, solution.instance().number_of_vertices());
         let block_length = rand::thread_rng().gen_range(1, self.max_length + 1);
-        self.stored_move = Some(DoubleEdgeExchange::get_delta(solution, start_idx, block_length));
+        self.stored_move = Some(self.evaluate_move(solution, start_idx, block_length));
         true
     }
 
@@ -104,7 +104,7 @@ impl NeighborhoodImpl for DoubleEdgeExchange {
         let number_of_vertices = solution.instance().number_of_vertices();
         for start_idx in 0..number_of_vertices {
             for block_length in 1..self.max_length {
-                let de_move = DoubleEdgeExchange::get_delta(solution, start_idx, block_length);
+                let de_move = self.evaluate_move(solution, start_idx, block_length);
 
                 // If move is not set or delta < delta of stored solution => update stored move
                 if let Some(delta) = self.delta() {  
@@ -127,7 +127,7 @@ impl NeighborhoodImpl for DoubleEdgeExchange {
         let number_of_vertices = solution.instance().number_of_vertices();
         for start_idx in 0..number_of_vertices {
             for block_length in 1..self.max_length {
-                let de_move = DoubleEdgeExchange::get_delta(solution, start_idx, block_length);
+                let de_move = self.evaluate_move(solution, start_idx, block_length);
                 if de_move.delta() < 0 {
                     self.stored_move = Some(de_move);
                     return true;
@@ -239,7 +239,7 @@ fn test_delta_eval() {
     }
     let mut double_edge_exchange = DoubleEdgeExchange::new(4);
     solution.calculate_objective_value();
-    double_edge_exchange.stored_move = Some(DoubleEdgeExchange::get_delta(&solution, 1, 2));
+    double_edge_exchange.stored_move = Some(double_edge_exchange.evaluate_move(&solution, 1, 2));
     double_edge_exchange.apply(&mut solution, true);
     let x = solution.objective_value();
     solution.calculate_objective_value();
@@ -258,7 +258,7 @@ fn test_delta() {
     println!("length: {}", length);
 
     let mut double_edge_exchange = DoubleEdgeExchange::new(4);
-    double_edge_exchange.stored_move = Some(DoubleEdgeExchange::get_delta(&solution, start, length));
+    double_edge_exchange.stored_move = Some(double_edge_exchange.evaluate_move(&solution, start, length));
     let new_val = double_edge_exchange.stored_move.unwrap().delta() + solution.objective_value();
     double_edge_exchange.apply(&mut solution, true);
     assert_eq!(new_val, solution.objective_value());

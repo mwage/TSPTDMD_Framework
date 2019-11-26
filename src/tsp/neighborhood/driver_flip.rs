@@ -20,7 +20,7 @@ impl DriverFlip {
         match self.stored_move {
             Some(x) => Some(x.delta),
             None => None
-        }
+        }rust 
     }
 
     pub fn apply(&mut self, solution: &mut Solution, delta_eval: bool) {
@@ -39,7 +39,7 @@ impl DriverFlip {
         // solution.delta_evaluation(new_driver, -distance);
     }
 
-    pub fn get_delta(solution: &Solution, idx: usize, new_driver: usize) -> DFMove {
+    pub fn evaluate_move(&self, solution: &Solution, idx: usize, new_driver: usize) -> DFMove {
         let distance = solution.get_distance(idx);
         let old_driver_distance = solution.get_driver_distance(solution.get_assignment(idx).driver()) - distance;
         let new_driver_distance = solution.get_driver_distance(new_driver);
@@ -62,7 +62,7 @@ impl NeighborhoodImpl for DriverFlip {
         if new_driver >= old_driver {
             new_driver += 1;
         }
-        self.stored_move = Some(DriverFlip::get_delta(solution, idx, new_driver));
+        self.stored_move = Some(self.evaluate_move(solution, idx, new_driver));
         true
     }
 
@@ -78,7 +78,7 @@ impl NeighborhoodImpl for DriverFlip {
                 continue;
             }
 
-            let df_move = DriverFlip::get_delta(solution, i, smallest_driver);
+            let df_move = self.evaluate_move(solution, i, smallest_driver);
 
             // If move is not set or delta < delta of stored solution => update stored move
             if let Some(delta) = self.delta() {  
@@ -107,7 +107,7 @@ impl NeighborhoodImpl for DriverFlip {
             if solution.get_assignment(i).driver() == smallest_driver {
                 continue;
             }
-            let df_move = DriverFlip::get_delta(solution, i, smallest_driver);
+            let df_move = self.evaluate_move(solution, i, smallest_driver);
 
             if df_move.delta() < 0 {
                 self.stored_move = Some(df_move);
@@ -171,7 +171,7 @@ fn test_delta() {
     let old_driver = solution.get_assignment(idx).driver();
     let new_driver = (old_driver + 1) % 3;
     let mut driver_flip = DriverFlip::new();
-    driver_flip.stored_move = Some(DriverFlip::get_delta(&solution, idx, new_driver));
+    driver_flip.stored_move = Some(driver_flip.evaluate_move(&solution, idx, new_driver));
     let new_val = driver_flip.delta().unwrap() + solution.objective_value();
     driver_flip.apply(&mut solution, true);
 

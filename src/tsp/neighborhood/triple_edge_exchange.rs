@@ -7,17 +7,35 @@ use crate::rand::Rng;
 use crate::modulo_pos;
 
 pub struct TripleEdgeExchange {
-    max_length: usize
+    max_length: usize,
+    stored_move: Option<TEMove>
 }
 
 impl TripleEdgeExchange {
     pub fn new(max_length: usize) -> Self {
         TripleEdgeExchange {
-            max_length
+            max_length,
+            stored_move: None
+        }
+    }
+    
+    pub fn delta(&self) -> Option<isize> {
+        match self.stored_move {
+            Some(x) => Some(x.delta),
+            None => None
         }
     }
 
-    pub fn apply(solution: &mut Solution, start_idx: usize, first_block_length: usize, second_block_length: usize, delta_eval: bool) {
+    pub fn set_move(&mut self, new_move: TEMove) {
+        self.stored_move = Some(new_move);
+    }
+
+    pub fn stored_move(&self) -> TEMove {
+        self.stored_move.unwrap()
+    }
+
+    pub fn apply(&mut self, solution: &mut Solution, delta_eval: bool) {
+        let TEMove { start_idx, first_block_length, second_block_length, delta, distances } = self.stored_move.expect("Attempted to set non-initialized neighbor.");
         let start_idx = start_idx - 1;
         let number_of_vertices = solution.instance().number_of_vertices();
         let first_block_length = first_block_length + 1;    // Transform number of edges to number of nodes
@@ -49,51 +67,51 @@ impl TripleEdgeExchange {
         solution.get_assignment_mut((start_idx + second_block_length) % number_of_vertices).set_driver(copy[total_length].driver());
         solution.get_assignment_mut((start_idx + total_length) % number_of_vertices).set_driver(copy[first_block_length].driver());
         
-        if !delta_eval {
-            return;
+        if delta_eval {
+            solution.delta_evaluation(delta, distances);
         }
 
-        println!("First driver");
-        let driver = copy[0].driver();
-        let first_vertex = solution.get_assignment((start_idx - 1) % number_of_vertices).vertex();
-        println!("first_vertex: {}", first_vertex);
-        let old_destination = copy[0].vertex();
-        println!("old_dest: {}", old_destination);
-        let new_destination = solution.get_assignment(start_idx).vertex();
-        println!("new_dest: {}", new_destination);
-        let old_distance = solution.instance().get_vertex(first_vertex).get_weight(old_destination);
-        let new_distance = solution.instance().get_vertex(first_vertex).get_weight(new_destination);
-        solution.delta_evaluation(driver, old_distance - new_distance);
+        // println!("First driver");
+        // let driver = copy[0].driver();
+        // let first_vertex = solution.get_assignment((start_idx - 1) % number_of_vertices).vertex();
+        // println!("first_vertex: {}", first_vertex);
+        // let old_destination = copy[0].vertex();
+        // println!("old_dest: {}", old_destination);
+        // let new_destination = solution.get_assignment(start_idx).vertex();
+        // println!("new_dest: {}", new_destination);
+        // let old_distance = solution.instance().get_vertex(first_vertex).get_weight(old_destination);
+        // let new_distance = solution.instance().get_vertex(first_vertex).get_weight(new_destination);
+        // solution.delta_evaluation(driver, old_distance - new_distance);
 
-        println!("Second driver");       
-        let driver = copy[first_block_length].driver();
-        let first_vertex = copy[first_block_length - 1].vertex();
-        println!("first_vertex: {}", first_vertex);
-        let old_destination = copy[first_block_length].vertex();
-        println!("old_dest: {}", old_destination);
-        let new_destination = solution.get_assignment((start_idx + total_length) % number_of_vertices).vertex();
-        println!("new_dest: {}", new_destination);
-        let old_distance = solution.instance().get_vertex(first_vertex).get_weight(old_destination);
-        let new_distance = solution.instance().get_vertex(first_vertex).get_weight(new_destination);
-        solution.delta_evaluation(driver, old_distance - new_distance);
+        // println!("Second driver");       
+        // let driver = copy[first_block_length].driver();
+        // let first_vertex = copy[first_block_length - 1].vertex();
+        // println!("first_vertex: {}", first_vertex);
+        // let old_destination = copy[first_block_length].vertex();
+        // println!("old_dest: {}", old_destination);
+        // let new_destination = solution.get_assignment((start_idx + total_length) % number_of_vertices).vertex();
+        // println!("new_dest: {}", new_destination);
+        // let old_distance = solution.instance().get_vertex(first_vertex).get_weight(old_destination);
+        // let new_distance = solution.instance().get_vertex(first_vertex).get_weight(new_destination);
+        // solution.delta_evaluation(driver, old_distance - new_distance);
         
 
-        println!("Third driver");
-        let driver = copy[total_length].driver();
-        let first_vertex = copy[total_length - 1].vertex();
-        println!("first_vertex: {}", first_vertex);
-        let old_destination = copy[total_length].vertex();
-        println!("old_dest: {}", old_destination);
-        println!("{}", first_block_length);
-        println!("{:?}", solution.get_assignment(start_idx));
-        let new_destination = solution.get_assignment((start_idx + first_block_length) % number_of_vertices).vertex();
-        println!("new_dest: {}", new_destination);
-        let old_distance = solution.instance().get_vertex(first_vertex).get_weight(old_destination);
-        let new_distance = solution.instance().get_vertex(first_vertex).get_weight(new_destination);
-        solution.delta_evaluation(driver, old_distance - new_distance);
+        // println!("Third driver");
+        // let driver = copy[total_length].driver();
+        // let first_vertex = copy[total_length - 1].vertex();
+        // println!("first_vertex: {}", first_vertex);
+        // let old_destination = copy[total_length].vertex();
+        // println!("old_dest: {}", old_destination);
+        // println!("{}", first_block_length);
+        // println!("{:?}", solution.get_assignment(start_idx));
+        // let new_destination = solution.get_assignment((start_idx + first_block_length) % number_of_vertices).vertex();
+        // println!("new_dest: {}", new_destination);
+        // let old_distance = solution.instance().get_vertex(first_vertex).get_weight(old_destination);
+        // let new_distance = solution.instance().get_vertex(first_vertex).get_weight(new_destination);
+        // solution.delta_evaluation(driver, old_distance - new_distance);
     }
 
-    pub fn get_delta(solution: &Solution, start_idx: usize, first_block_length: usize, second_block_length: usize) -> isize {
+    pub fn evaluate_move(&self, solution: &Solution, start_idx: usize, first_block_length: usize, second_block_length: usize) -> TEMove {
         println!("Start of delta!");
         let start_idx = start_idx - 1;        
         let number_of_vertices = solution.instance().number_of_vertices();
@@ -147,54 +165,55 @@ impl TripleEdgeExchange {
             delta += (desired - updated_driver_distances[i]).pow(2) - 
                 (desired - solution.get_driver_distance(i)).pow(2);
         }
-        delta
+        TEMove::new(start_idx, first_block_length, second_block_length, delta, updated_driver_distances)
     }
 }
 
 impl NeighborhoodImpl for TripleEdgeExchange {
-    fn get_random_neighbor(&self, solution: &mut Solution, delta_eval: bool) -> bool {
+    fn get_random_neighbor(&mut self, solution: &Solution, delta_eval: bool) -> bool {
         let start = rand::thread_rng().gen_range(0, solution.instance().number_of_vertices());
         let first_length = rand::thread_rng().gen_range(1, self.max_length + 1);
         // TODO: get max_length from instance size?
         let second_length = rand::thread_rng().gen_range(1, self.max_length + 1);
-        TripleEdgeExchange::apply(solution, start, first_length, second_length, delta_eval);
+        self.stored_move = Some(self.evaluate_move(solution, start, first_length, second_length));
 
         true
     }
 
-    fn get_best_improving_neighbor(&self, solution: &mut Solution, delta_eval: bool) -> bool {
+    fn get_best_improving_neighbor(&mut self, solution: &Solution, delta_eval: bool) -> bool {
         let number_of_vertices = solution.instance().number_of_vertices();
         let mut best_solution: (usize, usize, usize, isize) = (0, 0, 0, 0);
         for start_idx in 0..number_of_vertices {
             for first_block_length in 1..self.max_length {
                 for second_block_length in 1..self.max_length {
-                    let delta = TripleEdgeExchange::get_delta(solution, start_idx, first_block_length, second_block_length);
-                    if delta < best_solution.3 {
-                        best_solution = (start_idx, first_block_length, second_block_length, delta);
+                    let te_move = self.evaluate_move(solution, start_idx, first_block_length, second_block_length);
+                    if let Some(delta) = self.delta() {  
+                        if te_move.delta() >= delta {
+                            continue;
+                        }
                     }
+
+                    self.stored_move = Some(te_move);
                 }
             }
         }
 
-        if best_solution.3 > 0 {
-            TripleEdgeExchange::apply(
-                solution, best_solution.0, best_solution.1, best_solution.2, delta_eval);
-            return true;
+        match self.stored_move {
+            Some(_) => true,
+            None => false
         }
-
-        false
     }
 
-    fn get_first_improving_neighbor(&self, solution: &mut Solution, delta_eval: bool) -> bool {
+    fn get_first_improving_neighbor(&mut self, solution: &Solution, delta_eval: bool) -> bool {
         let number_of_vertices = solution.instance().number_of_vertices();
         for start_idx in 0..number_of_vertices {
             for first_block_length in 1..self.max_length {
                 for second_block_length in 1..self.max_length {
-                    let delta = TripleEdgeExchange::get_delta(solution, start_idx, first_block_length, second_block_length);
-                    if delta < 0 {
-                        TripleEdgeExchange::apply(
-                            solution, start_idx, first_block_length, second_block_length, delta_eval);
-                        return true;                 
+                    let te_move = self.evaluate_move(solution, start_idx, first_block_length, second_block_length);
+
+                    if te_move.delta() < 0 {
+                        self.stored_move = Some(te_move);
+                        return true;
                     }
                 }
             }
@@ -213,8 +232,32 @@ impl NeighborhoodImpl for TripleEdgeExchange {
     }
 }
 
+pub struct TEMove {
+    start_idx: usize,
+    first_block_length: usize,
+    second_block_length: usize,
+    delta: isize,
+    distances: Vec<isize>
+}
+
+impl TEMove {
+    pub fn new(start_idx: usize, first_block_length: usize, second_block_length: usize, delta: isize, distances: Vec<isize>) -> Self {
+        TEMove {
+            start_idx,
+            first_block_length,
+            second_block_length,
+            delta,
+            distances
+        }
+    }
+
+    pub fn delta(&self) -> isize {
+        self.delta
+    }
+}
+
 // #[test]
-// fn test_double_edge_thingy() {
+// fn test_triple_edge_thingy() {
 //     let neighborhood = TripleEdgeExchange::new(0);
 //     let vertices = 5;
 //     let instance = TSPInstance::new(vertices, vertices, 10);
@@ -295,7 +338,11 @@ fn test_delta() {
     let start = rand::thread_rng().gen_range(0, solution.instance().number_of_vertices());
     let first_length = rand::thread_rng().gen_range(1, 4);
     let second_length = rand::thread_rng().gen_range(1, 4);
-    let new_val = TripleEdgeExchange::get_delta(&solution, start, first_length, second_length) + solution.objective_value();
-    TripleEdgeExchange::apply(&mut solution, start, first_length, second_length, true);
+
+    let mut triple_edge_exchange = TripleEdgeExchange::new(4);
+    triple_edge_exchange.stored_move = Some(triple_edge_exchange.evaluate_move(&solution, start, first_length, second_length));
+    let new_val = triple_edge_exchange.stored_move.unwrap().delta() + solution.objective_value();
+    triple_edge_exchange.apply(&mut solution, true);
+
     assert_eq!(new_val, solution.objective_value());
 }
