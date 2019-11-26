@@ -113,7 +113,7 @@ pub fn test_delta() {
     greedy.set_instance(&instance);
     greedy.solve_greedy(&mut solution, &logger);
 
-    println!("{:?}", solution);
+    // println!("{:?}", solution);
 
     solution.calculate_objective_value();
     println!("{:?}", solution.driver_distances());
@@ -125,13 +125,14 @@ pub fn test_delta() {
     triple_edge_exchange.set_move(triple_edge_exchange.evaluate_move(&solution, start, length, length_2));
     println!("Delta: {}", triple_edge_exchange.stored_move().delta());
 
-    let new_val = triple_edge_exchange.delta().unwrap() + solution.objective_value();
-    triple_edge_exchange.apply(&mut solution, true);
     println!("{:?}", solution.driver_distances());
-    println!("{:?}", solution);
+    triple_edge_exchange.apply(&mut solution, true);
+    let new_val = solution.objective_value();
+    println!("{:?}", solution.driver_distances());
+    // println!("{:?}", solution);
+    solution.calculate_objective_value_from_scratch();
+    println!("{:?}", solution.driver_distances());
     println!("{}, {}", new_val, solution.objective_value());
-    solution.calculate_objective_value();
-    println!("obj {}", solution.objective_value());
 }
 
 // Returns positive modulo

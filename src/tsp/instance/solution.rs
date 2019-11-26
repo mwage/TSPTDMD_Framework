@@ -17,15 +17,13 @@ pub struct Solution {
 
 impl Solution {
     pub fn new(instance: Rc<TSPInstance>) -> Self {
-        let sol = Solution {
+        Solution {
             assignments: Vec::with_capacity(instance.number_of_vertices()),
             unassigned_vertices: (1..instance.number_of_vertices()).collect(),
             driver_distances: vec![0; instance.number_of_drivers()],
             instance,
             objective_value: isize::max_value()
-        };
-        println!("{:?}", sol.driver_distances());
-        sol
+        }
     }
 
     pub fn new_random(instance: Rc<TSPInstance>) -> Self {

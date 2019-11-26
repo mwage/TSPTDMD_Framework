@@ -19,13 +19,6 @@ impl DoubleEdgeExchange {
         }
     }
 
-    fn stored_move(&self) -> &DEMove {
-        match &self.stored_move {
-            Some(x) => &x,
-            None => panic!("Attempted to set non-initialized neighbor.")
-        }        
-    }
-
     pub fn delta(&self) -> Option<isize> {
         match &self.stored_move {
             Some(x) => Some(x.delta),
@@ -33,11 +26,17 @@ impl DoubleEdgeExchange {
         }
     }
 
-    pub fn apply(&mut self, solution: &mut Solution, delta_eval: bool) {
+    fn stored_move(&self) -> &DEMove {
+        match &self.stored_move {
+            Some(x) => &x,
+            None => panic!("Attempted to set non-initialized neighbor.")
+        }        
+    }
+
+    fn apply(&mut self, solution: &mut Solution, delta_eval: bool) {
         let (start_idx, block_length, delta, distances) = self.stored_move().to_tuple();
-        // TODO: Only set instance, calc distances on the fly
         let number_of_vertices = solution.instance().number_of_vertices();
-        let start_idx = modulo_pos(start_idx as isize - 1, number_of_vertices);
+        // let start_idx = modulo_pos(start_idx as isize - 1, number_of_vertices);
 
         let mut copy = Vec::with_capacity(block_length + 1);
         for i in start_idx..start_idx + block_length + 1 {
@@ -70,11 +69,10 @@ impl DoubleEdgeExchange {
         // solution.delta_evaluation(solution.get_assignment((start_idx + block_length + 1) % number_of_vertices).driver(), old_distance - new_distance);
     }
 
-    pub fn evaluate_move(&self, solution: &Solution, start_idx: usize, block_length: usize) -> DEMove {
+    fn evaluate_move(&self, solution: &Solution, start_idx: usize, block_length: usize) -> DEMove {
         assert!(block_length != 0);
-
         let number_of_vertices = solution.instance().number_of_vertices();
-        let start_idx = modulo_pos(start_idx as isize - 1, number_of_vertices);
+        // let start_idx = modulo_pos(start_idx as isize - 1, number_of_vertices);
         let prev_ass = solution.get_assignment(modulo_pos(start_idx as isize - 1, number_of_vertices));
         let start_ass = solution.get_assignment(start_idx);
         let end_ass = solution.get_assignment((start_idx + block_length) % number_of_vertices);
@@ -228,49 +226,23 @@ impl DEMove {
 // }
 
 #[test]
-fn test_delta_eval() {
-    let vertices = 5;
-    let mut instance = TSPInstance::new(vertices, vertices, 100);
-    instance.add_edge(0, 1, 10);
-    instance.add_edge(0, 2, 5);
-    instance.add_edge(0, 3, 106);
-    instance.add_edge(0, 4, 52);
-    instance.add_edge(1, 2, 24);
-    instance.add_edge(1, 3, 17);
-    instance.add_edge(1, 4, 20);
-    instance.add_edge(2, 3, 17);
-    instance.add_edge(2, 4, 20);
-    instance.add_edge(3, 4, 47);
-
-    let mut solution = Solution::new(Rc::new(instance));
-    for i in 0..vertices {
-        solution.add_assignment(i, i, 10);
-        assert_eq!(solution.get_assignment(i).driver(), i);
-        assert_eq!(solution.get_assignment(i).vertex(), i);
-    }
-    let mut double_edge_exchange = DoubleEdgeExchange::new(4);
-    solution.calculate_objective_value();
-    double_edge_exchange.stored_move = Some(double_edge_exchange.evaluate_move(&solution, 1, 2));
-    double_edge_exchange.apply(&mut solution, true);
-    let x = solution.objective_value();
-    solution.calculate_objective_value();
-    assert_eq!(x, solution.objective_value());
-}
-
-
-#[test]
 fn test_delta() {
     let instance = TSPInstance::new_random(10, 3, 100, 50);
     let mut solution = Solution::new_random(Rc::new(instance));
     solution.calculate_objective_value();
     let start = rand::thread_rng().gen_range(0, solution.instance().number_of_vertices());
     let length = rand::thread_rng().gen_range(1, 4);
-    println!("start: {}", start);
-    println!("length: {}", length);
 
     let mut double_edge_exchange = DoubleEdgeExchange::new(4);
     double_edge_exchange.stored_move = Some(double_edge_exchange.evaluate_move(&solution, start, length));
-    let new_val = double_edge_exchange.delta().unwrap() + solution.objective_value();
+    println!("{:?}", solution.driver_distances());
+    println!("{}", solution.objective_value());
     double_edge_exchange.apply(&mut solution, true);
-    assert_eq!(new_val, solution.objective_value());
+    println!("{:?}", solution.driver_distances());
+    println!("{}", solution.objective_value());
+    let x = solution.objective_value();
+    solution.calculate_objective_value_from_scratch();
+    println!("{:?}", solution.driver_distances());
+    println!("{}", solution.objective_value());
+    assert_eq!(x, solution.objective_value());
 }

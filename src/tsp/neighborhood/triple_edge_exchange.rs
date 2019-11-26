@@ -39,21 +39,19 @@ impl TripleEdgeExchange {
 
     pub fn apply(&mut self, solution: &mut Solution, delta_eval: bool) {
         let (start_idx, first_block_length, second_block_length, delta, distances) = self.stored_move().to_tuple();
-        let start_idx = start_idx - 1;  // TODO: Kill, as it can lead to subtract with overflow
         let number_of_vertices = solution.instance().number_of_vertices();
-        let first_block_length = first_block_length + 1;    // Transform number of edges to number of nodes
-        let second_block_length = second_block_length + 1;  // for easier indexing
         let total_length = first_block_length + second_block_length;
+
         assert!(total_length < number_of_vertices);
         assert_ne!(first_block_length, 0);
         assert_ne!(second_block_length, 0);
 
-        let ass_0 = solution.get_assignment((start_idx + total_length) % number_of_vertices);
-        let ass_1 = solution.get_assignment(modulo_pos(start_idx as isize - 1, number_of_vertices));
-        let ass_2 = solution.get_assignment(start_idx);
-        let ass_3 = solution.get_assignment((start_idx + first_block_length - 1) % number_of_vertices);
-        let ass_4 = solution.get_assignment((start_idx + first_block_length) % number_of_vertices);
-        let ass_5 = solution.get_assignment((start_idx + total_length - 1) % number_of_vertices);
+        // let ass_0 = solution.get_assignment((start_idx + total_length) % number_of_vertices);
+        // let ass_1 = solution.get_assignment(modulo_pos(start_idx as isize - 1, number_of_vertices));
+        // let ass_2 = solution.get_assignment(start_idx);
+        // let ass_3 = solution.get_assignment((start_idx + first_block_length - 1) % number_of_vertices);
+        // let ass_4 = solution.get_assignment((start_idx + first_block_length) % number_of_vertices);
+        // let ass_5 = solution.get_assignment((start_idx + total_length - 1) % number_of_vertices);
 
         let mut copy = Vec::with_capacity(total_length);
         for i in start_idx..start_idx + total_length + 1 {
@@ -115,8 +113,7 @@ impl TripleEdgeExchange {
     }
 
     pub fn evaluate_move(&self, solution: &Solution, start_idx: usize, first_block_length: usize, second_block_length: usize) -> TEMove {
-        println!("Start of delta!");
-        let start_idx = start_idx - 1;  // TODO: Kill, as it can lead to subtract with overflow
+        // println!("Start of delta!");
         let number_of_vertices = solution.instance().number_of_vertices();
         let first_block_length = first_block_length + 1;    // Transform number of edges to number of nodes
         let second_block_length = second_block_length + 1;  // for easier indexing
@@ -128,46 +125,47 @@ impl TripleEdgeExchange {
         let ass_3 = solution.get_assignment((start_idx + first_block_length - 1) % number_of_vertices);
         let ass_4 = solution.get_assignment((start_idx + first_block_length) % number_of_vertices);
         let ass_5 = solution.get_assignment((start_idx + total_length - 1) % number_of_vertices);
-        println!("ass_1: {:?}", ass_1);
-        println!("ass_2: {:?}", ass_2);
-        println!("ass_3: {:?}", ass_3);
-        println!("ass_4: {:?}", ass_4);
-        println!("ass_5: {:?}", ass_5);
-        println!("ass_0: {:?}", ass_0);
-        println!("v1: {}, v2: {}", ass_1.vertex(), ass_2.vertex());
+        // println!("ass_1: {:?}", ass_1);
+        // println!("ass_2: {:?}", ass_2);
+        // println!("ass_3: {:?}", ass_3);
+        // println!("ass_4: {:?}", ass_4);
+        // println!("ass_5: {:?}", ass_5);
+        // println!("ass_0: {:?}", ass_0);
+        // println!("v1: {}, v2: {}", ass_1.vertex(), ass_2.vertex());
         let e_1 = solution.instance().get_vertex(ass_1.vertex()).get_weight(ass_2.vertex());
-        println!("e_1: {}", e_1);
+        // println!("e_1: {}", e_1);
         let e_2 = solution.instance().get_vertex(ass_3.vertex()).get_weight(ass_4.vertex());
-        println!("e_2: {}", e_2);
+        // println!("e_2: {}", e_2);
         let e_3 = solution.instance().get_vertex(ass_5.vertex()).get_weight(ass_0.vertex());
-        println!("e_3: {}", e_3);
+        // println!("e_3: {}", e_3);
         let e_4 = solution.instance().get_vertex(ass_1.vertex()).get_weight(ass_4.vertex());
-        println!("e_4: {}", e_4);
+        // println!("e_4: {}", e_4);
         let e_5 = solution.instance().get_vertex(ass_3.vertex()).get_weight(ass_0.vertex());
-        println!("e_5: {}", e_5);
+        // println!("e_5: {}", e_5);
         let e_6 = solution.instance().get_vertex(ass_2.vertex()).get_weight(ass_5.vertex());
-        println!("e_6: {}", e_6);
+        // println!("e_6: {}", e_6);
 
         let desired = solution.instance().desired_travel_distance();
 
-        let driver_1 = solution.get_driver_distance(ass_2.driver());
-        let driver_2 = solution.get_driver_distance(ass_4.driver());
-        let driver_3 = solution.get_driver_distance(ass_0.driver());
-        println!("driver_1: {}", driver_1);
-        println!("driver_2: {}", driver_2);
-        println!("driver_3: {}", driver_3);
+        // let driver_1 = solution.get_driver_distance(ass_2.driver());
+        // let driver_2 = solution.get_driver_distance(ass_4.driver());
+        // let driver_3 = solution.get_driver_distance(ass_0.driver());
+        // println!("driver_1: {}", driver_1);
+        // println!("driver_2: {}", driver_2);
+        // println!("driver_3: {}", driver_3);
 
         let mut updated_driver_distances = solution.driver_distances().clone();
         updated_driver_distances[ass_2.driver()] = updated_driver_distances[ass_2.driver()] - e_1 + e_4;
         updated_driver_distances[ass_4.driver()] = updated_driver_distances[ass_4.driver()] - e_2 + e_5;
         updated_driver_distances[ass_0.driver()] = updated_driver_distances[ass_0.driver()] - e_3 + e_6;
         
-        println!("{:?}", updated_driver_distances);
+        // println!("{:?}", updated_driver_distances);
         let mut delta = 0;
         for i in 0..updated_driver_distances.len() {
             delta += (desired - updated_driver_distances[i]).pow(2) - 
                 (desired - solution.get_driver_distance(i)).pow(2);
         }
+
         TEMove::new(start_idx, first_block_length, second_block_length, delta, updated_driver_distances)
     }
 }
