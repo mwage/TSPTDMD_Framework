@@ -121,16 +121,23 @@ impl Solution {
         }
     }
 
-    pub fn get_smallest_driver(&self) -> usize {  // Get driver with smallest distance
+    // Get driver with smallest distance
+    pub fn get_smallest_driver(&self) -> usize {  
         let (best_driver, _) = self.driver_distances.iter().enumerate().min_by_key(|(_, x)| *x).unwrap();
         best_driver
     }
     
-    pub fn calculate_objective_value(&mut self) {
-        // TODO: Calculate all driver distances
+    // Calculates objective value from driver distances
+    pub fn calculate_objective_value(&mut self) {   
         self.objective_value = self.driver_distances.iter()
             .map(|x| (self.instance.desired_travel_distance() - *x).pow(2))
             .collect::<Vec<isize>>().iter().sum();
+    }    
+    
+    // Calculates objective value by recalculating driver distances
+    pub fn calculate_objective_value_from_scratch(&mut self) {  
+        // TODO: Calculate all driver distances
+        self.calculate_objective_value();
     }
     
     pub fn is_feasible(&self) -> String {

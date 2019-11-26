@@ -4,7 +4,6 @@ use crate::rand::Rng;
 use crate::tsp::Solution;
 use crate::tsp::TSPInstance;
 use super::NeighborhoodImpl;
-use crate::modulo_pos;
 
 pub struct DriverFlip {
     stored_move: Option<DFMove>
@@ -73,7 +72,7 @@ impl NeighborhoodImpl for DriverFlip {
         }
         let number_of_vertices = solution.instance().number_of_vertices();
         let (smallest_driver, _) = solution.driver_distances().iter().enumerate()
-            .min_by_key(|(_, dist)| *dist).unwrap();    // Get driver with smallest distance driven
+            .min_by_key(|(_, dist)| *dist).unwrap();    // Get driver with smallest distance
         for i in 0..number_of_vertices {
             if solution.get_assignment(i).driver() == smallest_driver {
                 continue;
@@ -103,15 +102,15 @@ impl NeighborhoodImpl for DriverFlip {
         }
         let number_of_vertices = solution.instance().number_of_vertices();
         let (smallest_driver, _) = solution.driver_distances().iter().enumerate()
-            .min_by_key(|(_, dist)| *dist).unwrap();    // Get driver with smallest distance driven
+            .min_by_key(|(_, dist)| *dist).unwrap();    // Get driver with smallest distance
         for i in 0..number_of_vertices {
             if solution.get_assignment(i).driver() == smallest_driver {
                 continue;
             }
+            let df_move = DriverFlip::get_delta(solution, i, smallest_driver);
 
-            let delta = DriverFlip::get_delta(solution, i, smallest_driver);
-            if delta < 0 {
-                DriverFlip::apply(solution, i, smallest_driver, delta_eval);
+            if df_move.delta() < 0 {
+                self.stored_move = Some(df_move);
                 return true;
             }
         }
@@ -157,7 +156,9 @@ fn test_driver_flip() {
     solution.add_assignment(0, 0, 10);
     assert_eq!(solution.assignments().len(), 1);
     assert_eq!(solution.get_assignment(0).driver(), 0);
-    DriverFlip::apply(&mut solution, 0, 1, false);
+    let mut driver_flip = DriverFlip::new();
+    driver_flip.stored_move = Some(DFMove::new(0, 1, 0, Vec::new()));
+    driver_flip.apply(&mut solution, false);
     assert_eq!(solution.get_assignment(0).driver(), 1);
 }
 
@@ -169,7 +170,10 @@ fn test_delta() {
     let idx = rand::thread_rng().gen_range(0, 10);
     let old_driver = solution.get_assignment(idx).driver();
     let new_driver = (old_driver + 1) % 3;
-    let new_val = DriverFlip::get_delta(&solution,idx, new_driver) + solution.objective_value();
-    DriverFlip::apply(&mut solution, idx, new_driver, true);
+    let mut driver_flip = DriverFlip::new();
+    driver_flip.stored_move = Some(DriverFlip::get_delta(&solution, idx, new_driver));
+    let new_val = driver_flip.delta().unwrap() + solution.objective_value();
+    driver_flip.apply(&mut solution, true);
+
     assert_eq!(new_val, solution.objective_value());
 }
