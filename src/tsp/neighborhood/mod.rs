@@ -19,7 +19,7 @@ pub trait NeighborhoodImpl {
     fn set_neighbor(&mut self, solution: &mut Solution, delta_eval: bool);
     fn to_string(&self) -> String;    // Used for logging
 
-    fn get_neighbor(&self, solution: &mut Solution, step_function: &StepFunction, delta_eval: bool) -> bool {  // Match stepfunction
+    fn get_neighbor(&mut self, solution: &mut Solution, step_function: &StepFunction, delta_eval: bool) -> bool {  // Match stepfunction
         match step_function {
             StepFunction::Random => self.get_random_neighbor(solution, delta_eval),
             StepFunction::BestImprovement => self.get_best_improving_neighbor(solution, delta_eval),

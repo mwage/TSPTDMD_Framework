@@ -17,14 +17,21 @@ impl DriverFlip {
     }
 
     pub fn delta(&self) -> Option<isize> {
-        match self.stored_move {
+        match &self.stored_move {
             Some(x) => Some(x.delta),
             None => None
-        }rust 
+        }
+    }
+
+    fn stored_move(&self) -> &DFMove {
+        match &self.stored_move {
+            Some(x) => &x,
+            None => panic!("Attempted to set non-initialized neighbor.")
+        }        
     }
 
     pub fn apply(&mut self, solution: &mut Solution, delta_eval: bool) {
-        let DFMove { idx, new_driver, delta, distances } = self.stored_move.expect("Attempted to set non-initialized neighbor.");
+        let (idx, new_driver, delta, distances) = self.stored_move().to_tuple();
         let old_driver = solution.get_assignment(idx).driver();
         let vertex = solution.get_assignment(idx).vertex();
         solution.get_assignment_mut(idx).set_driver(new_driver);
@@ -127,6 +134,7 @@ impl NeighborhoodImpl for DriverFlip {
     }
 }
 
+#[derive(Clone)]
 struct DFMove {
     idx: usize,
     new_driver: usize,
@@ -146,6 +154,10 @@ impl DFMove {
 
     pub fn delta(&self) -> isize {
         self.delta
+    }
+
+    pub fn to_tuple(&self) -> (usize, usize, isize, Vec<isize>) {
+        (self.idx, self.new_driver, self.delta, self.distances.clone())
     }
 }
 

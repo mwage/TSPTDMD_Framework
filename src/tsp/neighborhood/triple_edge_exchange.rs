@@ -18,9 +18,16 @@ impl TripleEdgeExchange {
             stored_move: None
         }
     }
+
+    pub fn stored_move(&self) -> &TEMove {
+        match &self.stored_move {
+            Some(x) => &x,
+            None => panic!("Attempted to set non-initialized neighbor.")
+        }        
+    }
     
     pub fn delta(&self) -> Option<isize> {
-        match self.stored_move {
+        match &self.stored_move {
             Some(x) => Some(x.delta),
             None => None
         }
@@ -30,12 +37,8 @@ impl TripleEdgeExchange {
         self.stored_move = Some(new_move);
     }
 
-    pub fn stored_move(&self) -> TEMove {
-        self.stored_move.unwrap()
-    }
-
     pub fn apply(&mut self, solution: &mut Solution, delta_eval: bool) {
-        let TEMove { start_idx, first_block_length, second_block_length, delta, distances } = self.stored_move.expect("Attempted to set non-initialized neighbor.");
+        let (start_idx, first_block_length, second_block_length, delta, distances) = self.stored_move().to_tuple();
         let start_idx = start_idx - 1;
         let number_of_vertices = solution.instance().number_of_vertices();
         let first_block_length = first_block_length + 1;    // Transform number of edges to number of nodes
@@ -254,6 +257,10 @@ impl TEMove {
     pub fn delta(&self) -> isize {
         self.delta
     }
+
+    pub fn to_tuple(&self) -> (usize, usize, usize, isize, Vec<isize>) {
+        (self.start_idx, self.first_block_length, self.second_block_length, self.delta, self.distances.clone())
+    }
 }
 
 // #[test]
@@ -336,12 +343,12 @@ fn test_delta() {
     let mut solution = Solution::new_random(Rc::new(instance));
     solution.calculate_objective_value();
     let start = rand::thread_rng().gen_range(0, solution.instance().number_of_vertices());
-    let first_length = rand::thread_rng().gen_range(1, 4);
-    let second_length = rand::thread_rng().gen_range(1, 4);
+    let first_length = rand::thread_rng().gen_range(1, 3);
+    let second_length = rand::thread_rng().gen_range(1, 3);
 
-    let mut triple_edge_exchange = TripleEdgeExchange::new(4);
+    let mut triple_edge_exchange = TripleEdgeExchange::new(3);
     triple_edge_exchange.stored_move = Some(triple_edge_exchange.evaluate_move(&solution, start, first_length, second_length));
-    let new_val = triple_edge_exchange.stored_move.unwrap().delta() + solution.objective_value();
+    let new_val = triple_edge_exchange.delta().unwrap() + solution.objective_value();
     triple_edge_exchange.apply(&mut solution, true);
 
     assert_eq!(new_val, solution.objective_value());

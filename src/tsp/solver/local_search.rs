@@ -22,14 +22,14 @@ impl<N> LocalSearch<N> where N: NeighborhoodImpl {
         }
     }
 
-    pub fn local_search(&self, solution: &mut Solution) {
+    pub fn local_search(&mut self, solution: &mut Solution) {
         match self.step_function {
             StepFunction::Random => self.search_random(solution),
             _ => self.search_deterministic(solution)
         };
     }
     
-    fn search_deterministic(&self, solution: &mut Solution) {
+    fn search_deterministic(&mut self, solution: &mut Solution) {
         let mut counter = 0;
         loop {
             let improved = self.neighborhood.get_neighbor(solution, &self.step_function, true);    // TODO: Set delta eval
@@ -41,7 +41,7 @@ impl<N> LocalSearch<N> where N: NeighborhoodImpl {
         }
     }
 
-    fn search_random(&self, solution: &mut Solution) {
+    fn search_random(&mut self, solution: &mut Solution) {
         let mut counter = 0;
         let mut best_solution = solution.clone();
         loop {

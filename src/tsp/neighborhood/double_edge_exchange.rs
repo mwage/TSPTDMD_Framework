@@ -19,15 +19,22 @@ impl DoubleEdgeExchange {
         }
     }
 
+    fn stored_move(&self) -> &DEMove {
+        match &self.stored_move {
+            Some(x) => &x,
+            None => panic!("Attempted to set non-initialized neighbor.")
+        }        
+    }
+
     pub fn delta(&self) -> Option<isize> {
-        match self.stored_move {
+        match &self.stored_move {
             Some(x) => Some(x.delta),
             None => None
         }
     }
 
     pub fn apply(&mut self, solution: &mut Solution, delta_eval: bool) {
-        let DEMove { start_idx, block_length, delta, distances } = self.stored_move.expect("Attempted to set non-initialized neighbor.");
+        let (start_idx, block_length, delta, distances) = self.stored_move().to_tuple();
         // TODO: Only set instance, calc distances on the fly
         let number_of_vertices = solution.instance().number_of_vertices();
         let start_idx = modulo_pos(start_idx as isize - 1, number_of_vertices);
@@ -167,6 +174,10 @@ impl DEMove {
     pub fn delta(&self) -> isize {
         self.delta
     }
+
+    pub fn to_tuple(&self) -> (usize, usize, isize, Vec<isize>) {
+        (self.start_idx, self.block_length, self.delta, self.distances.clone())
+    }
 }
     
 
@@ -259,7 +270,7 @@ fn test_delta() {
 
     let mut double_edge_exchange = DoubleEdgeExchange::new(4);
     double_edge_exchange.stored_move = Some(double_edge_exchange.evaluate_move(&solution, start, length));
-    let new_val = double_edge_exchange.stored_move.unwrap().delta() + solution.objective_value();
+    let new_val = double_edge_exchange.delta().unwrap() + solution.objective_value();
     double_edge_exchange.apply(&mut solution, true);
     assert_eq!(new_val, solution.objective_value());
 }
