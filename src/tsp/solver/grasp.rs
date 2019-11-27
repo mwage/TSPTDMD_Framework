@@ -32,10 +32,12 @@ impl<N> Grasp<N> where N: NeighborhoodImpl {
 
 impl<N> Solver for Grasp<N> where N: NeighborhoodImpl {
     fn solve(&mut self, instance: Rc<TSPInstance>, logger: Logger) {
-        let mut best_solution: Solution = Solution::new(Rc::clone(&instance));
+        let mut best_solution = Solution::new(Rc::clone(&instance));
         let mut beta = 1;
         let mut next_beta_increment = 1;
         let mut counter = 0;
+        self.greedy.set_instance(&instance);
+        // println!("{:?}", instance);
 
         loop {
             let mut candidate = Solution::new(Rc::clone(&instance));
@@ -45,18 +47,23 @@ impl<N> Solver for Grasp<N> where N: NeighborhoodImpl {
             if candidate.objective_value() < best_solution.objective_value() {
                 best_solution = candidate;
             }
+            
+            // println!("{} . {}, next: {}", beta, counter, next_beta_increment);
 
             counter += 1;
             if counter >= next_beta_increment {
                 next_beta_increment = (next_beta_increment as f64 * self.base).ceil() as usize;
                 beta += 1;
                 self.greedy = GreedySolver::new(beta);
+                self.greedy.set_instance(&instance);
             }
 
             if counter > self.iteration_limit {
                 break;
             }
         }
+
+        logger.log_result(&best_solution);
     }
 
     fn to_string(&self) -> String {

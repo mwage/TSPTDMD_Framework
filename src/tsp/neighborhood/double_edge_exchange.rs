@@ -36,7 +36,6 @@ impl DoubleEdgeExchange {
     fn apply(&mut self, solution: &mut Solution, delta_eval: bool) {
         let (start_idx, block_length, delta, distances) = self.stored_move().to_tuple();
         let number_of_vertices = solution.instance().number_of_vertices();
-        // let start_idx = modulo_pos(start_idx as isize - 1, number_of_vertices);
 
         let mut copy = Vec::with_capacity(block_length + 1);
         for i in start_idx..start_idx + block_length + 1 {
@@ -53,26 +52,11 @@ impl DoubleEdgeExchange {
         if delta_eval {
             solution.delta_evaluation(delta, distances);
         }
-
-
-
-        // let prev_vertex = solution.get_assignment(modulo_pos(start_idx as isize - 1, number_of_vertices)).vertex();
-        // let old_distance = solution.instance().get_vertex(prev_vertex).get_weight(copy[0].vertex());   // Old distance of d0 to start vertex
-        // let new_vertex = solution.get_assignment(start_idx).vertex();
-        // let new_distance = solution.instance().get_vertex(prev_vertex).get_weight(new_vertex);
-        // solution.delta_evaluation(solution.get_assignment(start_idx).driver(), old_distance - new_distance);
-
-        // let next_vertex = solution.get_assignment((start_idx + block_length + 1) % number_of_vertices).vertex();
-        // let old_distance = solution.instance().get_vertex(next_vertex).get_weight(copy[copy.len() - 1].vertex());   // Old distance of d0 to start vertex
-        // let new_vertex = solution.get_assignment((start_idx + block_length) % number_of_vertices).vertex();
-        // let new_distance = solution.instance().get_vertex(next_vertex).get_weight(new_vertex);
-        // solution.delta_evaluation(solution.get_assignment((start_idx + block_length + 1) % number_of_vertices).driver(), old_distance - new_distance);
     }
 
     fn evaluate_move(&self, solution: &Solution, start_idx: usize, block_length: usize) -> DEMove {
         assert!(block_length != 0);
         let number_of_vertices = solution.instance().number_of_vertices();
-        // let start_idx = modulo_pos(start_idx as isize - 1, number_of_vertices);
         let prev_ass = solution.get_assignment(modulo_pos(start_idx as isize - 1, number_of_vertices));
         let start_ass = solution.get_assignment(start_idx);
         let end_ass = solution.get_assignment((start_idx + block_length) % number_of_vertices);
@@ -177,53 +161,7 @@ impl DEMove {
         (self.start_idx, self.block_length, self.delta, self.distances.clone())
     }
 }
-    
 
-// #[test]
-// fn test_double_edge_thingy() {
-//     let neighborhood = DoubleEdgeExchange::new(0);
-//     let vertices = 5;
-//     let instance = TSPInstance::new(vertices, vertices, 10);
-//     let mut solution = Solution::new(Rc::new(instance));
-//     for i in 0..vertices as u32 {
-//         solution.add_assignment(i, i, 10);
-//         assert_eq!(solution.get_assignment(i as usize).driver(), i);
-//         assert_eq!(solution.get_assignment(i as usize).vertex(), i);
-//     }
-//     assert_eq!(solution.assignments().len(), vertices);
-//     DoubleEdgeExchange::apply(&mut solution, 1, 2, false);
-//     assert_eq!(solution.get_assignment(0).vertex(), 0);
-//     assert_eq!(solution.get_assignment(0).driver(), 0);
-//     assert_eq!(solution.get_assignment(1).vertex(), 3);
-//     assert_eq!(solution.get_assignment(1).driver(), 1);
-//     assert_eq!(solution.get_assignment(2).vertex(), 2);
-//     assert_eq!(solution.get_assignment(2).driver(), 3);
-//     assert_eq!(solution.get_assignment(3).vertex(), 1);
-//     assert_eq!(solution.get_assignment(3).driver(), 2);
-//     assert_eq!(solution.get_assignment(4).vertex(), 4);
-//     assert_eq!(solution.get_assignment(4).driver(), 4);
-
-//     // Test overflow
-//     let instance = TSPInstance::new(vertices, vertices, 10);
-//     let mut solution = Solution::new(Rc::new(instance));
-//     for i in 0..vertices as u32 {
-//         solution.add_assignment(i, i, 10);
-//         assert_eq!(solution.get_assignment(i as usize).driver(), i);
-//         assert_eq!(solution.get_assignment(i as usize).vertex(), i);
-//     }
-//     assert_eq!(solution.assignments().len(), vertices);
-//     DoubleEdgeExchange::apply(&mut solution, 3, 2, false);
-//     assert_eq!(solution.get_assignment(0).vertex(), 3);
-//     assert_eq!(solution.get_assignment(0).driver(), 4);
-//     assert_eq!(solution.get_assignment(1).vertex(), 1);
-//     assert_eq!(solution.get_assignment(1).driver(), 1);
-//     assert_eq!(solution.get_assignment(2).vertex(), 2);
-//     assert_eq!(solution.get_assignment(2).driver(), 2);
-//     assert_eq!(solution.get_assignment(3).vertex(), 0);
-//     assert_eq!(solution.get_assignment(3).driver(), 3);
-//     assert_eq!(solution.get_assignment(4).vertex(), 4);
-//     assert_eq!(solution.get_assignment(4).driver(), 0);
-// }
 
 #[test]
 fn test_delta() {

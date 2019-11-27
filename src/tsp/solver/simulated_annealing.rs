@@ -4,34 +4,49 @@ use crate::tsp::io::Logger;
 use crate::tsp::TSPInstance;
 use crate::tsp::solver::Solver;
 use crate::tsp::neighborhood::NeighborhoodImpl;
-use crate::StepFunction;
+use crate::Solution;
+use crate::GreedySolver;
 
 pub struct SimulatedAnnealing {
-    neighborhoods: Vec<Box<dyn NeighborhoodImpl>>,
-    step_functions: Vec<StepFunction>,
+    neighborhood: Box<NeighborhoodImpl>,
     temperature: f64,
     alpha: f64,
     terminating_temperature: f64
 }
 
 impl SimulatedAnnealing {
-    pub fn new(neighborhoods: Vec<Box<dyn NeighborhoodImpl>>, step_functions: Vec<StepFunction>) -> Self {
+    pub fn new(neighborhood: Box<dyn NeighborhoodImpl>) -> Self {
+        // TODO: make generic
         SimulatedAnnealing {
-            neighborhoods,
-            step_functions,
-            temperature: 1.0,
-            alpha: 0.01,
-            terminating_temperature: 0.01
+            neighborhood,
+            temperature: 4.0,
+            alpha: 0.999,
+            terminating_temperature: 10f64.powf(-10f64)
         }
     }
+
+    fn decrease_temperature(&self) {
+
+    }
+
+    // fn accept(&self) -> bool {
+
+    //     let x = e.powf(- delta / T)
+    //rand 0,1 < x
+    // }
 }
 
 impl Solver for SimulatedAnnealing {
     fn solve(&mut self, instance: Rc<TSPInstance>, logger: Logger) {
-        
+        let mut best_solution = Solution::new(Rc::clone(&instance));
+        let mut greedy = GreedySolver::new(1);
+        greedy.set_instance(&instance);
+        greedy.solve_greedy(&mut best_solution, &logger);
+
+
     }
 
     fn to_string(&self) -> String {
-        String::from("SimulatedAnnealing")
+        format!("SimulatedAnnealing.{}", self.neighborhood.to_string())
     }
 }

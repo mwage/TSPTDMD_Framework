@@ -93,14 +93,6 @@ impl Solution {
         self.instance.get_vertex(first).get_weight(prev)
     }
     
-    // /// Calculates the change in objective value given a
-    // /// delta: change in distance for driver (old - new)
-    // pub fn delta_evaluation(&mut self, driver: usize, delta: isize) {
-    //     let new_distance = self.driver_distances[driver] - delta;
-    //     self.objective_value -= delta * (-2 * self.instance().desired_travel_distance() + self.driver_distances[driver] + new_distance);
-    //     self.driver_distances[driver] = new_distance;
-    // }
-
     pub fn add_assignment(&mut self, vertex: usize, driver: usize, distance: isize) {
         if self.assignments.len() > self.instance.number_of_vertices() {
             panic!("Exceeded maximum number of assignments.");
@@ -132,7 +124,7 @@ impl Solution {
         self.objective_value = self.driver_distances.iter()
             .map(|x| (self.instance.desired_travel_distance() - *x).pow(2))
             .collect::<Vec<isize>>().iter().sum();
-    }    
+    }
     
     // Calculates objective value by recalculating driver distances
     pub fn calculate_objective_value_from_scratch(&mut self) {
