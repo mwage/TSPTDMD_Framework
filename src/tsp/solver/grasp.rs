@@ -37,18 +37,15 @@ impl<N> Solver for Grasp<N> where N: NeighborhoodImpl {
         let mut next_beta_increment = 1;
         let mut counter = 0;
         self.greedy.set_instance(&instance);
-        // println!("{:?}", instance);
 
         loop {
             let mut candidate = Solution::new(Rc::clone(&instance));
             self.greedy.solve_greedy(&mut candidate, &logger);
-            self.local_search.local_search(&mut candidate);
+            let candidate = self.local_search.local_search(candidate, &logger);
 
             if candidate.objective_value() < best_solution.objective_value() {
                 best_solution = candidate;
             }
-            
-            // println!("{} . {}, next: {}", beta, counter, next_beta_increment);
 
             counter += 1;
             if counter >= next_beta_increment {

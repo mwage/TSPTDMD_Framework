@@ -25,13 +25,6 @@ impl TripleEdgeExchange {
             None => panic!("Attempted to set non-initialized neighbor.")
         }        
     }
-    
-    pub fn delta(&self) -> Option<isize> {
-        match &self.stored_move {
-            Some(x) => Some(x.delta),
-            None => None
-        }
-    }
 
     pub fn set_move(&mut self, new_move: TEMove) {
         self.stored_move = Some(new_move);
@@ -162,6 +155,13 @@ impl NeighborhoodImpl for TripleEdgeExchange {
     fn set_neighbor(&mut self, solution: &mut Solution, delta_eval: bool) {
         self.apply(solution, delta_eval);
         self.stored_move = None;
+    }
+
+    fn delta(&self) -> Option<isize> {
+        match &self.stored_move {
+            Some(x) => Some(x.delta),
+            None => None
+        }
     }
 
     fn to_string(&self) -> String {

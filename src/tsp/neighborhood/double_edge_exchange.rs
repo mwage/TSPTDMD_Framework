@@ -19,13 +19,6 @@ impl DoubleEdgeExchange {
         }
     }
 
-    pub fn delta(&self) -> Option<isize> {
-        match &self.stored_move {
-            Some(x) => Some(x.delta),
-            None => None
-        }
-    }
-
     fn stored_move(&self) -> &DEMove {
         match &self.stored_move {
             Some(x) => &x,
@@ -129,6 +122,13 @@ impl NeighborhoodImpl for DoubleEdgeExchange {
     fn set_neighbor(&mut self, solution: &mut Solution, delta_eval: bool) {
         self.apply(solution, delta_eval);
         self.stored_move = None;
+    }
+    
+    fn delta(&self) -> Option<isize> {
+        match &self.stored_move {
+            Some(x) => Some(x.delta),
+            None => None
+        }
     }
 
     fn to_string(&self) -> String {
