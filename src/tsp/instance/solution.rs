@@ -162,6 +162,7 @@ impl Solution {
     }
 
     pub fn vertices_to_str(&self) -> String {
+        // TODO: fix logging so permutation is correct (no double 0s)
         let mut result = String::from("0");
         let min = cmp::min(self.instance.number_of_vertices() - 1, self.number_of_assignments());
         for i in 0..min {
@@ -172,6 +173,7 @@ impl Solution {
     }
 
     pub fn drivers_to_str(&self) -> String {
+        // TODO: fix logging so permutation is correct (no double 0s)
         let mut result = String::new();
         let min = cmp::min(self.instance.number_of_vertices(), self.number_of_assignments());
         for i in 0..min {
