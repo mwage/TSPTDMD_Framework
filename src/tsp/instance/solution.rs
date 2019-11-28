@@ -162,9 +162,23 @@ impl Solution {
     }
 
     pub fn vertices_to_str(&self) -> String {
-        // TODO: fix logging so permutation is correct (no double 0s)
         let mut result = String::from("0");
         let min = cmp::min(self.instance.number_of_vertices() - 1, self.number_of_assignments());
+
+        // If solution is a permutation with 0 not at the end: permute vertices to end with 0
+        if let Some(zero_idx) = self.assignments.iter().position(|x| x.vertex() == 0) {
+            let min_for_mod = cmp::min(self.instance.number_of_vertices(), self.number_of_assignments());
+            if zero_idx != min - 1 {
+                for i in 0..min {
+                    let idx = (i + zero_idx + 1) % min_for_mod;
+                    result.push_str(" ");
+                    result += &self.assignments[idx].vertex().to_string();
+                }
+                return result;
+            }
+        }
+
+        // Otherwise just add vertices as is
         for i in 0..min {
             result.push_str(" ");
             result += &self.assignments[i].vertex().to_string();
@@ -173,9 +187,22 @@ impl Solution {
     }
 
     pub fn drivers_to_str(&self) -> String {
-        // TODO: fix logging so permutation is correct (no double 0s)
         let mut result = String::new();
         let min = cmp::min(self.instance.number_of_vertices(), self.number_of_assignments());
+        
+        // If solution is a permutation with 0 not at the end: permute vertices to end with 0
+        if let Some(zero_idx) = self.assignments.iter().position(|x| x.vertex() == 0) {
+            if zero_idx != min - 1 {
+                for i in 0..min {
+                    let idx = (i + zero_idx + 1) % min;
+                    result.push_str(" ");
+                    result += &self.assignments[idx].driver().to_string();
+                }
+                return result;
+            }
+        }
+
+        // Otherwise just add vertices as is
         for i in 0..min {
             result.push_str(" ");
             result += &self.assignments[i].driver().to_string();
