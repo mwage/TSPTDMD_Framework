@@ -24,7 +24,7 @@ fn main() {
     // local_search(Some("berlin52_k2_2"), Neighborhood::DoubleEdgeExchange(5), StepFunction::BestImprovement, 10000, 1);
     
     // test_all_local_searches();
-    variable_neighborhood(Some("berlin52_k2_2"), vec![Neighborhood::DoubleEdgeExchange(5), Neighborhood::DriverFlip, Neighborhood::TripleEdgeExchange(5)], 1);
+    variable_neighborhood(Some("berlin52_k2_2"), vec![Neighborhood::DoubleEdgeExchange(None), Neighborhood::DriverFlip, Neighborhood::TripleEdgeExchange(25)], 1);
     // grasp(Some("berlin52_k2_2"), 5, Neighborhood::DoubleEdgeExchange(5), StepFunction::BestImprovement, 100, 1000, 1);
 }
 

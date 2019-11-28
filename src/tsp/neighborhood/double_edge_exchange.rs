@@ -7,12 +7,12 @@ use crate::rand::Rng;
 use crate::modulo_pos;
 
 pub struct DoubleEdgeExchange {
-    max_length: usize,
+    max_length: Option<usize>,
     stored_move: Option<DEMove>
 }
 
 impl DoubleEdgeExchange {
-    pub fn new(max_length: usize) -> Self {
+    pub fn new(max_length: Option<usize>) -> Self {
         DoubleEdgeExchange {
             max_length,
             stored_move: None
@@ -72,20 +72,30 @@ impl DoubleEdgeExchange {
         }
         DEMove::new(start_idx, block_length, delta, driver_distances)
     }
+
+    fn calculate_max_length(&self, instance: &TSPInstance) -> usize {
+        if let Some(length) = self.max_length {
+            length
+        } else {
+            instance.number_of_vertices() - 1
+        }
+    }
 }
 
 impl NeighborhoodImpl for DoubleEdgeExchange {
     fn get_random_neighbor(&mut self, solution: &Solution, delta_eval: bool) -> bool {
+        let max_length = self.calculate_max_length(solution.instance());
         let start_idx = rand::thread_rng().gen_range(0, solution.instance().number_of_vertices());
-        let block_length = rand::thread_rng().gen_range(1, self.max_length + 1);
+        let block_length = rand::thread_rng().gen_range(1, max_length + 1);
         self.stored_move = Some(self.evaluate_move(solution, start_idx, block_length));
         true
     }
 
     fn get_best_improving_neighbor(&mut self, solution: &Solution, delta_eval: bool) -> bool {
+        let max_length = self.calculate_max_length(solution.instance());
         let number_of_vertices = solution.instance().number_of_vertices();
         for start_idx in 0..number_of_vertices {
-            for block_length in 1..self.max_length {
+            for block_length in 1..max_length {
                 let de_move = self.evaluate_move(solution, start_idx, block_length);
 
                 // If move is not set or delta < delta of stored solution => update stored move
@@ -106,9 +116,10 @@ impl NeighborhoodImpl for DoubleEdgeExchange {
     }
     
     fn get_first_improving_neighbor(&mut self, solution: &Solution, delta_eval: bool) -> bool {
+        let max_length = self.calculate_max_length(solution.instance());
         let number_of_vertices = solution.instance().number_of_vertices();
         for start_idx in 0..number_of_vertices {
-            for block_length in 1..self.max_length {
+            for block_length in 1..max_length {
                 let de_move = self.evaluate_move(solution, start_idx, block_length);
                 if de_move.delta() < 0 {
                     self.stored_move = Some(de_move);
@@ -132,7 +143,10 @@ impl NeighborhoodImpl for DoubleEdgeExchange {
     }
 
     fn to_string(&self) -> String {
-        format!("DoubleEdgeExchange.{}", self.max_length)
+        match self.max_length {
+            Some(x) => format!("DoubleEdgeExchange.{}", x),
+            _ => String::from("DoubleEdgeExchange.Max")
+        }        
     }
 }
 
@@ -171,7 +185,7 @@ fn test_delta() {
     let start = rand::thread_rng().gen_range(0, solution.instance().number_of_vertices());
     let length = rand::thread_rng().gen_range(1, 4);
 
-    let mut double_edge_exchange = DoubleEdgeExchange::new(4);
+    let mut double_edge_exchange = DoubleEdgeExchange::new(Some(4));
     double_edge_exchange.stored_move = Some(double_edge_exchange.evaluate_move(&solution, start, length));
     println!("{:?}", solution.driver_distances());
     println!("{}", solution.objective_value());
