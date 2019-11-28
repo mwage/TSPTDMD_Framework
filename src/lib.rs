@@ -10,6 +10,7 @@ use tsp::solver::GreedySolver;
 use tsp::solver::LocalSearch;
 use tsp::solver::PilotSolver;
 use tsp::solver::SimulatedAnnealing;
+use tsp::solver::VariableNeighborhood;
 use tsp::neighborhood::DoubleEdgeExchange;
 use tsp::neighborhood::DriverFlip;
 use tsp::neighborhood::NeighborhoodImpl;
@@ -68,8 +69,8 @@ fn start_grasp<N> (neighborhood: N, step_function: StepFunction, candidate_size:
 
 
 
-pub fn vnd() {
-
+pub fn variable_neighborhood(instance_name: Option<&str>, neighborhoods: Vec<Neighborhood>, runs: usize) {
+    TestRunner::solve_instance(VariableNeighborhood::new(neighborhoods.iter().map(|x| get_neighborhood_impl(x)).collect()), instance_name, runs);
 }
 
 pub fn simulated_annealing(instance_name: Option<&str>, neighborhoods: Vec<Neighborhood>, step_functions: Vec<StepFunction>, runs: usize) {

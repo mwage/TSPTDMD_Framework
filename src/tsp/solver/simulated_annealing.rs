@@ -7,16 +7,15 @@ use crate::tsp::neighborhood::NeighborhoodImpl;
 use crate::Solution;
 use crate::GreedySolver;
 
-pub struct SimulatedAnnealing {
-    neighborhood: Box<NeighborhoodImpl>,
+pub struct SimulatedAnnealing<N: NeighborhoodImpl> {
+    neighborhood: N,
     temperature: f64,
     alpha: f64,
     terminating_temperature: f64
 }
 
-impl SimulatedAnnealing {
-    pub fn new(neighborhood: Box<dyn NeighborhoodImpl>) -> Self {
-        // TODO: make generic
+impl<N> SimulatedAnnealing<N> where N: NeighborhoodImpl {
+    pub fn new(neighborhood: N) -> Self {
         SimulatedAnnealing {
             neighborhood,
             temperature: 4.0,
@@ -36,7 +35,7 @@ impl SimulatedAnnealing {
     // }
 }
 
-impl Solver for SimulatedAnnealing {
+impl<N> Solver for SimulatedAnnealing<N> where N: NeighborhoodImpl {
     fn solve(&mut self, instance: Rc<TSPInstance>, logger: Logger) {
         let mut best_solution = Solution::new(Rc::clone(&instance));
         let mut greedy = GreedySolver::new(1);

@@ -128,8 +128,8 @@ impl NeighborhoodImpl for TripleEdgeExchange {
             }
         }
 
-        match self.stored_move {
-            Some(_) => true,
+        match &self.stored_move {
+            Some(te_move) => te_move.delta() < 0,
             None => false
         }
     }

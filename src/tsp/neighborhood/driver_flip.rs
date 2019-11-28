@@ -94,8 +94,8 @@ impl NeighborhoodImpl for DriverFlip {
             self.stored_move = Some(df_move);
         }
 
-        match self.stored_move {
-            Some(_) => true,
+        match &self.stored_move {
+            Some(df_move) => df_move.delta() < 0,
             None => false
         }
     }

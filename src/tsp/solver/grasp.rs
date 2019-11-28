@@ -41,6 +41,7 @@ impl<N> Solver for Grasp<N> where N: NeighborhoodImpl {
         loop {
             let mut candidate = Solution::new(Rc::clone(&instance));
             self.greedy.solve_greedy(&mut candidate, &logger);
+            candidate.calculate_objective_value();
             let candidate = self.local_search.local_search(candidate, &logger);
 
             if candidate.objective_value() < best_solution.objective_value() {

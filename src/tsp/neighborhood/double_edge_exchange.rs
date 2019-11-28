@@ -99,8 +99,8 @@ impl NeighborhoodImpl for DoubleEdgeExchange {
             }
         }
 
-        match self.stored_move {
-            Some(_) => true,
+        match &self.stored_move {
+            Some(de_move) => de_move.delta() < 0,
             None => false
         }
     }

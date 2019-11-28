@@ -63,7 +63,7 @@ impl<N> LocalSearch<N> where N: NeighborhoodImpl {
                 self.neighborhood.set_neighbor(&mut solution, true);
                 // best_solution = solution.clone();
             }
-            if counter >= self.iteration_limit {
+            if counter >= self.iteration_limit || logger.get_elapsed() >= crate::TIME_LIMIT {
                 break;
             }
 
@@ -81,7 +81,6 @@ impl<N> LocalSearch<N> where N: NeighborhoodImpl {
 
 impl<N> Solver for LocalSearch<N> where N: NeighborhoodImpl {
     fn solve(&mut self, instance: Rc<TSPInstance>, logger: Logger) {
-        // let solution = Solution::new_random(instance.clone());
         let mut solution = Solution::new(Rc::clone(&instance));
         let mut greedy = GreedySolver::new(1);
         greedy.set_instance(&instance);

@@ -4,7 +4,6 @@ use crate::tsp::io::Logger;
 use crate::tsp::TSPInstance;
 use crate::tsp::solver::Solver;
 use crate::tsp::neighborhood::NeighborhoodImpl;
-use crate::StepFunction;
 use crate::Solution;
 use crate::GreedySolver;
 
@@ -22,26 +21,31 @@ impl VariableNeighborhood {
 
 impl Solver for VariableNeighborhood {
     fn solve(&mut self, instance: Rc<TSPInstance>, logger: Logger) {
-        let mut best_solution = Solution::new(Rc::clone(&instance));
+        let mut solution = Solution::new(Rc::clone(&instance));
         let mut greedy = GreedySolver::new(1);
         greedy.set_instance(&instance);
-        greedy.solve_greedy(&mut best_solution, &logger);
-
+        greedy.solve_greedy(&mut solution, &logger);
+        solution.calculate_objective_value();
+        
         let mut counter = 0;
         while counter < self.neighborhoods.len() {
             let neighborhood = &mut self.neighborhoods[counter];
-            if neighborhood.get_best_improving_neighbor(&best_solution, true) {
-                neighborhood.set_neighbor(&mut best_solution, true);
+            if neighborhood.get_best_improving_neighbor(&solution, true) {
+                neighborhood.set_neighbor(&mut solution, true);
                 counter = 0;
+
+                if logger.get_elapsed() >= crate::TIME_LIMIT {
+                    break;
+                }
+                continue;
             }
             counter += 1;
-            // TODO Time constraint
         }
 
-        logger.log_result(&best_solution);
+        logger.log_result(&solution);
     }
 
     fn to_string(&self) -> String {
-        String::from("SimulatedAnnealing")
+        String::from("VariableNeighborhood")
     }
 }
