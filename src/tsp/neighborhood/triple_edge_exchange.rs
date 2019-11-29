@@ -56,7 +56,6 @@ impl TripleEdgeExchange {
     }
 
     fn evaluate_move(&self, solution: &Solution, start_idx: usize, first_block_length: usize, second_block_length: usize) -> TEMove {
-        // println!("Start of delta!");
         let number_of_vertices = solution.instance().number_of_vertices();
         let first_block_length = first_block_length + 1;    // Transform number of edges to number of nodes
         let second_block_length = second_block_length + 1;  // for easier indexing

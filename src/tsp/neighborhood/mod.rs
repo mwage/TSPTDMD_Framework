@@ -1,7 +1,9 @@
+mod compound;
 mod driver_flip;
 mod double_edge_exchange;
 mod triple_edge_exchange;
 
+pub use compound::Compound;
 pub use driver_flip::DriverFlip;
 pub use double_edge_exchange::DoubleEdgeExchange;
 pub use triple_edge_exchange::TripleEdgeExchange;
@@ -34,7 +36,8 @@ pub trait NeighborhoodImpl {
 pub enum Neighborhood {
     DoubleEdgeExchange(Option<usize>),
     DriverFlip,
-    TripleEdgeExchange(Option<usize>)
+    TripleEdgeExchange(Option<usize>),
+    Compound
 }
 
 #[derive(Debug, Clone)]

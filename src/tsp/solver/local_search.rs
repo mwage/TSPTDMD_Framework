@@ -48,20 +48,11 @@ impl<N> LocalSearch<N> where N: NeighborhoodImpl {
 
     fn search_random(&mut self, mut solution: Solution, logger: &Logger) -> Solution {
         let mut counter = 0;
-        // let mut best_solution = solution.clone();
         loop {
-            self.neighborhood.get_neighbor(&mut solution, &self.step_function, true);    // TODO: Set delta eval
-            
-            // TODO: Think about when we want to set moves (only when better solution found? always?)
-            
-            // self.neighborhood.set_neighbor(&mut solution, true);
-            // if solution.objective_value() < best_solution.objective_value() {
-            //     best_solution = solution.clone();
-            // }            
+            self.neighborhood.get_neighbor(&mut solution, &self.step_function, true);    // TODO: Set delta eval    
 
             if self.neighborhood.delta().unwrap() < 0 {
                 self.neighborhood.set_neighbor(&mut solution, true);
-                // best_solution = solution.clone();
             }
             if counter >= self.iteration_limit || logger.get_elapsed() >= crate::TIME_LIMIT {
                 break;
@@ -70,7 +61,6 @@ impl<N> LocalSearch<N> where N: NeighborhoodImpl {
             counter += 1;
         }
 
-        // best_solution
         solution
     }
 
