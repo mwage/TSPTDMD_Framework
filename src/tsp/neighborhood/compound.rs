@@ -6,6 +6,7 @@ use super::NeighborhoodImpl;
 use crate::tsp::Solution;
 use crate::tsp::TSPInstance;
 use crate::rand::Rng;
+use crate::tsp::io::Logger;
 
 pub struct Compound {
     max_length: Option<usize>,
@@ -73,13 +74,13 @@ impl NeighborhoodImpl for Compound {
         // TODO: randomly select one
     }
 
-    fn get_best_improving_neighbor(&mut self, solution: &Solution, delta_eval: bool) -> bool {
-        self.triple_edge_exchange.get_random_neighbor(solution, delta_eval)
+    fn get_best_improving_neighbor(&mut self, solution: &Solution, delta_eval: bool, logger: &Logger) -> bool {
+        self.triple_edge_exchange.get_best_improving_neighbor(solution, delta_eval, logger)
         // TODO: randomly select one
     }
     
-    fn get_first_improving_neighbor(&mut self, solution: &Solution, delta_eval: bool) -> bool {
-        self.triple_edge_exchange.get_random_neighbor(solution, delta_eval)
+    fn get_first_improving_neighbor(&mut self, solution: &Solution, delta_eval: bool, logger: &Logger) -> bool {
+        self.triple_edge_exchange.get_first_improving_neighbor(solution, delta_eval, logger)
         // TODO: randomly select one
     }
 

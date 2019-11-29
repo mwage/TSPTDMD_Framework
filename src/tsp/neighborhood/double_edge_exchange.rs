@@ -5,6 +5,7 @@ use crate::tsp::Solution;
 use crate::tsp::TSPInstance;
 use crate::rand::Rng;
 use crate::modulo_pos;
+use crate::tsp::io::Logger;
 
 pub struct DoubleEdgeExchange {
     max_length: Option<usize>,
@@ -91,7 +92,7 @@ impl NeighborhoodImpl for DoubleEdgeExchange {
         true
     }
 
-    fn get_best_improving_neighbor(&mut self, solution: &Solution, delta_eval: bool) -> bool {
+    fn get_best_improving_neighbor(&mut self, solution: &Solution, delta_eval: bool, logger: &Logger) -> bool {
         let max_length = self.calculate_max_length(solution.instance());
         let number_of_vertices = solution.instance().number_of_vertices();
         for start_idx in 0..number_of_vertices {
@@ -100,12 +101,19 @@ impl NeighborhoodImpl for DoubleEdgeExchange {
 
                 // If move is not set or delta < delta of stored solution => update stored move
                 if let Some(delta) = self.delta() {  
-                    if de_move.delta() >= delta {
-                        continue;
+                    if de_move.delta() < delta {
+                        self.stored_move = Some(de_move);
                     }
+                } else {
+                    self.stored_move = Some(de_move);
                 }
 
-                self.stored_move = Some(de_move);
+                if logger.get_elapsed() >= crate::TIME_LIMIT {
+                    return match &self.stored_move {
+                        Some(de_move) => de_move.delta() < 0,
+                        None => false
+                    };
+                }
             }
         }
 
@@ -115,7 +123,7 @@ impl NeighborhoodImpl for DoubleEdgeExchange {
         }
     }
     
-    fn get_first_improving_neighbor(&mut self, solution: &Solution, delta_eval: bool) -> bool {
+    fn get_first_improving_neighbor(&mut self, solution: &Solution, delta_eval: bool, logger: &Logger) -> bool {
         let max_length = self.calculate_max_length(solution.instance());
         let number_of_vertices = solution.instance().number_of_vertices();
         for start_idx in 0..number_of_vertices {
@@ -124,6 +132,10 @@ impl NeighborhoodImpl for DoubleEdgeExchange {
                 if de_move.delta() < 0 {
                     self.stored_move = Some(de_move);
                     return true;
+                }
+
+                if logger.get_elapsed() >= crate::TIME_LIMIT {
+                    return false;
                 }
             }
         }

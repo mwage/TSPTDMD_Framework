@@ -3,6 +3,7 @@ use std::rc::Rc;
 use super::NeighborhoodImpl;
 use crate::tsp::Solution;
 use crate::tsp::TSPInstance;
+use crate::tsp::io::Logger;
 use crate::rand::Rng;
 use crate::modulo_pos;
 
@@ -113,8 +114,7 @@ impl NeighborhoodImpl for TripleEdgeExchange {
         true
     }
 
-    fn get_best_improving_neighbor(&mut self, solution: &Solution, delta_eval: bool) -> bool {
-        //TODO: Should have time termination here and for first improving 
+    fn get_best_improving_neighbor(&mut self, solution: &Solution, delta_eval: bool, logger: &Logger) -> bool {
         let max_length = self.calculate_max_length(solution.instance());
         let number_of_vertices = solution.instance().number_of_vertices();
         for start_idx in 0..number_of_vertices {
@@ -122,12 +122,19 @@ impl NeighborhoodImpl for TripleEdgeExchange {
                 for second_block_length in 1..max_length {
                     let te_move = self.evaluate_move(solution, start_idx, first_block_length, second_block_length);
                     if let Some(delta) = self.delta() {  
-                        if te_move.delta() >= delta {
-                            continue;
+                        if te_move.delta() < delta {
+                            self.stored_move = Some(te_move);
                         }
+                    } else {
+                        self.stored_move = Some(te_move);
                     }
 
-                    self.stored_move = Some(te_move);
+                    if logger.get_elapsed() >= crate::TIME_LIMIT {
+                        return match &self.stored_move {
+                            Some(te_move) => te_move.delta() < 0,
+                            None => false
+                        };
+                    }
                 }
             }
         }
@@ -138,7 +145,7 @@ impl NeighborhoodImpl for TripleEdgeExchange {
         }
     }
 
-    fn get_first_improving_neighbor(&mut self, solution: &Solution, delta_eval: bool) -> bool {
+    fn get_first_improving_neighbor(&mut self, solution: &Solution, delta_eval: bool, logger: &Logger) -> bool {
         let max_length = self.calculate_max_length(solution.instance());
         let number_of_vertices = solution.instance().number_of_vertices();
         for start_idx in 0..number_of_vertices {
@@ -149,6 +156,9 @@ impl NeighborhoodImpl for TripleEdgeExchange {
                     if te_move.delta() < 0 {
                         self.stored_move = Some(te_move);
                         return true;
+                    }
+                    if logger.get_elapsed() >= crate::TIME_LIMIT {
+                        return false;
                     }
                 }
             }

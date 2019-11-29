@@ -4,6 +4,7 @@ use crate::rand::Rng;
 use crate::tsp::Solution;
 use crate::tsp::TSPInstance;
 use super::NeighborhoodImpl;
+use crate::tsp::io::Logger;
 
 pub struct DriverFlip {
     stored_move: Option<DFMove>
@@ -70,7 +71,7 @@ impl NeighborhoodImpl for DriverFlip {
         true
     }
 
-    fn get_best_improving_neighbor(&mut self, solution: &Solution, delta_eval: bool) -> bool {
+    fn get_best_improving_neighbor(&mut self, solution: &Solution, delta_eval: bool, logger: &Logger) -> bool {
         if solution.instance().number_of_drivers() == 1 {
             return false;
         }
@@ -86,12 +87,19 @@ impl NeighborhoodImpl for DriverFlip {
 
             // If move is not set or delta < delta of stored solution => update stored move
             if let Some(delta) = self.delta() {  
-                if df_move.delta() >= delta {
-                    continue;
+                if df_move.delta() < delta {
+                    self.stored_move = Some(df_move);
                 }
+            } else {
+                self.stored_move = Some(df_move);
             }
 
-            self.stored_move = Some(df_move);
+            if logger.get_elapsed() >= crate::TIME_LIMIT {
+                return match &self.stored_move {
+                    Some(df_move) => df_move.delta() < 0,
+                    None => false
+                };
+            }
         }
 
         match &self.stored_move {
@@ -100,7 +108,7 @@ impl NeighborhoodImpl for DriverFlip {
         }
     }
 
-    fn get_first_improving_neighbor(&mut self, solution: &Solution, delta_eval: bool) -> bool {
+    fn get_first_improving_neighbor(&mut self, solution: &Solution, delta_eval: bool, logger: &Logger) -> bool {
         if solution.instance().number_of_drivers() == 1 {
             return false;
         }
@@ -116,6 +124,10 @@ impl NeighborhoodImpl for DriverFlip {
             if df_move.delta() < 0 {
                 self.stored_move = Some(df_move);
                 return true;
+            }
+            
+            if logger.get_elapsed() >= crate::TIME_LIMIT {
+                return false;
             }
         }
         false
