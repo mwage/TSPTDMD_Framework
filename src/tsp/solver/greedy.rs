@@ -114,6 +114,6 @@ impl Solver for GreedySolver {
     }
 
     fn to_string(&self) -> String {
-        format!("Greedy.{}", self.candidate_size)
+        format!("greedy.{}", self.candidate_size)
     }
 }

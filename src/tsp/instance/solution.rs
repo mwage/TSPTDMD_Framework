@@ -148,8 +148,8 @@ impl Solution {
 
         let mut feasible = true;
         for i in 0..self.assignments.len() {
-            let first_vertex = if i == 0 { 0 } else { self.assignments[i-1].vertex() };
-            let second_vertex = self.assignments[i].vertex();
+            let first_vertex = self.assignments[i].vertex();
+            let second_vertex = self.assignments[(i + 1) % self.assignments.len()].vertex();
             if !self.instance.is_valid(first_vertex, second_vertex) {
                 feasible = false;
             }

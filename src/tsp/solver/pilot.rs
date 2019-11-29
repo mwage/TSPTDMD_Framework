@@ -79,6 +79,6 @@ impl Solver for PilotSolver {
     }
 
     fn to_string(&self) -> String {
-        format!("Pilot.{}", self.beta)
+        format!("pilot.{}", self.beta)
     }
 }

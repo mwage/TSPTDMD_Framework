@@ -65,6 +65,6 @@ impl<N> Solver for Grasp<N> where N: NeighborhoodImpl {
     }
 
     fn to_string(&self) -> String {
-        format!("GRASP.{}.{}", self.local_search.neighborhood_to_string(), self.greedy.candidate_size())
+        format!("grasp.{}.{}", self.local_search.neighborhood_to_string(), self.greedy.candidate_size())
     }
 }
