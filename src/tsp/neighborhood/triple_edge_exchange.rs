@@ -1,4 +1,5 @@
 use std::rc::Rc;
+use std::cmp;
 
 use super::NeighborhoodImpl;
 use crate::tsp::Solution;
@@ -95,10 +96,11 @@ impl TripleEdgeExchange {
     }
 
     fn calculate_max_length(&self, instance: &TSPInstance) -> usize {
+        let max = (instance.number_of_vertices() - 1) / 2;
         if let Some(length) = self.max_length {
-            length
+            cmp::min(length, max)
         } else {
-            (instance.number_of_vertices() - 1) / 2
+            max
         }
     }
 }

@@ -41,11 +41,15 @@ fn all_from_env( ) {
 }
 
 fn test_all_local_searches(instance: Option<&str>) {
-    let neighborhoods = vec![Neighborhood::DriverFlip];
+    let neighborhoods = vec![Neighborhood::DoubleEdgeExchange(None), Neighborhood::TripleEdgeExchange(None), Neighborhood::DriverFlip];
     let step_functions = vec![StepFunction::BestImprovement];
     for neighborhood in neighborhoods.iter() {
-        for stepfunction in step_functions.iter() {
-            local_search(instance, neighborhood.to_owned(), stepfunction.to_owned(), 10000, 1);
+        for step_function in step_functions.iter() {
+            let runs = match step_function {
+                StepFunction::Random => 5,
+                _ => 1
+            };
+            local_search(instance, neighborhood.to_owned(), step_function.to_owned(), 20000, runs);
         }
     }
 }

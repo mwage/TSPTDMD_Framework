@@ -56,7 +56,7 @@ impl<N> Solver for Grasp<N> where N: NeighborhoodImpl {
                 self.greedy.set_instance(&instance);
             }
 
-            if counter > self.iteration_limit {
+            if counter > self.iteration_limit || logger.get_elapsed() >= crate::TIME_LIMIT {
                 break;
             }
         }
@@ -65,6 +65,6 @@ impl<N> Solver for Grasp<N> where N: NeighborhoodImpl {
     }
 
     fn to_string(&self) -> String {
-        format!("grasp.{}.{}", self.local_search.neighborhood_to_string(), self.greedy.candidate_size())
+        format!("grasp.{}.{}.{}", self.greedy.candidate_size(), self.iteration_limit, self.local_search.neighborhood_to_string())
     }
 }

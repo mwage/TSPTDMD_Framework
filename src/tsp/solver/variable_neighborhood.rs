@@ -33,13 +33,13 @@ impl Solver for VariableNeighborhood {
             if neighborhood.get_best_improving_neighbor(&solution, true, &logger) {
                 neighborhood.set_neighbor(&mut solution, true);
                 counter = 0;
-
-                if logger.get_elapsed() >= crate::TIME_LIMIT {
-                    break;
-                }
-                continue;
+            } else {
+                counter += 1;
             }
-            counter += 1;
+
+            if logger.get_elapsed() >= crate::TIME_LIMIT {
+                break;
+            }
         }
 
         logger.log_result(&solution);

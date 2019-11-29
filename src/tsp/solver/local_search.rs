@@ -83,6 +83,6 @@ impl<N> Solver for LocalSearch<N> where N: NeighborhoodImpl {
     }
 
     fn to_string(&self) -> String {
-        format!("ls.{}", self.neighborhood_to_string())
+        format!("ls.{}.{}", self.iteration_limit, self.neighborhood_to_string())
     }
 }
