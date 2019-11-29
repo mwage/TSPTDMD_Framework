@@ -34,7 +34,7 @@ pub trait NeighborhoodImpl {
 pub enum Neighborhood {
     DoubleEdgeExchange(Option<usize>),
     DriverFlip,
-    TripleEdgeExchange(usize)
+    TripleEdgeExchange(Option<usize>)
 }
 
 #[derive(Debug, Clone)]

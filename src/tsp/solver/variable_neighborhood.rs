@@ -4,7 +4,7 @@ use crate::tsp::io::Logger;
 use crate::tsp::TSPInstance;
 use crate::tsp::solver::Solver;
 use crate::tsp::neighborhood::NeighborhoodImpl;
-use crate::Solution;
+use crate::tsp::Solution;
 use crate::GreedySolver;
 
 pub struct VariableNeighborhood {

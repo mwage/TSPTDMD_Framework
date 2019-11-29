@@ -187,14 +187,8 @@ fn test_delta() {
 
     let mut double_edge_exchange = DoubleEdgeExchange::new(Some(4));
     double_edge_exchange.stored_move = Some(double_edge_exchange.evaluate_move(&solution, start, length));
-    println!("{:?}", solution.driver_distances());
-    println!("{}", solution.objective_value());
     double_edge_exchange.apply(&mut solution, true);
-    println!("{:?}", solution.driver_distances());
-    println!("{}", solution.objective_value());
     let x = solution.objective_value();
     solution.calculate_objective_value_from_scratch();
-    println!("{:?}", solution.driver_distances());
-    println!("{}", solution.objective_value());
     assert_eq!(x, solution.objective_value());
 }

@@ -23,7 +23,7 @@ impl DriverFlip {
         }        
     }
 
-    pub fn apply(&mut self, solution: &mut Solution, delta_eval: bool) {
+    fn apply(&mut self, solution: &mut Solution, delta_eval: bool) {
         let (idx, new_driver, delta, distances) = self.stored_move().to_tuple();
         let old_driver = solution.get_assignment(idx).driver();
         let vertex = solution.get_assignment(idx).vertex();

@@ -7,30 +7,26 @@ use crate::rand::Rng;
 use crate::modulo_pos;
 
 pub struct TripleEdgeExchange {
-    max_length: usize,
+    max_length: Option<usize>,
     stored_move: Option<TEMove>
 }
 
 impl TripleEdgeExchange {
-    pub fn new(max_length: usize) -> Self {
+    pub fn new(max_length: Option<usize>) -> Self {
         TripleEdgeExchange {
             max_length,
             stored_move: None
         }
     }
 
-    pub fn stored_move(&self) -> &TEMove {
+    fn stored_move(&self) -> &TEMove {
         match &self.stored_move {
             Some(x) => &x,
             None => panic!("Attempted to set non-initialized neighbor.")
         }        
     }
-
-    pub fn set_move(&mut self, new_move: TEMove) {
-        self.stored_move = Some(new_move);
-    }
-
-    pub fn apply(&mut self, solution: &mut Solution, delta_eval: bool) {
+    
+    fn apply(&mut self, solution: &mut Solution, delta_eval: bool) {
         let (start_idx, first_block_length, second_block_length, delta, distances) = self.stored_move().to_tuple();
         let number_of_vertices = solution.instance().number_of_vertices();
         let total_length = first_block_length + second_block_length;
@@ -59,7 +55,7 @@ impl TripleEdgeExchange {
         }
     }
 
-    pub fn evaluate_move(&self, solution: &Solution, start_idx: usize, first_block_length: usize, second_block_length: usize) -> TEMove {
+    fn evaluate_move(&self, solution: &Solution, start_idx: usize, first_block_length: usize, second_block_length: usize) -> TEMove {
         // println!("Start of delta!");
         let number_of_vertices = solution.instance().number_of_vertices();
         let first_block_length = first_block_length + 1;    // Transform number of edges to number of nodes
@@ -97,25 +93,33 @@ impl TripleEdgeExchange {
 
         TEMove::new(start_idx, first_block_length, second_block_length, delta, updated_driver_distances)
     }
+
+    fn calculate_max_length(&self, instance: &TSPInstance) -> usize {
+        if let Some(length) = self.max_length {
+            length
+        } else {
+            (instance.number_of_vertices() - 1) / 2
+        }
+    }
 }
 
 impl NeighborhoodImpl for TripleEdgeExchange {
     fn get_random_neighbor(&mut self, solution: &Solution, delta_eval: bool) -> bool {
+        let max_length = self.calculate_max_length(solution.instance());
         let start = rand::thread_rng().gen_range(0, solution.instance().number_of_vertices());
-        let first_length = rand::thread_rng().gen_range(1, self.max_length + 1);
-        // TODO: get max_length from instance size?
-        let second_length = rand::thread_rng().gen_range(1, self.max_length + 1);
+        let first_length = rand::thread_rng().gen_range(1, max_length + 1);
+        let second_length = rand::thread_rng().gen_range(1, max_length + 1);
         self.stored_move = Some(self.evaluate_move(solution, start, first_length, second_length));
 
         true
     }
 
     fn get_best_improving_neighbor(&mut self, solution: &Solution, delta_eval: bool) -> bool {
+        let max_length = self.calculate_max_length(solution.instance());
         let number_of_vertices = solution.instance().number_of_vertices();
-        let mut best_solution: (usize, usize, usize, isize) = (0, 0, 0, 0);
         for start_idx in 0..number_of_vertices {
-            for first_block_length in 1..self.max_length {
-                for second_block_length in 1..self.max_length {
+            for first_block_length in 1..max_length {
+                for second_block_length in 1..max_length {
                     let te_move = self.evaluate_move(solution, start_idx, first_block_length, second_block_length);
                     if let Some(delta) = self.delta() {  
                         if te_move.delta() >= delta {
@@ -135,10 +139,11 @@ impl NeighborhoodImpl for TripleEdgeExchange {
     }
 
     fn get_first_improving_neighbor(&mut self, solution: &Solution, delta_eval: bool) -> bool {
+        let max_length = self.calculate_max_length(solution.instance());
         let number_of_vertices = solution.instance().number_of_vertices();
         for start_idx in 0..number_of_vertices {
-            for first_block_length in 1..self.max_length {
-                for second_block_length in 1..self.max_length {
+            for first_block_length in 1..max_length {
+                for second_block_length in 1..max_length {
                     let te_move = self.evaluate_move(solution, start_idx, first_block_length, second_block_length);
 
                     if te_move.delta() < 0 {
@@ -165,7 +170,10 @@ impl NeighborhoodImpl for TripleEdgeExchange {
     }
 
     fn to_string(&self) -> String {
-        format!("TripleEdgeExchange.{}", self.max_length)
+        match self.max_length {
+            Some(x) => format!("TripleEdgeExchange.{}", x),
+            _ => String::from("TripleEdgeExchange.Max")
+        }
     }
 }
 
@@ -197,80 +205,6 @@ impl TEMove {
     }
 }
 
-// #[test]
-// fn test_triple_edge_thingy() {
-//     let neighborhood = TripleEdgeExchange::new(0);
-//     let vertices = 5;
-//     let instance = TSPInstance::new(vertices, vertices, 10);
-//     let mut solution = Solution::new(Rc::new(instance));
-//     for i in 0..vertices as u32 {
-//         solution.add_assignment(i, i, 10);
-//         assert_eq!(solution.get_assignment(i as usize).driver(), i);
-//         assert_eq!(solution.get_assignment(i as usize).vertex(), i);
-//     }
-//     assert_eq!(solution.assignments().len(), vertices);
-//     TripleEdgeExchange::apply(&mut solution, 1, 2, false);
-//     assert_eq!(solution.get_assignment(0).vertex(), 0);
-//     assert_eq!(solution.get_assignment(0).driver(), 0);
-//     assert_eq!(solution.get_assignment(1).vertex(), 3);
-//     assert_eq!(solution.get_assignment(1).driver(), 1);
-//     assert_eq!(solution.get_assignment(2).vertex(), 2);
-//     assert_eq!(solution.get_assignment(2).driver(), 3);
-//     assert_eq!(solution.get_assignment(3).vertex(), 1);
-//     assert_eq!(solution.get_assignment(3).driver(), 2);
-//     assert_eq!(solution.get_assignment(4).vertex(), 4);
-//     assert_eq!(solution.get_assignment(4).driver(), 4);
-
-//     // Test overflow
-//     let instance = TSPInstance::new(vertices, vertices, 10);
-//     let mut solution = Solution::new(Rc::new(instance));
-//     for i in 0..vertices as u32 {
-//         solution.add_assignment(i, i, 10);
-//         assert_eq!(solution.get_assignment(i as usize).driver(), i);
-//         assert_eq!(solution.get_assignment(i as usize).vertex(), i);
-//     }
-//     assert_eq!(solution.assignments().len(), vertices);
-//     TripleEdgeExchange::apply(&mut solution, 3, 2, false);
-//     assert_eq!(solution.get_assignment(0).vertex(), 3);
-//     assert_eq!(solution.get_assignment(0).driver(), 4);
-//     assert_eq!(solution.get_assignment(1).vertex(), 1);
-//     assert_eq!(solution.get_assignment(1).driver(), 1);
-//     assert_eq!(solution.get_assignment(2).vertex(), 2);
-//     assert_eq!(solution.get_assignment(2).driver(), 2);
-//     assert_eq!(solution.get_assignment(3).vertex(), 0);
-//     assert_eq!(solution.get_assignment(3).driver(), 3);
-//     assert_eq!(solution.get_assignment(4).vertex(), 4);
-//     assert_eq!(solution.get_assignment(4).driver(), 0);
-// }
-
-// #[test]
-// fn test_delta_eval() {
-//     let vertices = 5;
-//     let mut instance = TSPInstance::new(vertices, vertices, 100);
-//     instance.add_edge(0, 1, 10);
-//     instance.add_edge(0, 2, 5);
-//     instance.add_edge(0, 3, 106);
-//     instance.add_edge(0, 4, 52);
-//     instance.add_edge(1, 2, 24);
-//     instance.add_edge(1, 3, 17);
-//     instance.add_edge(1, 4, 20);
-//     instance.add_edge(2, 3, 17);
-//     instance.add_edge(2, 4, 20);
-//     instance.add_edge(3, 4, 47);
-
-//     let mut solution = Solution::new(Rc::new(instance));
-//     for i in 0..vertices as u32 {
-//         solution.add_assignment(i, i, 10);
-//         assert_eq!(solution.get_assignment(i as usize).driver(), i);
-//         assert_eq!(solution.get_assignment(i as usize).vertex(), i);
-//     }
-//     solution.calculate_objective_value();
-//     DoubleEdgeExchange::apply(&mut solution, 1, 2, true);
-//     let x = solution.objective_value();
-//     solution.calculate_objective_value();
-//     assert_eq!(x, solution.objective_value());
-// }
-
 #[test]
 fn test_delta() {
     let instance = TSPInstance::new_random(10, 10, 100, 50);
@@ -280,7 +214,7 @@ fn test_delta() {
     let first_length = rand::thread_rng().gen_range(1, 3);
     let second_length = rand::thread_rng().gen_range(1, 3);
 
-    let mut triple_edge_exchange = TripleEdgeExchange::new(3);
+    let mut triple_edge_exchange = TripleEdgeExchange::new(Some(3));
     triple_edge_exchange.stored_move = Some(triple_edge_exchange.evaluate_move(&solution, start, first_length, second_length));
     let new_val = triple_edge_exchange.delta().unwrap() + solution.objective_value();
     triple_edge_exchange.apply(&mut solution, true);

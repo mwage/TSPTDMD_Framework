@@ -16,15 +16,6 @@ use tsp::neighborhood::DriverFlip;
 use tsp::neighborhood::NeighborhoodImpl;
 use tsp::neighborhood::TripleEdgeExchange;
 
-// TODO: Kill
-use tsp::Solution;
-use tsp::TSPInstance;
-use std::rc::Rc;
-use rand::Rng;
-use tsp::io::Logger;
-use tsp::io::InstanceParser;
-use tsp::solver::Solver;
-
 // exports
 pub use tsp::neighborhood::Neighborhood;
 pub use tsp::neighborhood::StepFunction;
@@ -67,8 +58,6 @@ fn start_grasp<N> (neighborhood: N, step_function: StepFunction, candidate_size:
     TestRunner::solve_instance(Grasp::new(neighborhood, step_function, candidate_size, iteration_limit, ls_iteration_limit), instance_name, runs);
 }
 
-
-
 pub fn variable_neighborhood(instance_name: Option<&str>, neighborhoods: Vec<Neighborhood>, runs: usize) {
     TestRunner::solve_instance(VariableNeighborhood::new(neighborhoods.iter().map(|x| get_neighborhood_impl(x)).collect()), instance_name, runs);
 }
@@ -84,56 +73,6 @@ fn get_neighborhood_impl(neighborhood: &Neighborhood) -> Box<dyn NeighborhoodImp
         Neighborhood::DriverFlip => Box::new(DriverFlip::new()),
         _ => unimplemented!()
     }
-}
-
-// TODO: Kill
-pub fn test_delta() {
-    let mut instance =  TSPInstance::new(6, 2, 0);
-    instance.add_edge(0, 1, 1);
-    instance.add_edge(0, 2, 20);
-    instance.add_edge(0, 3, 4);
-    instance.add_edge(0, 4, 5);
-    instance.add_edge(0, 5, 6);
-    instance.add_edge(1, 2, 2);
-    instance.add_edge(1, 3, 4);
-    instance.add_edge(1, 4, 5);
-    instance.add_edge(1, 5, 6);
-    instance.add_edge(2, 3, 3);
-    instance.add_edge(2, 4, 5);
-    instance.add_edge(2, 5, 6);
-    instance.add_edge(3, 4, 4);
-    instance.add_edge(3, 5, 6);
-    instance.add_edge(4, 5, 5);
-
-    // let instance = InstanceParser::get_instance("").unwrap();
-    
-    let instance = Rc::new(instance);
-    let mut greedy = GreedySolver::new(1);
-    let logger = Logger::new(&greedy, "test");
-    let mut solution = Solution::new(Rc::clone(&instance));
-    greedy.set_instance(&instance);
-    greedy.solve_greedy(&mut solution, &logger);
-
-    // println!("{:?}", solution);
-
-    solution.calculate_objective_value();
-    println!("{:?}", solution.driver_distances());
-    println!("Before: {}", solution.objective_value());
-    let start = 2;
-    let length = 1;
-    let length_2 = 0;
-    let mut triple_edge_exchange = TripleEdgeExchange::new(5);
-    triple_edge_exchange.set_move(triple_edge_exchange.evaluate_move(&solution, start, length, length_2));
-    println!("Delta: {}", triple_edge_exchange.stored_move().delta());
-
-    println!("{:?}", solution.driver_distances());
-    triple_edge_exchange.apply(&mut solution, true);
-    let new_val = solution.objective_value();
-    println!("{:?}", solution.driver_distances());
-    // println!("{:?}", solution);
-    solution.calculate_objective_value_from_scratch();
-    println!("{:?}", solution.driver_distances());
-    println!("{}, {}", new_val, solution.objective_value());
 }
 
 // Returns positive modulo

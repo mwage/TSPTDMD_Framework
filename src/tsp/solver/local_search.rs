@@ -2,8 +2,8 @@ use std::rc::Rc;
 
 use super::Solver;
 use crate::tsp::io::Logger;
-use crate::Solution;
-use crate::TSPInstance;
+use crate::tsp::Solution;
+use crate::tsp::TSPInstance;
 use crate::tsp::neighborhood::NeighborhoodImpl;
 use crate::StepFunction;
 use crate::GreedySolver;

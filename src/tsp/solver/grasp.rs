@@ -6,8 +6,8 @@ use super::Solver;
 use crate::tsp::io::Logger;
 use crate::StepFunction;
 use crate::tsp::neighborhood::NeighborhoodImpl;
-use crate::TSPInstance;
-use crate::Solution;
+use crate::tsp::TSPInstance;
+use crate::tsp::Solution;
 
 pub struct Grasp<N: NeighborhoodImpl> {
     greedy: GreedySolver,
