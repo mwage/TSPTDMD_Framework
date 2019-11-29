@@ -46,6 +46,6 @@ impl<N> Solver for SimulatedAnnealing<N> where N: NeighborhoodImpl {
     }
 
     fn to_string(&self) -> String {
-        format!("SimulatedAnnealing.{}", self.neighborhood.to_string())
+        format!("SA.{}", self.neighborhood.to_string())
     }
 }

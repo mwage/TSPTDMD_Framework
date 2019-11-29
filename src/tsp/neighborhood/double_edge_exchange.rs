@@ -77,7 +77,7 @@ impl DoubleEdgeExchange {
         if let Some(length) = self.max_length {
             length
         } else {
-            instance.number_of_vertices() - 1
+            instance.number_of_vertices() / 2
         }
     }
 }
@@ -144,8 +144,8 @@ impl NeighborhoodImpl for DoubleEdgeExchange {
 
     fn to_string(&self) -> String {
         match self.max_length {
-            Some(x) => format!("DoubleEdgeExchange-{}", x),
-            _ => String::from("DoubleEdgeExchange-Max")
+            Some(x) => format!("de-{}", x),
+            _ => String::from("de-max")
         }        
     }
 }

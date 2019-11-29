@@ -94,8 +94,8 @@ impl NeighborhoodImpl for Compound {
 
     fn to_string(&self) -> String {
         match self.max_length {
-            Some(x) => format!("Compound-{}", x),
-            _ => String::from("Compound-Max")
+            Some(x) => format!("comp-{}", x),
+            _ => String::from("comp-max")
         }        
     }
 }

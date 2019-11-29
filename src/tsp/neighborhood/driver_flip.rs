@@ -134,7 +134,7 @@ impl NeighborhoodImpl for DriverFlip {
     }
 
     fn to_string(&self) -> String {
-        String::from("DriverFlip")
+        String::from("df")
     }
 }
 
