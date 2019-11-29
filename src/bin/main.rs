@@ -14,9 +14,9 @@ use tsp_framework::variable_neighborhood;
 
 
 fn main() {
-    // all_from_env();
+    all_from_env();
     // greedy(Some("berlin52_k2_2"), 1, 1);
-    pilot(Some("berlin52_k4_1"), 15, 1);
+    // pilot(Some("berlin52_k4_1"), 15, 1);
     // pilot(Some("0010_k1"), 100);
     // greedy(Some("berlin52_k2_2"), 3);
     // local_search(Some("berlin52_k2_2"), Neighborhood::DoubleEdgeExchange(5), StepFunction::BestImprovement, 10000, 1);

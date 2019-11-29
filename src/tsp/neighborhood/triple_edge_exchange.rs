@@ -114,6 +114,7 @@ impl NeighborhoodImpl for TripleEdgeExchange {
     }
 
     fn get_best_improving_neighbor(&mut self, solution: &Solution, delta_eval: bool) -> bool {
+        //TODO: Should have time termination here and for first improving 
         let max_length = self.calculate_max_length(solution.instance());
         let number_of_vertices = solution.instance().number_of_vertices();
         for start_idx in 0..number_of_vertices {
