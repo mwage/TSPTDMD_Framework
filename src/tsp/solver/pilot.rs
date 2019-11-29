@@ -28,7 +28,7 @@ impl Solver for PilotSolver {
     fn solve(&mut self, instance: Rc<TSPInstance>, logger: Logger) {
         self.greedy.set_instance(&instance);    // Initialize instance of greedy algorithm
         self.best_solutions.push(Solution::new(Rc::clone(&instance)));   // Add an initial empty solution
-        let mut results: Vec<(usize, usize, usize, isize)> = Vec::with_capacity(instance.number_of_vertices() - 1);  // Initialize vector for results of different branches empty
+        let mut results: Vec<(usize, usize, usize, i128)> = Vec::with_capacity(instance.number_of_vertices() - 1);  // Initialize vector for results of different branches empty
         
         for i in 0..instance.number_of_vertices() - 1 {
             for j in 0..self.best_solutions.len() {

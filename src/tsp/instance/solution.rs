@@ -12,7 +12,7 @@ pub struct Solution {
     unassigned_vertices: Vec<usize>,
     driver_distances: Vec<isize>,
     instance: Rc<TSPInstance>,
-    objective_value: isize
+    objective_value: i128
 }
 
 impl Solution {
@@ -22,7 +22,7 @@ impl Solution {
             unassigned_vertices: (1..instance.number_of_vertices()).collect(),
             driver_distances: vec![0; instance.number_of_drivers()],
             instance,
-            objective_value: isize::max_value()
+            objective_value: i128::max_value()
         }
     }
 
@@ -46,7 +46,7 @@ impl Solution {
         &self.unassigned_vertices
     }
 
-    pub fn objective_value(&self) -> isize {
+    pub fn objective_value(&self) -> i128 {
         self.objective_value
     }
 
@@ -83,7 +83,7 @@ impl Solution {
     }
 
     pub fn delta_evaluation(&mut self, delta: isize, distances: Vec<isize>) {
-        self.objective_value += delta;
+        self.objective_value += delta as i128;
         self.driver_distances = distances;
     }
 
@@ -122,8 +122,8 @@ impl Solution {
     // Calculates objective value from driver distances
     pub fn calculate_objective_value(&mut self) {
         self.objective_value = self.driver_distances.iter()
-            .map(|x| (self.instance.desired_travel_distance() - *x).pow(2))
-            .collect::<Vec<isize>>().iter().sum();
+            .map(|x| ((self.instance.desired_travel_distance() - *x) as i128).pow(2))
+            .collect::<Vec<i128>>().iter().sum();
     }
     
     // Calculates objective value by recalculating driver distances

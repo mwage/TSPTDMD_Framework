@@ -226,8 +226,8 @@ fn test_delta() {
 
     let mut triple_edge_exchange = TripleEdgeExchange::new(Some(3));
     triple_edge_exchange.stored_move = Some(triple_edge_exchange.evaluate_move(&solution, start, first_length, second_length));
-    let new_val = triple_edge_exchange.delta().unwrap() + solution.objective_value();
     triple_edge_exchange.apply(&mut solution, true);
-
+    let new_val = solution.objective_value();
+    solution.calculate_objective_value_from_scratch();
     assert_eq!(new_val, solution.objective_value());
 }
