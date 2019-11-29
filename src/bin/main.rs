@@ -35,7 +35,7 @@ fn all_from_env( ) {
         "local" => test_all_local_searches(None),
         "grasp" => grasp(None, 5, Neighborhood::DoubleEdgeExchange(None), StepFunction::BestImprovement, 1000, 10000, 1),
         "vnd" => variable_neighborhood(None, vec![Neighborhood::DoubleEdgeExchange(None), 
-            Neighborhood::DriverFlip, Neighborhood::TripleEdgeExchange(None)], args[2].parse::<usize>().unwrap()),
+            Neighborhood::DriverFlip, Neighborhood::TripleEdgeExchange(None)], 1),
         _ => unimplemented!()
     };
 }
