@@ -14,7 +14,7 @@ use tsp_framework::variable_neighborhood;
 
 
 fn main() {
-    // all_from_env();
+    all_from_env();
     // greedy(Some("berlin52_k2_2"), 1, 1);
     // pilot(Some("berlin52_k2_2"), 15, 1);
     // pilot(Some("0010_k1"), 100);
@@ -23,7 +23,7 @@ fn main() {
     
     // test_all_local_searches();
     // variable_neighborhood(Some("berlin52_k2_2"), vec![Neighborhood::DoubleEdgeExchange(None), Neighborhood::DriverFlip, Neighborhood::TripleEdgeExchange(None)], 1);
-    grasp(Some("berlin52_k2_2"), 5, Neighborhood::DoubleEdgeExchange(None), StepFunction::BestImprovement, 100, 1000, 1);
+    // grasp(Some("berlin52_k2_2"), 5, Neighborhood::DoubleEdgeExchange(None), StepFunction::BestImprovement, 100, 1000, 1);
 }
 
 fn all_from_env( ) {
@@ -35,7 +35,7 @@ fn all_from_env( ) {
         "local" => test_all_local_searches(None),
         "grasp" => grasp(None, 5, Neighborhood::DoubleEdgeExchange(None), StepFunction::BestImprovement, 1000, 10000, 1),
         "vnd" => variable_neighborhood(None, vec![Neighborhood::DoubleEdgeExchange(None), 
-            Neighborhood::DriverFlip, Neighborhood::TripleEdgeExchange(None)], 1),
+            Neighborhood::DriverFlip, Neighborhood::TripleEdgeExchange(None)], args[2].parse::<usize>().unwrap()),
         _ => unimplemented!()
     };
 }

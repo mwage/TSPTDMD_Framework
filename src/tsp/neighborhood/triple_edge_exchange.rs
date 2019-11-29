@@ -170,8 +170,8 @@ impl NeighborhoodImpl for TripleEdgeExchange {
 
     fn to_string(&self) -> String {
         match self.max_length {
-            Some(x) => format!("TripleEdgeExchange.{}", x),
-            _ => String::from("TripleEdgeExchange.Max")
+            Some(x) => format!("TripleEdgeExchange-{}", x),
+            _ => String::from("TripleEdgeExchange-Max")
         }
     }
 }

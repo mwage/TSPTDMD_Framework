@@ -46,6 +46,7 @@ impl Solver for VariableNeighborhood {
     }
 
     fn to_string(&self) -> String {
-        String::from("VariableNeighborhood")
+        let neighborhoods = self.neighborhoods.iter().map(|x| x.to_string()).fold(String::new(), |a, b| a + &b + ".");
+        format!("VariableNeighborhood.{}", neighborhoods)
     }
 }
