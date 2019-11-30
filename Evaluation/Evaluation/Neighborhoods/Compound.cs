@@ -2,10 +2,10 @@
 {
     public class Compound : INeighborhood
     {
-        public int MaxLength { get; }
+        public string MaxLength { get; }
         public Compound(string maxLength)
         {
-            MaxLength = int.Parse(maxLength);
+            MaxLength = maxLength;
         }
     }
 }

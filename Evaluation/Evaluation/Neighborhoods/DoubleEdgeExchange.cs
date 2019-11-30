@@ -6,10 +6,10 @@ namespace Evaluation.Neighborhoods
 {
     public class DoubleEdgeExchange : INeighborhood
     {
-        public int MaxLength { get; }
+        public string MaxLength { get; }
         public DoubleEdgeExchange(string maxLength)
         {
-            MaxLength = int.Parse(maxLength);
+            MaxLength = maxLength;
         }
     }
 }

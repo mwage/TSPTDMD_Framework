@@ -61,8 +61,17 @@ namespace Evaluation
                     case "greedy":
                         results.Add(new Greedy(parameters));
                         break;
+                    case "ls":
+                        results.Add(new LocalSearch(parameters));
+                        break;
                     case "grasp":
                         results.Add(new Grasp(parameters));
+                        break;
+                    case "pilot":
+                        results.Add(new Pilot(parameters));
+                        break;
+                    case "vnd":
+                        results.Add(new VariableNeighborhood(parameters));
                         break;
                     default:
                         Console.WriteLine("Can't process " + parameters[0]);
