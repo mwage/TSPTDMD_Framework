@@ -194,16 +194,18 @@ fn test_driver_flip() {
 
 #[test]
 fn test_delta() {
-    let instance = TSPInstance::new_random(10, 3, 100, 50);
-    let mut solution = Solution::new_random(Rc::new(instance));
-    solution.calculate_objective_value();
-    let idx = rand::thread_rng().gen_range(0, 10);
-    let old_driver = solution.get_assignment(idx).driver();
-    let new_driver = (old_driver + 1) % 3;
-    let mut driver_flip = DriverFlip::new();
-    driver_flip.stored_move = Some(driver_flip.evaluate_move(&solution, idx, new_driver));
-    driver_flip.apply(&mut solution, true);
-    let new_val = solution.objective_value();
-    solution.calculate_objective_value_from_scratch();
-    assert_eq!(new_val, solution.objective_value());
+    for _ in 0..100 {
+        let instance = TSPInstance::new_random(10, 3, 100, 50);
+        let mut solution = Solution::new_random(Rc::new(instance));
+        solution.calculate_objective_value();
+        let idx = rand::thread_rng().gen_range(0, 10);
+        let old_driver = solution.get_assignment(idx).driver();
+        let new_driver = (old_driver + 1) % 3;
+        let mut driver_flip = DriverFlip::new();
+        driver_flip.stored_move = Some(driver_flip.evaluate_move(&solution, idx, new_driver));
+        driver_flip.apply(&mut solution, true);
+        let new_val = solution.objective_value();
+        solution.calculate_objective_value_from_scratch();
+        assert_eq!(new_val, solution.objective_value());
+    }
 }

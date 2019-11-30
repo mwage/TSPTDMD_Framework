@@ -17,7 +17,7 @@ fn main() {
     all_from_env();
     // greedy(Some("berlin52_k2_2"), 1, 1);
     // pilot(Some("0025_k2"), 1000, 1);
-    // local_search(None, Neighborhood::Compound(Some(10)), StepFunction::FirstImprovement, 10000, 1);
+    // local_search(None, Neighborhood::TripleEdgeExchange(Some(10)), StepFunction::FirstImprovement, 50000, 1);
     // variable_neighborhood(Some("berlin52_k2_2"), vec![Neighborhood::DoubleEdgeExchange(None), Neighborhood::DriverFlip, Neighborhood::TripleEdgeExchange(None)], 1);
     // grasp(Some("berlin52_k2_2"), 5, Neighborhood::DoubleEdgeExchange(None), StepFunction::BestImprovement, 100, 1000, 1);
 }

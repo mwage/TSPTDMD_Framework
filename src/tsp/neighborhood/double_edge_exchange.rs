@@ -194,16 +194,18 @@ impl DEMove {
 
 #[test]
 fn test_delta() {
-    let instance = TSPInstance::new_random(10, 3, 100, 50);
-    let mut solution = Solution::new_random(Rc::new(instance));
-    solution.calculate_objective_value();
-    let start = rand::thread_rng().gen_range(0, solution.instance().number_of_vertices());
-    let length = rand::thread_rng().gen_range(1, 4);
+    for _ in 0..100 {
+        let instance = TSPInstance::new_random(10, 3, 100, 50);
+        let mut solution = Solution::new_random(Rc::new(instance));
+        solution.calculate_objective_value();
+        let start = rand::thread_rng().gen_range(0, solution.instance().number_of_vertices());
+        let length = rand::thread_rng().gen_range(1, 4);
 
-    let mut double_edge_exchange = DoubleEdgeExchange::new(Some(4));
-    double_edge_exchange.stored_move = Some(double_edge_exchange.evaluate_move(&solution, start, length));
-    double_edge_exchange.apply(&mut solution, true);
-    let x = solution.objective_value();
-    solution.calculate_objective_value_from_scratch();
-    assert_eq!(x, solution.objective_value());
+        let mut double_edge_exchange = DoubleEdgeExchange::new(Some(4));
+        double_edge_exchange.stored_move = Some(double_edge_exchange.evaluate_move(&solution, start, length));
+        double_edge_exchange.apply(&mut solution, true);
+        let x = solution.objective_value();
+        solution.calculate_objective_value_from_scratch();
+        assert_eq!(x, solution.objective_value());
+    }
 }

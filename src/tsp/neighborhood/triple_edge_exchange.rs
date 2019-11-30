@@ -109,8 +109,8 @@ impl NeighborhoodImpl for TripleEdgeExchange {
     fn get_random_neighbor(&mut self, solution: &Solution, delta_eval: bool) -> bool {
         let max_length = self.calculate_max_length(solution.instance());
         let start = rand::thread_rng().gen_range(0, solution.instance().number_of_vertices());
-        let first_length = rand::thread_rng().gen_range(1, max_length + 1);
-        let second_length = rand::thread_rng().gen_range(1, max_length + 1);
+        let first_length = rand::thread_rng().gen_range(1, max_length);
+        let second_length = rand::thread_rng().gen_range(0, max_length);
         self.stored_move = Some(self.evaluate_move(solution, start, first_length, second_length));
 
         true
@@ -122,7 +122,7 @@ impl NeighborhoodImpl for TripleEdgeExchange {
         let number_of_vertices = solution.instance().number_of_vertices();
         for start_idx in 0..number_of_vertices {
             for first_block_length in 1..max_length {
-                for second_block_length in 1..max_length {
+                for second_block_length in 0..max_length {
                     let te_move = self.evaluate_move(solution, start_idx, first_block_length, second_block_length);
                     if let Some(delta) = self.delta() {  
                         if te_move.delta() < delta {
@@ -221,17 +221,19 @@ impl TEMove {
 
 #[test]
 fn test_delta() {
-    let instance = TSPInstance::new_random(10, 10, 100, 50);
-    let mut solution = Solution::new_random(Rc::new(instance));
-    solution.calculate_objective_value();
-    let start = rand::thread_rng().gen_range(0, solution.instance().number_of_vertices());
-    let first_length = rand::thread_rng().gen_range(1, 3);
-    let second_length = rand::thread_rng().gen_range(1, 3);
-
-    let mut triple_edge_exchange = TripleEdgeExchange::new(Some(3));
-    triple_edge_exchange.stored_move = Some(triple_edge_exchange.evaluate_move(&solution, start, first_length, second_length));
-    triple_edge_exchange.apply(&mut solution, true);
-    let new_val = solution.objective_value();
-    solution.calculate_objective_value_from_scratch();
-    assert_eq!(new_val, solution.objective_value());
+    for _ in 0..100 {
+        let instance = TSPInstance::new_random(10, 10, 100, 50);
+        let mut solution = Solution::new_random(Rc::new(instance));
+        solution.calculate_objective_value();
+        let start = rand::thread_rng().gen_range(0, solution.instance().number_of_vertices());
+        let first_length = rand::thread_rng().gen_range(1, 3);
+        let second_length = rand::thread_rng().gen_range(1, 3);
+    
+        let mut triple_edge_exchange = TripleEdgeExchange::new(Some(3));
+        triple_edge_exchange.stored_move = Some(triple_edge_exchange.evaluate_move(&solution, start, first_length, second_length));
+        triple_edge_exchange.apply(&mut solution, true);
+        let new_val = solution.objective_value();
+        solution.calculate_objective_value_from_scratch();
+        assert_eq!(new_val, solution.objective_value());
+    }
 }
