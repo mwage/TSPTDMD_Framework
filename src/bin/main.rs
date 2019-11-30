@@ -14,12 +14,12 @@ use tsp_framework::variable_neighborhood;
 
 
 fn main() {
-    // all_from_env();
+    all_from_env();
     // greedy(Some("berlin52_k2_2"), 1, 1);
     // pilot(Some("a280_k1_1"), 1, 1);
     // pilot(Some("0010_k1"), 100);
     // greedy(Some("berlin52_k2_2"), 3);
-    local_search(None, Neighborhood::Compound(Some(10)), StepFunction::FirstImprovement, 10000, 1);
+    // local_search(None, Neighborhood::Compound(Some(10)), StepFunction::FirstImprovement, 10000, 1);
     
     // test_all_local_searches();
     // variable_neighborhood(Some("berlin52_k2_2"), vec![Neighborhood::DoubleEdgeExchange(None), Neighborhood::DriverFlip, Neighborhood::TripleEdgeExchange(None)], 1);
@@ -39,7 +39,7 @@ fn all_from_env( ) {
                 None
             };
             test_all_local_searches(None, max_length)
-        },   // TODO: set blocklength
+        },
         "grasp" => {
             let max_length = if args.len() > 2 {
                 Some(args[2].parse::<usize>().unwrap())
@@ -47,7 +47,7 @@ fn all_from_env( ) {
                 None
             };
             grasp(None, 5, Neighborhood::DoubleEdgeExchange(max_length), StepFunction::BestImprovement, 100, 20000, 1)
-        },   // TODO: set blocklength
+        },
         "vnd" => {
             let max_length = if args.len() > 2 {
                 Some(args[2].parse::<usize>().unwrap())
@@ -62,7 +62,7 @@ fn all_from_env( ) {
 }
 
 fn test_all_local_searches(instance: Option<&str>, max_length: Option<usize> ) {
-    let neighborhoods = vec![Neighborhood::DoubleEdgeExchange(max_length), Neighborhood::TripleEdgeExchange(max_length), Neighborhood::DriverFlip];
+    let neighborhoods = vec![Neighborhood::DoubleEdgeExchange(max_length), Neighborhood::TripleEdgeExchange(max_length), Neighborhood::DriverFlip, Neighborhood::Compound(max_length)];
     let step_functions = vec![StepFunction::BestImprovement, StepFunction::FirstImprovement, StepFunction::Random];
     for neighborhood in neighborhoods.iter() {
         for step_function in step_functions.iter() {

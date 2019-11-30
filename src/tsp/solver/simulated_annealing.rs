@@ -14,6 +14,7 @@ pub struct SimulatedAnnealing<N: NeighborhoodImpl> {
     terminating_temperature: f64
 }
 
+// TODO: Implement SA
 impl<N> SimulatedAnnealing<N> where N: NeighborhoodImpl {
     pub fn new(neighborhood: N) -> Self {
         SimulatedAnnealing {
