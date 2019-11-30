@@ -72,6 +72,7 @@ impl NeighborhoodImpl for DriverFlip {
     }
 
     fn get_best_improving_neighbor(&mut self, solution: &Solution, delta_eval: bool, logger: &Logger) -> bool {
+        self.stored_move = None;
         if solution.instance().number_of_drivers() == 1 {
             return false;
         }
@@ -109,6 +110,7 @@ impl NeighborhoodImpl for DriverFlip {
     }
 
     fn get_first_improving_neighbor(&mut self, solution: &Solution, delta_eval: bool, logger: &Logger) -> bool {
+        self.stored_move = None;
         if solution.instance().number_of_drivers() == 1 {
             return false;
         }
