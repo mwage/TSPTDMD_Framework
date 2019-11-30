@@ -23,36 +23,34 @@ impl<N> LocalSearch<N> where N: NeighborhoodImpl {
         }
     }
 
-    pub fn local_search(&mut self, solution: Solution, logger: &Logger) -> Solution {
+    pub fn local_search(&mut self, solution: &mut Solution, logger: &Logger) {
         match self.step_function {
             StepFunction::Random => self.search_random(solution, logger),
             _ => self.search_deterministic(solution, logger)
-        }
+        };
     }
     
-    fn search_deterministic(&mut self, mut solution: Solution, logger: &Logger) -> Solution {
+    fn search_deterministic(&mut self, solution: &mut Solution, logger: &Logger) {
         let mut counter = 0;
         loop {
-            let improved = self.neighborhood.get_neighbor(&mut solution, &self.step_function, true, logger);    // TODO: Set delta eval
+            let improved = self.neighborhood.get_neighbor(solution, &self.step_function, true, logger);    // TODO: Set delta eval
 
             if !improved || counter >= self.iteration_limit || logger.get_elapsed() >= crate::TIME_LIMIT {
                 break;
             }
             
-            self.neighborhood.set_neighbor(&mut solution, true);
+            self.neighborhood.set_neighbor(solution, true);
             counter += 1;
         }
-
-        solution
     }
 
-    fn search_random(&mut self, mut solution: Solution, logger: &Logger) -> Solution {
+    fn search_random(&mut self, mut solution: &mut Solution, logger: &Logger) {
         let mut counter = 0;
         loop {
-            self.neighborhood.get_neighbor(&mut solution, &self.step_function, true, logger);    // TODO: Set delta eval    
+            self.neighborhood.get_neighbor(solution, &self.step_function, true, logger);    // TODO: Set delta eval    
 
             if self.neighborhood.delta().unwrap() < 0 {
-                self.neighborhood.set_neighbor(&mut solution, true);
+                self.neighborhood.set_neighbor(solution, true);
             }
             if counter >= self.iteration_limit || logger.get_elapsed() >= crate::TIME_LIMIT {
                 break;
@@ -60,8 +58,6 @@ impl<N> LocalSearch<N> where N: NeighborhoodImpl {
 
             counter += 1;
         }
-
-        solution
     }
 
     pub fn neighborhood_to_string(&self) -> String {
@@ -75,9 +71,7 @@ impl<N> Solver for LocalSearch<N> where N: NeighborhoodImpl {
         let mut greedy = GreedySolver::new(1);
         greedy.solve_greedy(&instance, &mut solution, &logger);
         solution.calculate_objective_value();
-        println!("{}", solution.objective_value());
-        let solution = self.local_search(solution, &logger);
-        println!("{}", solution.objective_value());
+        self.local_search(&mut solution, &logger);
         logger.log_result(&solution);
     }
 

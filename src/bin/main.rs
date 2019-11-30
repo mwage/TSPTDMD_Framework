@@ -32,17 +32,38 @@ fn all_from_env( ) {
     match &args[1][..] {
         "greedy" => greedy(None, args[2].parse::<usize>().unwrap(), 1),
         "pilot" => pilot(None, args[2].parse::<usize>().unwrap(), 1),
-        "local" => test_all_local_searches(None),
-        "grasp" => grasp(None, 5, Neighborhood::DoubleEdgeExchange(None), StepFunction::BestImprovement, 1000, 10000, 1),
-        "vnd" => variable_neighborhood(None, vec![Neighborhood::DoubleEdgeExchange(None), 
-            Neighborhood::DriverFlip, Neighborhood::TripleEdgeExchange(None)], 1),
+        "local" => {
+            let max_length = if args.len() > 2 {
+                Some(args[2].parse::<usize>().unwrap())
+            } else {
+                None
+            };
+            test_all_local_searches(None, max_length)
+        },   // TODO: set blocklength
+        "grasp" => {
+            let max_length = if args.len() > 2 {
+                Some(args[2].parse::<usize>().unwrap())
+            } else {
+                None
+            };
+            grasp(None, 5, Neighborhood::DoubleEdgeExchange(max_length), StepFunction::BestImprovement, 100, 20000, 1)
+        },   // TODO: set blocklength
+        "vnd" => {
+            let max_length = if args.len() > 2 {
+                Some(args[2].parse::<usize>().unwrap())
+            } else {
+                None
+            };
+            variable_neighborhood(None, vec![Neighborhood::DoubleEdgeExchange(max_length),
+                Neighborhood::DriverFlip, Neighborhood::TripleEdgeExchange(max_length)], 1)
+        },
         _ => unimplemented!()
     };
 }
 
-fn test_all_local_searches(instance: Option<&str>) {
-    let neighborhoods = vec![Neighborhood::DoubleEdgeExchange(None), Neighborhood::TripleEdgeExchange(None), Neighborhood::DriverFlip];
-    let step_functions = vec![StepFunction::BestImprovement];
+fn test_all_local_searches(instance: Option<&str>, max_length: Option<usize> ) {
+    let neighborhoods = vec![Neighborhood::DoubleEdgeExchange(max_length), Neighborhood::TripleEdgeExchange(max_length), Neighborhood::DriverFlip];
+    let step_functions = vec![StepFunction::BestImprovement, StepFunction::FirstImprovement, StepFunction::Random];
     for neighborhood in neighborhoods.iter() {
         for step_function in step_functions.iter() {
             let runs = match step_function {
