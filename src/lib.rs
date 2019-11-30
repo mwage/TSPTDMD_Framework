@@ -21,7 +21,7 @@ pub use tsp::neighborhood::Neighborhood;
 pub use tsp::neighborhood::StepFunction;
 
 
-static TIME_LIMIT: u128 = 1000 * 60 * 15;
+static TIME_LIMIT: u128 = 1000 * 60;
 
 
 pub fn pilot(instance_name: Option<&str>, beta: usize, runs: usize) {

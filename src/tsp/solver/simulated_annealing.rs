@@ -39,8 +39,7 @@ impl<N> Solver for SimulatedAnnealing<N> where N: NeighborhoodImpl {
     fn solve(&mut self, instance: Rc<TSPInstance>, logger: Logger) {
         let mut best_solution = Solution::new(Rc::clone(&instance));
         let mut greedy = GreedySolver::new(1);
-        greedy.set_instance(&instance);
-        greedy.solve_greedy(&mut best_solution, &logger);
+        greedy.solve_greedy(&instance, &mut best_solution, &logger);
 
 
     }

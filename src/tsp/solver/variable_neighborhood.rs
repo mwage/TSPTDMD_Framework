@@ -23,8 +23,7 @@ impl Solver for VariableNeighborhood {
     fn solve(&mut self, instance: Rc<TSPInstance>, logger: Logger) {
         let mut solution = Solution::new(Rc::clone(&instance));
         let mut greedy = GreedySolver::new(1);
-        greedy.set_instance(&instance);
-        greedy.solve_greedy(&mut solution, &logger);
+        greedy.solve_greedy(&instance, &mut solution, &logger);
         solution.calculate_objective_value();
         
         let mut counter = 0;

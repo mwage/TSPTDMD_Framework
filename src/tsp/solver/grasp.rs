@@ -36,11 +36,10 @@ impl<N> Solver for Grasp<N> where N: NeighborhoodImpl {
         let mut beta = 1;
         let mut next_beta_increment = 1;
         let mut counter = 0;
-        self.greedy.set_instance(&instance);
 
         loop {
             let mut candidate = Solution::new(Rc::clone(&instance));
-            self.greedy.solve_greedy(&mut candidate, &logger);
+            self.greedy.solve_greedy(&instance, &mut candidate, &logger);
             candidate.calculate_objective_value();
             let candidate = self.local_search.local_search(candidate, &logger);
 
@@ -53,7 +52,6 @@ impl<N> Solver for Grasp<N> where N: NeighborhoodImpl {
                 next_beta_increment = (next_beta_increment as f64 * self.base).ceil() as usize;
                 beta += 1;
                 self.greedy = GreedySolver::new(beta);
-                self.greedy.set_instance(&instance);
             }
 
             if counter > self.iteration_limit || logger.get_elapsed() >= crate::TIME_LIMIT {
