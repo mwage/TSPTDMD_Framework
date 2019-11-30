@@ -44,7 +44,7 @@ impl<N> LocalSearch<N> where N: NeighborhoodImpl {
         }
     }
 
-    fn search_random(&mut self, mut solution: &mut Solution, logger: &Logger) {
+    fn search_random(&mut self, solution: &mut Solution, logger: &Logger) {
         let mut counter = 0;
         loop {
             self.neighborhood.get_neighbor(solution, &self.step_function, true, logger);    // TODO: Set delta eval    

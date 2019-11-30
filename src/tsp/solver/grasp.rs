@@ -13,7 +13,8 @@ pub struct Grasp<N: NeighborhoodImpl> {
     greedy: GreedySolver,
     local_search: LocalSearch<N>,
     iteration_limit: usize,
-    base: f64
+    base: f64,
+    max_beta: usize
 }
 
 impl<N> Grasp<N> where N: NeighborhoodImpl {
@@ -25,7 +26,8 @@ impl<N> Grasp<N> where N: NeighborhoodImpl {
             greedy: GreedySolver::new(1),
             local_search: LocalSearch::new(neighborhood, step_function, ls_iteration_limit),
             iteration_limit,
-            base
+            base,
+            max_beta
         }
     }    
 }
@@ -63,6 +65,6 @@ impl<N> Solver for Grasp<N> where N: NeighborhoodImpl {
     }
 
     fn to_string(&self) -> String {
-        format!("grasp.{}.{}.{}", self.greedy.candidate_size(), self.iteration_limit, self.local_search.neighborhood_to_string())
+        format!("grasp.{}.{}.{}", self.max_beta, self.iteration_limit, self.local_search.to_string())
     }
 }

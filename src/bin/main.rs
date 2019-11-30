@@ -17,11 +17,7 @@ fn main() {
     all_from_env();
     // greedy(Some("berlin52_k2_2"), 1, 1);
     // pilot(Some("a280_k1_1"), 1, 1);
-    // pilot(Some("0010_k1"), 100);
-    // greedy(Some("berlin52_k2_2"), 3);
     // local_search(None, Neighborhood::Compound(Some(10)), StepFunction::FirstImprovement, 10000, 1);
-    
-    // test_all_local_searches();
     // variable_neighborhood(Some("berlin52_k2_2"), vec![Neighborhood::DoubleEdgeExchange(None), Neighborhood::DriverFlip, Neighborhood::TripleEdgeExchange(None)], 1);
     // grasp(Some("berlin52_k2_2"), 5, Neighborhood::DoubleEdgeExchange(None), StepFunction::BestImprovement, 100, 1000, 1);
 }
@@ -54,23 +50,37 @@ fn all_from_env( ) {
             } else {
                 None
             };
-            variable_neighborhood(None, vec![Neighborhood::DoubleEdgeExchange(max_length),
-                Neighborhood::DriverFlip, Neighborhood::TripleEdgeExchange(max_length)], 1)
+            variable_neighborhood(None, vec![
+                Neighborhood::DoubleEdgeExchange(max_length), 
+                Neighborhood::DriverFlip, 
+                Neighborhood::TripleEdgeExchange(max_length)
+            ], 1)
         },
         _ => unimplemented!()
     };
 }
 
 fn test_all_local_searches(instance: Option<&str>, max_length: Option<usize> ) {
-    let neighborhoods = vec![Neighborhood::DoubleEdgeExchange(max_length), Neighborhood::TripleEdgeExchange(max_length), Neighborhood::DriverFlip, Neighborhood::Compound(max_length)];
-    let step_functions = vec![StepFunction::BestImprovement, StepFunction::FirstImprovement, StepFunction::Random];
+    let neighborhoods = vec![
+        Neighborhood::DoubleEdgeExchange(max_length), 
+        Neighborhood::TripleEdgeExchange(max_length), 
+        Neighborhood::DriverFlip, Neighborhood::Compound(max_length),
+        Neighborhood::Compound(max_length)
+    ];
+
+    let step_functions = vec![
+        StepFunction::BestImprovement, 
+        StepFunction::FirstImprovement, 
+        StepFunction::Random
+    ];
+
     for neighborhood in neighborhoods.iter() {
         for step_function in step_functions.iter() {
             let runs = match step_function {
                 StepFunction::Random => 5,
                 _ => 1
             };
-            local_search(instance, neighborhood.to_owned(), step_function.to_owned(), 20000, runs);
+            local_search(instance, neighborhood.to_owned(), step_function.to_owned(), 50000, runs);
         }
     }
 }
