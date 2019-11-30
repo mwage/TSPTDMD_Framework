@@ -15,6 +15,7 @@ use tsp::neighborhood::DoubleEdgeExchange;
 use tsp::neighborhood::DriverFlip;
 use tsp::neighborhood::NeighborhoodImpl;
 use tsp::neighborhood::TripleEdgeExchange;
+use tsp::neighborhood::Compound;
 
 // exports
 pub use tsp::neighborhood::Neighborhood;
@@ -37,6 +38,7 @@ pub fn local_search(instance_name: Option<&str>, neighborhood: Neighborhood, ste
         Neighborhood::DriverFlip => start_local_search(DriverFlip::new(), step_function, iteration_limit, instance_name, runs),
         Neighborhood::DoubleEdgeExchange(x) => start_local_search(DoubleEdgeExchange::new(x), step_function, iteration_limit, instance_name, runs),
         Neighborhood::TripleEdgeExchange(x) => start_local_search(TripleEdgeExchange::new(x), step_function, iteration_limit, instance_name, runs),
+        Neighborhood::Compound(x) => start_local_search(Compound::new(x), step_function, iteration_limit, instance_name, runs),
         _ => unimplemented!()
     };
 }

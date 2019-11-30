@@ -4,7 +4,6 @@ use super::DriverFlip;
 use super::Neighborhood;
 use super::NeighborhoodImpl;
 use crate::tsp::Solution;
-use crate::tsp::TSPInstance;
 use crate::rand::Rng;
 use crate::tsp::io::Logger;
 
@@ -42,46 +41,56 @@ impl Compound {
     }
     
     fn stored_move_mut(&mut self) -> &mut Box<dyn NeighborhoodImpl> {        
-        match &mut self.stored_move {
-            Some(x) => {
-                match x {
-                    Neighborhood::DoubleEdgeExchange(_) => &mut self.double_edge_exchange,
-                    Neighborhood::TripleEdgeExchange(_) => &mut self.triple_edge_exchange,
-                    Neighborhood::DriverFlip => &mut self.driver_flip,
-                    _ => panic!("Invalid neighborhood selected.")
-                }
-            },
+        match &self.stored_move {
+            Some(x) => match x {
+                Neighborhood::DoubleEdgeExchange(_) => &mut self.double_edge_exchange,
+                Neighborhood::TripleEdgeExchange(_) => &mut self.triple_edge_exchange,
+                Neighborhood::DriverFlip => &mut self.driver_flip,
+                _ => panic!("Invalid neighborhood selected.")
+            }
             None => panic!("Attempted to set non-initialized neighbor.")
         }
     }
-    
-    fn apply(&mut self, solution: &mut Solution, delta_eval: bool) {
-        // TODO: get delta from neighborhood with last stored move
+
+    fn select_neighborhood(&self) -> Neighborhood {
+        match rand::thread_rng().gen_range(0, 3) {
+            0 => Neighborhood::TripleEdgeExchange(None),
+            1 => Neighborhood::DoubleEdgeExchange(None),
+            2 => Neighborhood::DriverFlip,
+            _ => panic!("Invalid number generated!")
+        }
     }
 
-    fn calculate_max_length(&self, instance: &TSPInstance) -> usize {
-        if let Some(length) = self.max_length {
-            length
-        } else {
-            instance.number_of_vertices() - 1
+    fn get_neighborhood_impl_mut(&mut self, neighborhood: &Neighborhood) -> &mut Box<dyn NeighborhoodImpl> {
+        match neighborhood {
+            Neighborhood::DoubleEdgeExchange(_) => &mut self.double_edge_exchange,
+            Neighborhood::TripleEdgeExchange(_) => &mut self.triple_edge_exchange,
+            Neighborhood::DriverFlip => &mut self.driver_flip,
+            _ => panic!("Invalid neighborhood selected.")
         }
     }
 }
 
 impl NeighborhoodImpl for Compound {
     fn get_random_neighbor(&mut self, solution: &Solution, delta_eval: bool) -> bool {
-        self.triple_edge_exchange.get_random_neighbor(solution, delta_eval)
-        // TODO: randomly select one
+        let neighborhood = self.select_neighborhood();
+        let res = self.get_neighborhood_impl_mut(&neighborhood).get_random_neighbor(solution, delta_eval);
+        self.stored_move = Some(neighborhood);
+        res
     }
 
     fn get_best_improving_neighbor(&mut self, solution: &Solution, delta_eval: bool, logger: &Logger) -> bool {
-        self.triple_edge_exchange.get_best_improving_neighbor(solution, delta_eval, logger)
-        // TODO: randomly select one
+        let neighborhood = self.select_neighborhood();
+        let res = self.get_neighborhood_impl_mut(&neighborhood).get_best_improving_neighbor(solution, delta_eval, logger);
+        self.stored_move = Some(neighborhood);
+        res
     }
     
     fn get_first_improving_neighbor(&mut self, solution: &Solution, delta_eval: bool, logger: &Logger) -> bool {
-        self.triple_edge_exchange.get_first_improving_neighbor(solution, delta_eval, logger)
-        // TODO: randomly select one
+        let neighborhood = self.select_neighborhood();
+        let res = self.get_neighborhood_impl_mut(&neighborhood).get_first_improving_neighbor(solution, delta_eval, logger);
+        self.stored_move = Some(neighborhood);
+        res
     }
 
     fn set_neighbor(&mut self, solution: &mut Solution, delta_eval: bool) {

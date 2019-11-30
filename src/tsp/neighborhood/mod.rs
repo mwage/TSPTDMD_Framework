@@ -38,7 +38,7 @@ pub enum Neighborhood {
     DoubleEdgeExchange(Option<usize>),
     DriverFlip,
     TripleEdgeExchange(Option<usize>),
-    Compound
+    Compound(Option<usize>)
 }
 
 #[derive(Debug, Clone)]

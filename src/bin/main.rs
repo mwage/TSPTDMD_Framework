@@ -14,12 +14,12 @@ use tsp_framework::variable_neighborhood;
 
 
 fn main() {
-    all_from_env();
+    // all_from_env();
     // greedy(Some("berlin52_k2_2"), 1, 1);
     // pilot(Some("a280_k1_1"), 1, 1);
     // pilot(Some("0010_k1"), 100);
     // greedy(Some("berlin52_k2_2"), 3);
-    // local_search(Some("berlin52_k4_1"), Neighborhood::DoubleEdgeExchange(None), StepFunction::BestImprovement, 20000, 1);
+    local_search(None, Neighborhood::Compound(Some(10)), StepFunction::FirstImprovement, 10000, 1);
     
     // test_all_local_searches();
     // variable_neighborhood(Some("berlin52_k2_2"), vec![Neighborhood::DoubleEdgeExchange(None), Neighborhood::DriverFlip, Neighborhood::TripleEdgeExchange(None)], 1);
