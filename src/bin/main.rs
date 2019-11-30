@@ -16,7 +16,7 @@ use tsp_framework::variable_neighborhood;
 fn main() {
     all_from_env();
     // greedy(Some("berlin52_k2_2"), 1, 1);
-    // pilot(Some("a280_k1_1"), 1, 1);
+    // pilot(Some("0025_k2"), 1000, 1);
     // local_search(None, Neighborhood::Compound(Some(10)), StepFunction::FirstImprovement, 10000, 1);
     // variable_neighborhood(Some("berlin52_k2_2"), vec![Neighborhood::DoubleEdgeExchange(None), Neighborhood::DriverFlip, Neighborhood::TripleEdgeExchange(None)], 1);
     // grasp(Some("berlin52_k2_2"), 5, Neighborhood::DoubleEdgeExchange(None), StepFunction::BestImprovement, 100, 1000, 1);
@@ -42,7 +42,7 @@ fn all_from_env( ) {
             } else {
                 None
             };
-            grasp(None, 5, Neighborhood::DoubleEdgeExchange(max_length), StepFunction::BestImprovement, 100, 20000, 1)
+            grasp(None, 5, Neighborhood::TripleEdgeExchange(max_length), StepFunction::BestImprovement, 100, 20000, 5)
         },
         "vnd" => {
             let max_length = if args.len() > 2 {
@@ -54,7 +54,7 @@ fn all_from_env( ) {
                 Neighborhood::DoubleEdgeExchange(max_length), 
                 Neighborhood::DriverFlip, 
                 Neighborhood::TripleEdgeExchange(max_length)
-            ], 1)
+            ], 5)
         },
         _ => unimplemented!()
     };
