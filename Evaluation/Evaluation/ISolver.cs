@@ -1,6 +1,6 @@
 ﻿namespace Evaluation
 {
-    public interface IResult
+    public interface ISolver
     {
 
     }
