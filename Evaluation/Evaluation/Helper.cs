@@ -1,5 +1,7 @@
 ﻿using Evaluation.Neighborhoods;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Evaluation
 {
@@ -36,6 +38,16 @@ namespace Evaluation
                 default:
                     throw new NotImplementedException();
             }
+        }
+        public static double StdDev(this List<Result> results)
+        {
+            var count = results.Count();
+            if (count <= 1) return 0;
+
+            var avg = results.Average(x => x.ObjValue);
+            var sum = results.Sum(d => (d.ObjValue - avg) * (d.ObjValue - avg));
+
+            return Math.Sqrt(sum / count);
         }
     }
 }

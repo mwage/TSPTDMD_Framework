@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Evaluation.Solver
 {
@@ -15,6 +14,37 @@ namespace Evaluation.Solver
                 Results.Add(name, new List<Result>());
             }
             Results[name].Add(result);
+        }
+
+        public decimal GetTime(string instance)
+        {
+            return Results[instance].Average(x => (decimal)x.Time);
+        }
+
+        public double GetBestVal(string instance)
+        {
+            return Results[instance].Min(x => x.ObjValue);
+        }
+
+        public double GetAverageVal(string instance)
+        {
+            return Results[instance].Average(x => x.ObjValue);
+        }
+
+        public double GetWorstVal(string instance)
+        {
+            return Results[instance].Max(x => x.ObjValue);
+        }
+
+        public double GetFeasiblePercentage(string instance)
+        {
+            var feasible = Results[instance].Sum(x => x.IsFeasible ? 1: 0);
+            return (double) feasible / Results[instance].Count;
+        }
+
+        public double GetStandardDeviation(string instance)
+        {
+            return Results[instance].StdDev();
         }
     }
 }

@@ -108,9 +108,12 @@ namespace Evaluation
                     var isFeasible = lines[5] == "FEASIBLE";
                     var result = new Result(val, time, isFeasible);
                     solver.AddResult(lines[0], result);
-                    Console.WriteLine("Done adding to " + fileName);
                 }
 
+                foreach (var instance in solver.Results.Keys)
+                {
+                    Console.WriteLine(Math.Round(solver.GetStandardDeviation(instance), 2));
+                }
                 results.Add(solver);
             }
 
