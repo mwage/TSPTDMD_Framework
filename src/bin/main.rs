@@ -11,6 +11,7 @@ use tsp_framework::pilot;
 use tsp_framework::local_search;
 use tsp_framework::grasp;
 use tsp_framework::variable_neighborhood;
+use tsp_framework::simulated_annealing;
 
 
 fn main() {
@@ -42,7 +43,7 @@ fn all_from_env( ) {
             } else {
                 None
             };
-            grasp(None, 5, Neighborhood::TripleEdgeExchange(max_length), StepFunction::BestImprovement, 100, 20000, 5)
+            grasp(None, 5, Neighborhood::Compound(max_length), StepFunction::BestImprovement, 100, 20000, 5)
         },
         "vnd" => {
             let max_length = if args.len() > 2 {
@@ -55,6 +56,14 @@ fn all_from_env( ) {
                 Neighborhood::DriverFlip, 
                 Neighborhood::TripleEdgeExchange(max_length)
             ], 5)
+        },
+        "sa" => {
+            let max_length = if args.len() > 2 {
+                Some(args[2].parse::<usize>().unwrap())
+            } else {
+                None
+            };
+            simulated_annealing(None, Neighborhood::Compound(max_length), 5)
         },
         _ => unimplemented!()
     };

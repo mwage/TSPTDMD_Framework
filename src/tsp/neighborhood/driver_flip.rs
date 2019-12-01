@@ -6,6 +6,7 @@ use crate::tsp::TSPInstance;
 use super::NeighborhoodImpl;
 use crate::tsp::io::Logger;
 
+#[derive(Debug)]
 pub struct DriverFlip {
     stored_move: Option<DFMove>
 }
@@ -152,7 +153,7 @@ impl NeighborhoodImpl for DriverFlip {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 struct DFMove {
     idx: usize,
     new_driver: usize,

@@ -52,6 +52,7 @@ pub fn grasp(instance_name: Option<&str>, candidate_size: usize, neighborhood: N
         Neighborhood::DriverFlip => start_grasp(DriverFlip::new(), step_function, candidate_size, iteration_limit, ls_iteration_limit, instance_name, runs),
         Neighborhood::DoubleEdgeExchange(x) => start_grasp(DoubleEdgeExchange::new(x), step_function, candidate_size, iteration_limit, ls_iteration_limit, instance_name, runs),
         Neighborhood::TripleEdgeExchange(x) => start_grasp(TripleEdgeExchange::new(x), step_function, candidate_size, iteration_limit, ls_iteration_limit, instance_name, runs),
+        Neighborhood::Compound(x) => start_grasp(Compound::new(x), step_function, candidate_size, iteration_limit, ls_iteration_limit, instance_name, runs),
         _ => unimplemented!()
     };
 }
@@ -64,8 +65,18 @@ pub fn variable_neighborhood(instance_name: Option<&str>, neighborhoods: Vec<Nei
     TestRunner::solve_instance(VariableNeighborhood::new(neighborhoods.iter().map(|x| get_neighborhood_impl(x)).collect()), instance_name, runs);
 }
 
-pub fn simulated_annealing(instance_name: Option<&str>, neighborhoods: Vec<Neighborhood>, step_functions: Vec<StepFunction>, runs: usize) {
-    // TestRunner::solve_instance(SimulatedAnnealing::new(neighborhoods.iter().map(|x| get_neighborhood_impl(x)).collect(), step_functions), instance_name, runs);
+pub fn simulated_annealing(instance_name: Option<&str>, neighborhood: Neighborhood, runs: usize) {
+    match neighborhood {
+        Neighborhood::DriverFlip => start_sa(DriverFlip::new(), instance_name, runs),
+        Neighborhood::DoubleEdgeExchange(x) => start_sa(DoubleEdgeExchange::new(x), instance_name, runs),
+        Neighborhood::TripleEdgeExchange(x) => start_sa(TripleEdgeExchange::new(x), instance_name, runs),
+        Neighborhood::Compound(x) => start_sa(Compound::new(x), instance_name, runs),
+        _ => unimplemented!()
+    };
+}
+
+fn start_sa<N>(neighborhood: N, instance_name: Option<&str>, runs: usize) where N: NeighborhoodImpl {
+    TestRunner::solve_instance(SimulatedAnnealing::new(neighborhood), instance_name, runs);
 }
 
 fn get_neighborhood_impl(neighborhood: &Neighborhood) -> Box<dyn NeighborhoodImpl> {
