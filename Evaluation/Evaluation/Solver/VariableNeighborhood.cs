@@ -5,9 +5,8 @@ using Evaluation.Neighborhoods;
 
 namespace Evaluation.Solver
 {
-    public class VariableNeighborhood : ISolver
+    public class VariableNeighborhood : ASolver
     {
-        public Dictionary<string, Result> Results { get; } = new Dictionary<string, Result>();
         public List<INeighborhood> Neighborhoods { get; } = new List<INeighborhood>();
 
         public VariableNeighborhood(IReadOnlyList<string> parameters)

@@ -5,12 +5,11 @@ using Evaluation.Neighborhoods;
 
 namespace Evaluation.Solver
 {
-    public class LocalSearch : ISolver
+    public class LocalSearch : ASolver
     {
         public int IterationLimit { get; }
         public StepFunction StepFunction { get; }
         public INeighborhood Neighborhood { get; }
-        public Dictionary<string, Result> Results { get; } = new Dictionary<string, Result>();
 
         public LocalSearch(IReadOnlyList<string> parameters)
         {

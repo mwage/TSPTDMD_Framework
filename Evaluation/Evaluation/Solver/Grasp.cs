@@ -3,12 +3,11 @@ using System.Linq;
 
 namespace Evaluation.Solver
 {
-    public class Grasp : ISolver
+    public class Grasp : ASolver
     {
         public int MaxBeta { get; }
         public int IterationLimit { get; }
         public LocalSearch LocalSearch { get; }
-        public Dictionary<string, Result> Results { get; } = new Dictionary<string, Result>();
 
         public Grasp(IReadOnlyList<string> parameters)
         {
