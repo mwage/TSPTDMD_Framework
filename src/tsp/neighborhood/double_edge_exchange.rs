@@ -46,6 +46,8 @@ impl DoubleEdgeExchange {
 
         if delta_eval {
             solution.delta_evaluation(delta, distances);
+        } else {
+            solution.calculate_objective_value_from_scratch();
         }
     }
 
@@ -108,6 +110,12 @@ impl NeighborhoodImpl for DoubleEdgeExchange {
                     }
                 } else {
                     self.stored_move = Some(de_move);
+                }
+                
+                if !delta_eval {
+                    // Simulate non-delta overhead
+                    let mut candidate = solution.clone();
+                    candidate.calculate_objective_value_from_scratch();
                 }
 
                 if logger.get_elapsed() >= crate::TIME_LIMIT {

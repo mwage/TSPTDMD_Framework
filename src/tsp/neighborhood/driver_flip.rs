@@ -33,6 +33,8 @@ impl DriverFlip {
 
         if delta_eval {
             solution.delta_evaluation(delta, distances);
+        } else {
+            solution.calculate_objective_value_from_scratch();
         }
 
         // let prev_vertex = solution.get_assignment(modulo_pos(idx as isize - 1, solution.instance().number_of_vertices())).vertex();
@@ -77,6 +79,7 @@ impl NeighborhoodImpl for DriverFlip {
         if solution.instance().number_of_drivers() == 1 {
             return false;
         }
+        
         let number_of_vertices = solution.instance().number_of_vertices();
         let (smallest_driver, _) = solution.driver_distances().iter().enumerate()
             .min_by_key(|(_, dist)| *dist).unwrap();    // Get driver with smallest distance
@@ -94,6 +97,12 @@ impl NeighborhoodImpl for DriverFlip {
                 }
             } else {
                 self.stored_move = Some(df_move);
+            }
+
+            if !delta_eval {
+                // Simulate non-delta overhead
+                let mut candidate = solution.clone();
+                candidate.calculate_objective_value_from_scratch();
             }
 
             if logger.get_elapsed() >= crate::TIME_LIMIT {
