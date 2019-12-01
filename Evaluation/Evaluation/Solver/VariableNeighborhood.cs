@@ -16,5 +16,10 @@ namespace Evaluation.Solver
                 Neighborhoods.Add(parameters[i].ToNeighborhood());
             }
         }
+
+        public override string ToString()
+        {
+            return $"vnd_{string.Join('.', Neighborhoods)}";
+        }
     }
 }

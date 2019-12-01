@@ -17,5 +17,10 @@ namespace Evaluation.Solver
             StepFunction = parameters[2].ToStepFunction();
             Neighborhood = parameters[3].ToNeighborhood();
         }
+
+        public override string ToString()
+        {
+            return $"{Neighborhood}";
+        }
     }
 }

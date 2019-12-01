@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Evaluation.Solver
 {
@@ -10,6 +8,11 @@ namespace Evaluation.Solver
         public Pilot(IReadOnlyList<string> parameters)
         {
             Beta = int.Parse(parameters[1]);
+        }
+
+        public override string ToString()
+        {
+            return $"pilot_{Beta}";
         }
     }
 }

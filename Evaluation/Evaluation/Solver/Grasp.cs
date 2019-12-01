@@ -15,5 +15,10 @@ namespace Evaluation.Solver
             IterationLimit = int.Parse(parameters[2]);
             LocalSearch = new LocalSearch(parameters.ToList().GetRange(3, 4));
         }
+
+        public override string ToString()
+        {
+            return $"grasp_{MaxBeta}";
+        }
     }
 }

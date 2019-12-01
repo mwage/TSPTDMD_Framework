@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Evaluation.Neighborhoods
+﻿namespace Evaluation.Neighborhoods
 {
     public class DoubleEdgeExchange : INeighborhood
     {
@@ -10,6 +6,11 @@ namespace Evaluation.Neighborhoods
         public DoubleEdgeExchange(string maxLength)
         {
             MaxLength = maxLength;
+        }
+
+        public override string ToString()
+        {
+            return $"de_{MaxLength}";
         }
     }
 }

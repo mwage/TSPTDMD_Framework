@@ -13,5 +13,10 @@ namespace Evaluation.Solver
         {
             Neighborhood = parameters[1].ToNeighborhood();
         }
+
+        public override string ToString()
+        {
+            return "sa";
+        }
     }
 }

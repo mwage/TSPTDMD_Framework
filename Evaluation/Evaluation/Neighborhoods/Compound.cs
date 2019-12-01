@@ -7,5 +7,10 @@
         {
             MaxLength = maxLength;
         }
+
+        public override string ToString()
+        {
+            return $"comp-{MaxLength}";
+        }
     }
 }

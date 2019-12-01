@@ -10,5 +10,10 @@ namespace Evaluation.Solver
         {
             Beta = int.Parse(parameters[1]);
         }
+
+        public override string ToString()
+        {
+            return $"greedy_{Beta}";
+        }
     }
 }
