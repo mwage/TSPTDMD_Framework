@@ -6,11 +6,9 @@ namespace Evaluation.Solver
     {
         Dictionary<string, List<Result>> Results { get; }
         void AddResult(string name, Result result);
-        decimal GetTime(string instance);
-        double GetBestVal(string instance);
-        double GetAverageVal(string instance);
-        double GetWorstVal(string instance);
-        double GetFeasiblePercentage(string instance);
-        double GetStandardDeviation(string instance);
+        string GetTime(string instance);
+        string GetBestVal(string instance);
+        string GetAverageVal(string instance);
+        string GetNumberOfFeasible(string instance);
     }
 }

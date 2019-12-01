@@ -9,7 +9,7 @@ namespace Evaluation
 {
     internal class Program
     {
-        private const string ParsePath = @"C:\Users\wage\Documents\Projects\Uni\ProgrammingAssignment_1\results";
+        private const string ParsePath = @"C:\Users\mwagner\Documents\Heuristic Lecture\ProgrammingAssignment 1\results";
         private const string DeletePath = @"C:\Users\wage\Documents\Projects\Uni\ProgrammingAssignment_1\results";
         private const char FolderSeparator = '\\';
 
@@ -19,6 +19,7 @@ namespace Evaluation
             //DeletePartialLogs(DeletePath);
 
             Console.WriteLine("Done.");
+            Console.ReadLine();
         }
 
         private static void DeletePartialLogs(string deletionDirectory)
@@ -112,7 +113,7 @@ namespace Evaluation
 
                 foreach (var instance in solver.Results.Keys)
                 {
-                    Console.WriteLine(Math.Round(solver.GetStandardDeviation(instance), 2));
+                    Console.WriteLine(solver.GetAverageVal(instance));
                 }
                 results.Add(solver);
             }

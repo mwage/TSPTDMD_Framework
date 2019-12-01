@@ -39,7 +39,7 @@ namespace Evaluation
                     throw new NotImplementedException();
             }
         }
-        public static double StdDev(this List<Result> results)
+        public static double StdDev(this IEnumerable<Result> results)
         {
             var count = results.Count();
             if (count <= 1) return 0;

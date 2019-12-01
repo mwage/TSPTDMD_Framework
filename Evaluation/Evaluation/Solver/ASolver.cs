@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Evaluation.Solver
@@ -16,35 +17,48 @@ namespace Evaluation.Solver
             Results[name].Add(result);
         }
 
-        public decimal GetTime(string instance)
+        public string GetTime(string instance)
         {
-            return Results[instance].Average(x => (decimal)x.Time);
+            var average = Math.Round(Results[instance].Average(x => (double)x.Time), 2);
+
+            return "$" + average + "_{\\pm" + GetTimeStd(instance) + "}$";
         }
 
-        public double GetBestVal(string instance)
+        private double GetTimeStd(string instance)
         {
-            return Results[instance].Min(x => x.ObjValue);
+            return Math.Round(Results[instance].Where(x => x.IsFeasible).StdDev(), 2);
         }
 
-        public double GetAverageVal(string instance)
+        public string GetBestVal(string instance)
         {
-            return Results[instance].Average(x => x.ObjValue);
+            return !Results[instance].Any(x => x.IsFeasible)
+                ? "inf" 
+                : "$" + Math.Round(Results[instance].Where(x => x.IsFeasible).Min(x => x.ObjValue), 2) + "$";
         }
 
-        public double GetWorstVal(string instance)
+        public string GetAverageVal(string instance)
         {
-            return Results[instance].Max(x => x.ObjValue);
+            if (!Results[instance].Any(x => x.IsFeasible))
+            {
+                return "inf";
+            }
+
+            var average = Math.Round(Results[instance].Where(x => x.IsFeasible)
+                .Average(x => x.ObjValue), 2);
+
+            return "$" + average + "_{\\pm" + GetStandardDeviation(instance) + "}$";
         }
 
-        public double GetFeasiblePercentage(string instance)
+        public string GetNumberOfFeasible(string instance)
         {
-            var feasible = Results[instance].Sum(x => x.IsFeasible ? 1: 0);
-            return (double) feasible / Results[instance].Count;
+            return Results[instance].Count > 1 
+                ? "$" + Results[instance].Sum(x => x.IsFeasible ? 1 : 0) + "$"
+                : Results[instance].Single().IsFeasible.ToString();
         }
 
-        public double GetStandardDeviation(string instance)
+        private double GetStandardDeviation(string instance)
         {
-            return Results[instance].StdDev();
+            return Math.Round(Results[instance].Where(x => x.IsFeasible).StdDev(), 2);
         }
     }
 }
