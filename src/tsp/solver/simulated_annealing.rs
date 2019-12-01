@@ -23,7 +23,7 @@ impl<N> SimulatedAnnealing<N> where N: NeighborhoodImpl {
         SimulatedAnnealing {
             neighborhood,
             temperature: 4.0,
-            alpha: 0.995,
+            alpha: 0.9999999,
             starting_temperature: 4.0,
             terminating_temperature: 10f64.powf(-10f64)
         }
