@@ -8,7 +8,7 @@ namespace Evaluation
 {
     public class Table
     {
-        private const string LogPath = @"C:\Users\wage\Desktop\TSP Results\";
+        private const string LogPath = @"C:\Users\mwagner\Desktop\TSP Results\";
         public string Name { get; }
         private readonly List<string> _heading = new List<string>();
         private readonly Dictionary<string, List<string>> _data;
@@ -69,7 +69,7 @@ namespace Evaluation
         {
             switch (Program.OutputSeparator)
             {
-                case " && ":
+                case " & ":
                     return "\\\\";
 
                 default:

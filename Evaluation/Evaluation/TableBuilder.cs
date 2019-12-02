@@ -88,14 +88,14 @@ namespace Evaluation
             var de10 = _results.Single(x => x is LocalSearch solver && solver.StepFunction == StepFunction.BestImprovement && solver.Neighborhood is DoubleEdgeExchange nh && nh.MaxLength == "10");
             var te10 = _results.Single(x => x is LocalSearch solver && solver.StepFunction == StepFunction.BestImprovement && solver.Neighborhood is TripleEdgeExchange nh && nh.MaxLength == "10");
             var comp10 = _results.Single(x => x is LocalSearch solver && solver.StepFunction == StepFunction.BestImprovement && solver.Neighborhood is Compound nh && nh.MaxLength == "10");
-            var grasp10 = _results.Single(x => x is Grasp solver && solver.MaxBeta == 10);
+            var grasp10 = _results.Single(x => x is Grasp solver && solver.LocalSearch.Neighborhood is Compound comp && comp.MaxLength == "10");
             var vnd10 = _results.Single(x => x is VariableNeighborhood solver && solver.Neighborhoods.First() is DoubleEdgeExchange de && de.MaxLength == "10");
 
             var demax = _results.Single(x => x is LocalSearch solver && solver.StepFunction == StepFunction.BestImprovement && solver.Neighborhood is DoubleEdgeExchange nh && nh.MaxLength == "max");
             var temax = _results.Single(x => x is LocalSearch solver && solver.StepFunction == StepFunction.BestImprovement && solver.Neighborhood is TripleEdgeExchange nh && nh.MaxLength == "max");
             var compmax = _results.Single(x => x is LocalSearch solver && solver.StepFunction == StepFunction.BestImprovement && solver.Neighborhood is Compound nh && nh.MaxLength == "max");
-            var graspmax = _results.Single(x => x is Grasp solver && solver.MaxBeta == 10);
-            var vndmax = _results.Single(x => x is VariableNeighborhood solver && solver.Neighborhoods.First() is DoubleEdgeExchange de && de.MaxLength == "10");
+            var graspmax = _results.Single(x => x is Grasp solver && solver.LocalSearch.Neighborhood is Compound comp && comp.MaxLength == "max");
+            var vndmax = _results.Single(x => x is VariableNeighborhood solver && solver.Neighborhoods.First() is DoubleEdgeExchange de && de.MaxLength == "max");
 
 
             var minTable = new Table("best improvement minimum");
@@ -131,6 +131,23 @@ namespace Evaluation
             timeTable.AppendColumn(vndmax, vndmax.GetTime);
 
             _tables.Add(timeTable);
+
+            var feasibleTable = new Table("best improvement feasibility");
+
+            // Add columns
+            feasibleTable.AppendColumn(df, df.GetNumberOfFeasible);
+            feasibleTable.AppendColumn(de10, de10.GetNumberOfFeasible);
+            feasibleTable.AppendColumn(te10, te10.GetNumberOfFeasible);
+            feasibleTable.AppendColumn(comp10, comp10.GetNumberOfFeasible);
+            feasibleTable.AppendColumn(grasp10, grasp10.GetNumberOfFeasible);
+            feasibleTable.AppendColumn(vnd10, vnd10.GetNumberOfFeasible);
+            feasibleTable.AppendColumn(demax, demax.GetNumberOfFeasible);
+            feasibleTable.AppendColumn(temax, temax.GetNumberOfFeasible);
+            feasibleTable.AppendColumn(compmax, compmax.GetNumberOfFeasible);
+            feasibleTable.AppendColumn(graspmax, graspmax.GetNumberOfFeasible);
+            feasibleTable.AppendColumn(vndmax, vndmax.GetNumberOfFeasible);
+
+            _tables.Add(feasibleTable);
         }
 
         public void BuildFirstImprovementTables()
@@ -161,7 +178,7 @@ namespace Evaluation
 
             _tables.Add(minTable);
 
-            var timeTable = new Table("best improvement time");
+            var timeTable = new Table("first improvement time");
 
             // Add columns
             timeTable.AppendColumn(df, df.GetTime);
@@ -171,6 +188,13 @@ namespace Evaluation
             timeTable.AppendColumn(demax, demax.GetTime);
             timeTable.AppendColumn(temax, temax.GetTime);
             timeTable.AppendColumn(compmax, compmax.GetTime);
+            timeTable.AppendColumn(df, df.GetNumberOfFeasible);
+            timeTable.AppendColumn(de10, de10.GetNumberOfFeasible);
+            timeTable.AppendColumn(te10, te10.GetNumberOfFeasible);
+            timeTable.AppendColumn(comp10, comp10.GetNumberOfFeasible);
+            timeTable.AppendColumn(demax, demax.GetNumberOfFeasible);
+            timeTable.AppendColumn(temax, temax.GetNumberOfFeasible);
+            timeTable.AppendColumn(compmax, compmax.GetNumberOfFeasible);
 
             _tables.Add(timeTable);
         }
@@ -191,7 +215,7 @@ namespace Evaluation
             var sa = _results.Single(x => x is SimulatedAnnealing);
 
 
-            var minTable = new Table("first improvement minimum");
+            var minTable = new Table("random minimum");
 
             // Add columns
             minTable.AppendColumn(df, df.GetBestVal);
@@ -206,7 +230,7 @@ namespace Evaluation
             _tables.Add(minTable);
 
 
-            var meanTable = new Table("first improvement mean");
+            var meanTable = new Table("random mean");
 
             // Add columns
             meanTable.AppendColumn(df, df.GetAverageVal);
@@ -220,7 +244,7 @@ namespace Evaluation
 
             _tables.Add(meanTable);
 
-            var timeTable = new Table("best improvement time");
+            var timeTable = new Table("random time");
 
             // Add columns
             timeTable.AppendColumn(df, df.GetTime);
@@ -230,8 +254,23 @@ namespace Evaluation
             timeTable.AppendColumn(demax, demax.GetTime);
             timeTable.AppendColumn(temax, temax.GetTime);
             timeTable.AppendColumn(compmax, compmax.GetTime);
+            timeTable.AppendColumn(sa, sa.GetTime);
 
             _tables.Add(timeTable);
+
+            var feasibleTable = new Table("random feasibility");
+
+            // Add columns
+            feasibleTable.AppendColumn(df, df.GetNumberOfFeasible);
+            feasibleTable.AppendColumn(de10, de10.GetNumberOfFeasible);
+            feasibleTable.AppendColumn(te10, te10.GetNumberOfFeasible);
+            feasibleTable.AppendColumn(comp10, comp10.GetNumberOfFeasible);
+            feasibleTable.AppendColumn(demax, demax.GetNumberOfFeasible);
+            feasibleTable.AppendColumn(temax, temax.GetNumberOfFeasible);
+            feasibleTable.AppendColumn(compmax, compmax.GetNumberOfFeasible);
+            feasibleTable.AppendColumn(sa, sa.GetNumberOfFeasible);
+
+            _tables.Add(feasibleTable);
         }
 
         public void BuildDeltaEvaluationTable()
@@ -240,16 +279,29 @@ namespace Evaluation
             var table = new Table("delta evaluation");
 
             // Get algorithms
-            var df = _results.Single(x => x is LocalSearch solver && solver.Neighborhood is DriverFlip);
-            var de = _results.Single(x => x is LocalSearch solver && solver.Neighborhood is DoubleEdgeExchange nh && nh.MaxLength == "10");
-            var te = _results.Single(x => x is LocalSearch solver && solver.Neighborhood is TripleEdgeExchange nh && nh.MaxLength == "10");
-            var comp = _results.Single(x => x is LocalSearch solver && solver.Neighborhood is Compound nh && nh.MaxLength == "10");
+            var df = _results.Single(x => x is LocalSearch solver && solver.StepFunction == StepFunction.BestImprovement && solver.Neighborhood is DriverFlip);
+            var de = _results.Single(x => x is LocalSearch solver && solver.StepFunction == StepFunction.BestImprovement && solver.Neighborhood is DoubleEdgeExchange nh && nh.MaxLength == "10");
+            var te = _results.Single(x => x is LocalSearch solver && solver.StepFunction == StepFunction.BestImprovement && solver.Neighborhood is TripleEdgeExchange nh && nh.MaxLength == "10");
+            var comp = _results.Single(x => x is LocalSearch solver && solver.StepFunction == StepFunction.BestImprovement && solver.Neighborhood is Compound nh && nh.MaxLength == "10");
 
             // Add columns
             table.AppendColumn(df, df.GetTime);
             table.AppendColumn(de, de.GetTime);
             table.AppendColumn(te, te.GetTime);
             table.AppendColumn(comp, comp.GetTime);
+
+            _tables.Add(table);
+        }
+
+        public void BuildVNDTable()
+        {
+            Console.WriteLine("Build vnd table.");
+            var table = new Table("vnd");
+
+            foreach (var solver in _results.Where(x => x is VariableNeighborhood))
+            {
+                table.AppendColumn(solver, solver.GetBestVal);
+            }
 
             _tables.Add(table);
         }
