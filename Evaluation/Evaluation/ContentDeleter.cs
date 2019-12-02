@@ -7,7 +7,7 @@ namespace Evaluation
 {
     public static class ContentDeleter
     {
-        private const string DeletePath = @"C:\Users\wage\Documents\Projects\Uni\ProgrammingAssignment_1\results";
+        private const string DeletePath = @"C:\Users\wage\Desktop\TSP Deleted";
         public static void DeletePartialLogs()
         {
             foreach (var directory in Directory.GetDirectories(DeletePath))

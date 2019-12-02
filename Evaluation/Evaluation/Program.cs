@@ -9,10 +9,11 @@ namespace Evaluation
 
         private static void Main()
         {
+            ContentDeleter.DeletePartialLogs();
             var tableBuilder = new TableBuilder(Parser.ParseResults());
             tableBuilder.BuildDeterministicTable();
             tableBuilder.ToFile();
-            tableBuilder.PrintTables();
+            //tableBuilder.PrintTables();
 
 
             //ContentDeleter.DeletePartialLogs();
@@ -20,9 +21,6 @@ namespace Evaluation
             Console.WriteLine("Done.");
             //Console.ReadLine();
         }
-
-
-
     }
 }
 

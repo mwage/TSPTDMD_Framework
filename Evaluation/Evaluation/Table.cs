@@ -61,6 +61,7 @@ namespace Evaluation
                 lines.Add(instance + Program.OutputSeparator + string.Join(Program.OutputSeparator, resultList));
             }
 
+
             File.WriteAllLines($"{LogPath}{Name}{GetFileEnd()}", lines);
         }
 

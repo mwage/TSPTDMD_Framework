@@ -32,11 +32,13 @@ namespace Evaluation
             table.AppendColumn(pilot5, pilot5.GetBestVal);
             table.AppendColumn(pilot15, pilot15.GetBestVal);
             table.AppendColumn(pilot50, pilot50.GetBestVal);
+
             table.AppendColumn(greedy, greedy.GetTime);
             table.AppendColumn(pilot1, pilot1.GetTime);
             table.AppendColumn(pilot5, pilot5.GetTime);
             table.AppendColumn(pilot15, pilot15.GetTime);
             table.AppendColumn(pilot50, pilot50.GetTime);
+
             table.AppendColumn(greedy, greedy.GetNumberOfFeasible);
             table.AppendColumn(pilot1, pilot1.GetNumberOfFeasible);
             table.AppendColumn(pilot5, pilot5.GetNumberOfFeasible);

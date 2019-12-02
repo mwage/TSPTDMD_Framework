@@ -13,6 +13,7 @@ namespace Evaluation
 
         public static List<ISolver> ParseResults()
         {
+            Console.WriteLine("Parsing results...");
             var results = new List<ISolver>();
             foreach (var directory in Directory.GetDirectories(ParsePath))
             {
