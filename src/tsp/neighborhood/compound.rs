@@ -72,29 +72,29 @@ impl Compound {
 }
 
 impl NeighborhoodImpl for Compound {
-    fn get_random_neighbor(&mut self, solution: &Solution, delta_eval: bool) -> bool {
+    fn get_random_neighbor(&mut self, solution: &Solution) -> bool {
         let neighborhood = self.select_neighborhood();
-        let res = self.get_neighborhood_impl_mut(&neighborhood).get_random_neighbor(solution, delta_eval);
+        let res = self.get_neighborhood_impl_mut(&neighborhood).get_random_neighbor(solution);
         self.stored_move = Some(neighborhood);
         res
     }
 
-    fn get_best_improving_neighbor(&mut self, solution: &Solution, delta_eval: bool, logger: &Logger) -> bool {
+    fn get_best_improving_neighbor(&mut self, solution: &Solution, logger: &Logger) -> bool {
         let neighborhood = self.select_neighborhood();
-        let res = self.get_neighborhood_impl_mut(&neighborhood).get_best_improving_neighbor(solution, delta_eval, logger);
+        let res = self.get_neighborhood_impl_mut(&neighborhood).get_best_improving_neighbor(solution, logger);
         self.stored_move = Some(neighborhood);
         res
     }
     
-    fn get_first_improving_neighbor(&mut self, solution: &Solution, delta_eval: bool, logger: &Logger) -> bool {
+    fn get_first_improving_neighbor(&mut self, solution: &Solution, logger: &Logger) -> bool {
         let neighborhood = self.select_neighborhood();
-        let res = self.get_neighborhood_impl_mut(&neighborhood).get_first_improving_neighbor(solution, delta_eval, logger);
+        let res = self.get_neighborhood_impl_mut(&neighborhood).get_first_improving_neighbor(solution, logger);
         self.stored_move = Some(neighborhood);
         res
     }
 
-    fn set_neighbor(&mut self, solution: &mut Solution, delta_eval: bool) {
-        self.stored_move_mut().set_neighbor(solution, delta_eval);
+    fn set_neighbor(&mut self, solution: &mut Solution) {
+        self.stored_move_mut().set_neighbor(solution);
         self.stored_move = None;
     }
     

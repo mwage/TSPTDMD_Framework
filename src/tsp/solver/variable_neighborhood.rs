@@ -29,8 +29,8 @@ impl Solver for VariableNeighborhood {
         let mut counter = 0;
         while counter < self.neighborhoods.len() {
             let neighborhood = &mut self.neighborhoods[counter];
-            if neighborhood.get_best_improving_neighbor(&solution, true, &logger) {
-                neighborhood.set_neighbor(&mut solution, true);
+            if neighborhood.get_best_improving_neighbor(&solution, &logger) {
+                neighborhood.set_neighbor(&mut solution);
                 counter = 0;
             } else {
                 counter += 1;

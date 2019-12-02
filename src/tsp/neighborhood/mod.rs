@@ -16,18 +16,18 @@ use crate::tsp::io::Logger;
 // TODO: Implement non delta eval
 
 pub trait NeighborhoodImpl {
-    fn get_random_neighbor(&mut self, solution: &Solution, delta_eval: bool) -> bool;
-    fn get_best_improving_neighbor(&mut self, solution: &Solution, delta_eval: bool, logger: &Logger) -> bool;
-    fn get_first_improving_neighbor(&mut self, solution: &Solution, delta_eval: bool, logger: &Logger) -> bool;
-    fn set_neighbor(&mut self, solution: &mut Solution, delta_eval: bool);
+    fn get_random_neighbor(&mut self, solution: &Solution) -> bool;
+    fn get_best_improving_neighbor(&mut self, solution: &Solution, logger: &Logger) -> bool;
+    fn get_first_improving_neighbor(&mut self, solution: &Solution, logger: &Logger) -> bool;
+    fn set_neighbor(&mut self, solution: &mut Solution);
     fn delta(&self) -> Option<isize>;
     fn to_string(&self) -> String;    // Used for logging
 
-    fn get_neighbor(&mut self, solution: &mut Solution, step_function: &StepFunction, delta_eval: bool, logger: &Logger) -> bool {  // Match stepfunction
+    fn get_neighbor(&mut self, solution: &mut Solution, step_function: &StepFunction, logger: &Logger) -> bool {  // Match stepfunction
         match step_function {
-            StepFunction::Random => self.get_random_neighbor(solution, delta_eval),
-            StepFunction::BestImprovement => self.get_best_improving_neighbor(solution, delta_eval, logger),
-            StepFunction::FirstImprovement => self.get_first_improving_neighbor(solution, delta_eval, logger),
+            StepFunction::Random => self.get_random_neighbor(solution),
+            StepFunction::BestImprovement => self.get_best_improving_neighbor(solution, logger),
+            StepFunction::FirstImprovement => self.get_first_improving_neighbor(solution, logger),
             _ => unimplemented!()
         }
     }

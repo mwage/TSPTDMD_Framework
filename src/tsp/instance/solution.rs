@@ -162,21 +162,21 @@ impl Solution {
     }
 
     pub fn vertices_to_str(&self) -> String {
-        let mut result = String::from("0");
-        let min = cmp::min(self.instance.number_of_vertices() - 1, self.number_of_assignments());
-
+        let mut result = String::new();
+        let number_of_vertices = self.instance.number_of_vertices();
+        
         // If solution is a permutation with 0 not at the end: permute vertices to end with 0
         if let Some(zero_idx) = self.assignments.iter().position(|x| x.vertex() == 0) {
-            let min_for_mod = cmp::min(self.instance.number_of_vertices(), self.number_of_assignments());
-            if zero_idx != min - 1 {
-                for i in 0..min {
-                    let idx = (i + zero_idx + 1) % min_for_mod;
-                    result.push_str(" ");
-                    result += &self.assignments[idx].vertex().to_string();
-                }
-                return result;
+            for i in 0..number_of_vertices {
+                let idx = (i + zero_idx) % number_of_vertices;
+                result += &self.assignments[idx].vertex().to_string();
+                result.push_str(" ");
             }
+            return result;
         }
+        
+        let min = cmp::min(number_of_vertices - 1, self.number_of_assignments());
+        result += "0";
 
         // Otherwise just add vertices as is
         for i in 0..min {
@@ -188,22 +188,20 @@ impl Solution {
 
     pub fn drivers_to_str(&self) -> String {
         let mut result = String::new();
-        let min = cmp::min(self.instance.number_of_vertices(), self.number_of_assignments());
+        let number_of_vertices = self.instance.number_of_vertices();
         
         // If solution is a permutation with 0 not at the end: permute vertices to end with 0
         if let Some(zero_idx) = self.assignments.iter().position(|x| x.vertex() == 0) {
-            if zero_idx != min - 1 {
-                for i in 0..min {
-                    let idx = (i + zero_idx + 1) % min;
-                    result.push_str(" ");
-                    result += &self.assignments[idx].driver().to_string();
-                }
-                return result;
+            for i in 0..number_of_vertices {
+                let idx = (i + zero_idx + 1) % number_of_vertices;
+                result.push_str(" ");
+                result += &self.assignments[idx].driver().to_string();
             }
+            return result;
         }
 
         // Otherwise just add vertices as is
-        for i in 0..min {
+        for i in 0..self.assignments.len() {
             result.push_str(" ");
             result += &self.assignments[i].driver().to_string();
         }

@@ -28,7 +28,7 @@ impl DoubleEdgeExchange {
         }        
     }
 
-    fn apply(&mut self, solution: &mut Solution, delta_eval: bool) {
+    fn apply(&mut self, solution: &mut Solution) {
         let (start_idx, block_length, delta, distances) = self.stored_move().to_tuple();
         let number_of_vertices = solution.instance().number_of_vertices();
 
@@ -44,9 +44,7 @@ impl DoubleEdgeExchange {
             solution.get_assignment_mut((start_idx + block_length - i) % number_of_vertices).set_driver(copy[i + 1].driver());
         }
 
-        if delta_eval {
-            solution.delta_evaluation(delta, distances);
-        }
+        solution.delta_evaluation(delta, distances);
     }
 
     fn evaluate_move(&self, solution: &Solution, start_idx: usize, block_length: usize) -> DEMove {
@@ -85,7 +83,7 @@ impl DoubleEdgeExchange {
 }
 
 impl NeighborhoodImpl for DoubleEdgeExchange {
-    fn get_random_neighbor(&mut self, solution: &Solution, delta_eval: bool) -> bool {
+    fn get_random_neighbor(&mut self, solution: &Solution) -> bool {
         let max_length = self.calculate_max_length(solution.instance());
         let start_idx = rand::thread_rng().gen_range(0, solution.instance().number_of_vertices());
         let block_length = rand::thread_rng().gen_range(1, max_length + 1);
@@ -93,7 +91,7 @@ impl NeighborhoodImpl for DoubleEdgeExchange {
         true
     }
 
-    fn get_best_improving_neighbor(&mut self, solution: &Solution, delta_eval: bool, logger: &Logger) -> bool {
+    fn get_best_improving_neighbor(&mut self, solution: &Solution, logger: &Logger) -> bool {
         self.stored_move = None;
         let max_length = self.calculate_max_length(solution.instance());
         let number_of_vertices = solution.instance().number_of_vertices();
@@ -125,7 +123,7 @@ impl NeighborhoodImpl for DoubleEdgeExchange {
         }
     }
     
-    fn get_first_improving_neighbor(&mut self, solution: &Solution, delta_eval: bool, logger: &Logger) -> bool {
+    fn get_first_improving_neighbor(&mut self, solution: &Solution, logger: &Logger) -> bool {
         self.stored_move = None;
         let max_length = self.calculate_max_length(solution.instance());
         let number_of_vertices = solution.instance().number_of_vertices();
@@ -145,8 +143,8 @@ impl NeighborhoodImpl for DoubleEdgeExchange {
         false
     }
 
-    fn set_neighbor(&mut self, solution: &mut Solution, delta_eval: bool) {
-        self.apply(solution, delta_eval);
+    fn set_neighbor(&mut self, solution: &mut Solution) {
+        self.apply(solution);
         self.stored_move = None;
     }
     
@@ -203,7 +201,7 @@ fn test_delta() {
 
         let mut double_edge_exchange = DoubleEdgeExchange::new(Some(4));
         double_edge_exchange.stored_move = Some(double_edge_exchange.evaluate_move(&solution, start, length));
-        double_edge_exchange.apply(&mut solution, true);
+        double_edge_exchange.apply(&mut solution);
         let x = solution.objective_value();
         solution.calculate_objective_value_from_scratch();
         assert_eq!(x, solution.objective_value());

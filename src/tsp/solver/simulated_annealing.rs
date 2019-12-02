@@ -54,11 +54,11 @@ impl<N> Solver for SimulatedAnnealing<N> where N: NeighborhoodImpl {
         let mut counter = 0;
         while self.temperature > self.terminating_temperature {
 
-            if !self.neighborhood.get_random_neighbor(&best_solution, true) {
+            if !self.neighborhood.get_random_neighbor(&best_solution) {
                 continue;
             }
             if self.accept(self.neighborhood.delta().unwrap()) {
-                self.neighborhood.set_neighbor(&mut best_solution, true);
+                self.neighborhood.set_neighbor(&mut best_solution);
             }
 
             if logger.get_elapsed() >= crate::TIME_LIMIT {

@@ -25,20 +25,12 @@ impl DriverFlip {
         }        
     }
 
-    fn apply(&mut self, solution: &mut Solution, delta_eval: bool) {
+    fn apply(&mut self, solution: &mut Solution) {
         let (idx, new_driver, delta, distances) = self.stored_move().to_tuple();
         let old_driver = solution.get_assignment(idx).driver();
         let vertex = solution.get_assignment(idx).vertex();
         solution.get_assignment_mut(idx).set_driver(new_driver);
-
-        if delta_eval {
-            solution.delta_evaluation(delta, distances);
-        }
-
-        // let prev_vertex = solution.get_assignment(modulo_pos(idx as isize - 1, solution.instance().number_of_vertices())).vertex();
-        // let distance = solution.instance().get_vertex(prev_vertex).get_weight(vertex);
-        // solution.delta_evaluation(old_driver, distance);
-        // solution.delta_evaluation(new_driver, -distance);
+        solution.delta_evaluation(delta, distances);
     }
 
     fn evaluate_move(&self, solution: &Solution, idx: usize, new_driver: usize) -> DFMove {
@@ -57,7 +49,7 @@ impl DriverFlip {
 } 
 
 impl NeighborhoodImpl for DriverFlip {
-    fn get_random_neighbor(&mut self, solution: &Solution, delta_eval: bool) -> bool {
+    fn get_random_neighbor(&mut self, solution: &Solution) -> bool {
         let instance = solution.instance();
         if instance.number_of_drivers() == 1 {
             return false;
@@ -72,7 +64,7 @@ impl NeighborhoodImpl for DriverFlip {
         true
     }
 
-    fn get_best_improving_neighbor(&mut self, solution: &Solution, delta_eval: bool, logger: &Logger) -> bool {
+    fn get_best_improving_neighbor(&mut self, solution: &Solution, logger: &Logger) -> bool {
         self.stored_move = None;
         if solution.instance().number_of_drivers() == 1 {
             return false;
@@ -110,7 +102,7 @@ impl NeighborhoodImpl for DriverFlip {
         }
     }
 
-    fn get_first_improving_neighbor(&mut self, solution: &Solution, delta_eval: bool, logger: &Logger) -> bool {
+    fn get_first_improving_neighbor(&mut self, solution: &Solution, logger: &Logger) -> bool {
         self.stored_move = None;
         if solution.instance().number_of_drivers() == 1 {
             return false;
@@ -136,8 +128,8 @@ impl NeighborhoodImpl for DriverFlip {
         false
     }
 
-    fn set_neighbor(&mut self, solution: &mut Solution, delta_eval: bool) {
-        self.apply(solution, delta_eval);
+    fn set_neighbor(&mut self, solution: &mut Solution) {
+        self.apply(solution);
         self.stored_move = None;
     }
 
@@ -189,7 +181,7 @@ fn test_driver_flip() {
     assert_eq!(solution.get_assignment(0).driver(), 0);
     let mut driver_flip = DriverFlip::new();
     driver_flip.stored_move = Some(DFMove::new(0, 1, 0, Vec::new()));
-    driver_flip.apply(&mut solution, false);
+    driver_flip.apply(&mut solution);
     assert_eq!(solution.get_assignment(0).driver(), 1);
 }
 
@@ -204,7 +196,7 @@ fn test_delta() {
         let new_driver = (old_driver + 1) % 3;
         let mut driver_flip = DriverFlip::new();
         driver_flip.stored_move = Some(driver_flip.evaluate_move(&solution, idx, new_driver));
-        driver_flip.apply(&mut solution, true);
+        driver_flip.apply(&mut solution);
         let new_val = solution.objective_value();
         solution.calculate_objective_value_from_scratch();
         assert_eq!(new_val, solution.objective_value());
