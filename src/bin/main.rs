@@ -75,13 +75,13 @@ fn test_all_local_searches(instance: Option<&str>, max_length: Option<usize> ) {
         Neighborhood::DoubleEdgeExchange(max_length), 
         Neighborhood::TripleEdgeExchange(max_length), 
         Neighborhood::DriverFlip, Neighborhood::Compound(max_length),
-        Neighborhood::Compound(max_length)
+        // Neighborhood::Compound(max_length)
     ];
 
     let step_functions = vec![
         StepFunction::BestImprovement, 
-        StepFunction::FirstImprovement, 
-        StepFunction::Random
+        // StepFunction::FirstImprovement, 
+        // StepFunction::Random
     ];
 
     for neighborhood in neighborhoods.iter() {

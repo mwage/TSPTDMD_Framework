@@ -33,7 +33,7 @@ impl<N> LocalSearch<N> where N: NeighborhoodImpl {
     fn search_deterministic(&mut self, solution: &mut Solution, logger: &Logger) {
         let mut counter = 0;
         loop {
-            let improved = self.neighborhood.get_neighbor(solution, &self.step_function, true, logger);    // TODO: Set delta eval
+            let improved = self.neighborhood.get_neighbor(solution, &self.step_function, false, logger);    // TODO: Set delta eval
 
             if !improved || counter >= self.iteration_limit || logger.get_elapsed() >= crate::TIME_LIMIT {
                 break;
