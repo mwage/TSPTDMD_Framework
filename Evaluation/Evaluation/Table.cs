@@ -54,17 +54,28 @@ namespace Evaluation
         {
             var lines = new List<string>
             {
-                string.Join(Program.OutputSeparator, _heading)
+                string.Join(Program.OutputSeparator, _heading) + GetLineBreak()
             };
             foreach (var (instance, resultList) in _data)
             {
-                lines.Add(instance + Program.OutputSeparator + string.Join(Program.OutputSeparator, resultList));
+                lines.Add(instance + Program.OutputSeparator + string.Join(Program.OutputSeparator, resultList) + GetLineBreak());
             }
 
 
             File.WriteAllLines($"{LogPath}{Name}{GetFileEnd()}", lines);
         }
 
+        private string GetLineBreak()
+        {
+            switch (Program.OutputSeparator)
+            {
+                case " && ":
+                    return "\\\\";
+
+                default:
+                    return "";
+            }
+        }
         private string GetFileEnd()
         {
             switch (Program.OutputSeparator)

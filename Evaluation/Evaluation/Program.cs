@@ -12,6 +12,7 @@ namespace Evaluation
             ContentDeleter.DeletePartialLogs();
             var tableBuilder = new TableBuilder(Parser.ParseResults());
             tableBuilder.BuildDeterministicTable();
+            tableBuilder.BuildRandomConstructionTable();
             tableBuilder.ToFile();
             //tableBuilder.PrintTables();
 
