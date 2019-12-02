@@ -51,7 +51,7 @@ impl<N> Solver for SimulatedAnnealing<N> where N: NeighborhoodImpl {
         let mut greedy = GreedySolver::new(1);
         greedy.solve_greedy(&instance, &mut best_solution, &logger);
         best_solution.calculate_objective_value();
-        let mut counter = 0;
+        
         while self.temperature > self.terminating_temperature {
 
             if !self.neighborhood.get_random_neighbor(&best_solution) {
@@ -66,9 +66,7 @@ impl<N> Solver for SimulatedAnnealing<N> where N: NeighborhoodImpl {
             }
 
             self.decrease_temperature();
-            counter += 1;
         }
-        println!("{}", counter);
         logger.log_result(&best_solution);
     }
 

@@ -38,7 +38,7 @@ impl Logger {
         }
     }
 
-    pub fn get_elapsed(&self) -> u128 { // elapsed time since start in ms
+    pub fn get_elapsed(&self) -> u128 { // Elapsed time since start in ms
         self.timer.elapsed().as_millis()
     }
 

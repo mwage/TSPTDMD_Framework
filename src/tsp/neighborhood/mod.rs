@@ -13,8 +13,6 @@ use std::fmt;
 use crate::tsp::Solution;
 use crate::tsp::io::Logger;
 
-// TODO: Implement non delta eval
-
 pub trait NeighborhoodImpl {
     fn get_random_neighbor(&mut self, solution: &Solution) -> bool;
     fn get_best_improving_neighbor(&mut self, solution: &Solution, logger: &Logger) -> bool;

@@ -27,8 +27,6 @@ impl DriverFlip {
 
     fn apply(&mut self, solution: &mut Solution) {
         let (idx, new_driver, delta, distances) = self.stored_move().to_tuple();
-        let old_driver = solution.get_assignment(idx).driver();
-        let vertex = solution.get_assignment(idx).vertex();
         solution.get_assignment_mut(idx).set_driver(new_driver);
         solution.delta_evaluation(delta, distances);
     }
