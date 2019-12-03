@@ -61,7 +61,7 @@ impl<N> Solver for Grasp<N> where N: NeighborhoodImpl {
             }
         }
 
-        logger.log_result(&best_solution);
+        logger.log_result(&mut best_solution);
     }
 
     fn to_string(&self) -> String {

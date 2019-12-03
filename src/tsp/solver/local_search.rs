@@ -72,7 +72,7 @@ impl<N> Solver for LocalSearch<N> where N: NeighborhoodImpl {
         greedy.solve_greedy(&instance, &mut solution, &logger);
         solution.calculate_objective_value();
         self.local_search(&mut solution, &logger);
-        logger.log_result(&solution);
+        logger.log_result(&mut solution);
     }
 
     fn to_string(&self) -> String {

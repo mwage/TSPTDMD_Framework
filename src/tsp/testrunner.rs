@@ -34,18 +34,19 @@ impl TestRunner {
     }
 
     fn run_instance<T: Solver>(solver: &mut T, instance_name: &str, runs: usize) {
+        let instance = match InstanceParser::get_instance(instance_name) // Parse the instance from file
+        {
+            Ok(x) => x,
+            Err(_) => {
+                println!("Skipping {}.txt: Failed to read instance.", instance_name);
+                return;
+            },
+        };
+        let instance = Rc::new(instance);
         for _ in 0..runs {
             let logger = Logger::new(solver, instance_name);    // Initialize logger, starts the timer
-            let instance = match InstanceParser::get_instance(instance_name) // Parse the instance from file
-            {
-                Ok(x) => x,
-                Err(_) => {
-                    println!("Skipping {}.txt: Failed to read instance.", instance_name);
-                    return;
-                },
-            };
             println!("Solve instance: {}", instance_name);
-            solver.solve(Rc::new(instance), logger);   // Solve TSP instance with selected solver    
+            solver.solve(Rc::clone(&instance), logger);   // Solve TSP instance with selected solver    
         }
     }
 }

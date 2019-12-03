@@ -41,7 +41,7 @@ impl Solver for VariableNeighborhood {
             }
         }
 
-        logger.log_result(&solution);
+        logger.log_result(&mut solution);
     }
 
     fn to_string(&self) -> String {

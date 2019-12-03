@@ -37,7 +37,7 @@ impl Solver for PilotSolver {
                     results.push((j, *vertex, solution.get_assignment(i).driver(), solution.objective_value()));  // Add the result to the list
 
                     if logger.get_elapsed() >= crate::TIME_LIMIT {  // Time termination
-                        logger.log_result(&solution);
+                        logger.log_result(&mut solution);
                         return;
                     }
                 }

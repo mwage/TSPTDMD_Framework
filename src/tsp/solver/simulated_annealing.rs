@@ -23,7 +23,7 @@ impl<N> SimulatedAnnealing<N> where N: NeighborhoodImpl {
         SimulatedAnnealing {
             neighborhood,
             temperature: 4.0,
-            alpha: 0.9999999,
+            alpha: 0.99999,
             starting_temperature: 4.0,
             terminating_temperature: 10f64.powf(-10f64)
         }
@@ -67,7 +67,7 @@ impl<N> Solver for SimulatedAnnealing<N> where N: NeighborhoodImpl {
 
             self.decrease_temperature();
         }
-        logger.log_result(&best_solution);
+        logger.log_result(&mut best_solution);
     }
 
     fn to_string(&self) -> String {

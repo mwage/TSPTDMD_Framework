@@ -95,7 +95,7 @@ impl Solver for GreedySolver {
         println!("Target: {}", instance.desired_travel_distance());
         println!("{:?}", solution.driver_distances());
 
-        logger.log_result(&solution);    // Log results
+        logger.log_result(&mut solution);    // Log results
     }
 
     fn to_string(&self) -> String {
