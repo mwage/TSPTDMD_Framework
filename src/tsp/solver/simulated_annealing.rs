@@ -33,7 +33,7 @@ impl<N> SimulatedAnnealing<N> where N: NeighborhoodImpl {
         self.temperature *= self.alpha;
     }
 
-    fn accept(&self, delta: isize) -> bool {
+    fn accept(&self, delta: i128) -> bool {
         if delta < 0 {
             return true;
         }

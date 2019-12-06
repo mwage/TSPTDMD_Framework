@@ -18,7 +18,7 @@ pub trait NeighborhoodImpl {
     fn get_best_improving_neighbor(&mut self, solution: &Solution, logger: &Logger) -> bool;
     fn get_first_improving_neighbor(&mut self, solution: &Solution, logger: &Logger) -> bool;
     fn set_neighbor(&mut self, solution: &mut Solution);
-    fn delta(&self) -> Option<isize>;
+    fn delta(&self) -> Option<i128>;
     fn to_string(&self) -> String;    // Used for logging
 
     fn get_neighbor(&mut self, solution: &mut Solution, step_function: &StepFunction, logger: &Logger) -> bool {  // Match stepfunction

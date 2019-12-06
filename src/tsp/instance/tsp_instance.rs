@@ -6,9 +6,9 @@ use super::Vertex;
 pub struct TSPInstance {
     number_of_vertices: usize,
     number_of_drivers: usize, 
-    desired_travel_distance: isize,
+    desired_travel_distance: i64,
     vertices: Vec<Vertex>,
-    invalid_weight: Option<isize>
+    invalid_weight: Option<i64>
 }
 
 impl TSPInstance {
@@ -21,13 +21,13 @@ impl TSPInstance {
         TSPInstance {
             number_of_vertices,
             number_of_drivers,
-            desired_travel_distance: desired_travel_distance as isize,
+            desired_travel_distance: desired_travel_distance as i64,
             vertices,
             invalid_weight: None
         }
     }
 
-    pub fn new_random(number_of_vertices: usize, number_of_drivers: usize, desired_travel_distance: usize, max_distance : isize) -> Self {
+    pub fn new_random(number_of_vertices: usize, number_of_drivers: usize, desired_travel_distance: usize, max_distance : i64) -> Self {
         let mut instance = TSPInstance::new(number_of_vertices, number_of_drivers, desired_travel_distance);
 
         for i in 0..number_of_vertices {
@@ -51,7 +51,7 @@ impl TSPInstance {
         self.number_of_vertices
     }
     
-    pub fn desired_travel_distance(&self) -> isize {
+    pub fn desired_travel_distance(&self) -> i64 {
         self.desired_travel_distance
     }
 
@@ -66,12 +66,12 @@ impl TSPInstance {
         }        
     }
 
-    pub fn add_edge(&mut self, first: usize, second: usize, weight: isize) {
+    pub fn add_edge(&mut self, first: usize, second: usize, weight: i64) {
         self.vertices[first].add_edge(second, weight);
         self.vertices[second].add_edge(first, weight);
     }
 
-    pub fn complete_graph(&mut self, m: isize) {
+    pub fn complete_graph(&mut self, m: i64) {
         self.invalid_weight = Some(m);
         for i in 0..self.number_of_vertices {
             for j in 0..self.number_of_vertices {

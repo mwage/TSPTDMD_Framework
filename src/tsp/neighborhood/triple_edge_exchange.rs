@@ -86,8 +86,8 @@ impl TripleEdgeExchange {
         
         let mut delta = 0;
         for i in 0..updated_driver_distances.len() {
-            delta += (desired - updated_driver_distances[i]).pow(2) - 
-                (desired - solution.get_driver_distance(i)).pow(2);
+            delta += i128::from(desired - updated_driver_distances[i]).pow(2) - 
+                    i128::from(desired - solution.get_driver_distance(i)).pow(2);
         }
 
         TEMove::new(start_idx, first_block_length, second_block_length, delta, updated_driver_distances)
@@ -174,7 +174,7 @@ impl NeighborhoodImpl for TripleEdgeExchange {
         self.stored_move = None;
     }
 
-    fn delta(&self) -> Option<isize> {
+    fn delta(&self) -> Option<i128> {
         match &self.stored_move {
             Some(x) => Some(x.delta),
             None => None
@@ -193,12 +193,12 @@ pub struct TEMove {
     start_idx: usize,
     first_block_length: usize,
     second_block_length: usize,
-    delta: isize,
-    distances: Vec<isize>
+    delta: i128,
+    distances: Vec<i64>
 }
 
 impl TEMove {
-    pub fn new(start_idx: usize, first_block_length: usize, second_block_length: usize, delta: isize, distances: Vec<isize>) -> Self {
+    pub fn new(start_idx: usize, first_block_length: usize, second_block_length: usize, delta: i128, distances: Vec<i64>) -> Self {
         TEMove {
             start_idx,
             first_block_length,
@@ -208,11 +208,11 @@ impl TEMove {
         }
     }
 
-    pub fn delta(&self) -> isize {
+    pub fn delta(&self) -> i128 {
         self.delta
     }
 
-    pub fn to_tuple(&self) -> (usize, usize, usize, isize, Vec<isize>) {
+    pub fn to_tuple(&self) -> (usize, usize, usize, i128, Vec<i64>) {
         (self.start_idx, self.first_block_length, self.second_block_length, self.delta, self.distances.clone())
     }
 }

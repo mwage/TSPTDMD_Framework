@@ -67,8 +67,8 @@ impl DoubleEdgeExchange {
         
         let mut delta = 0;
         for i in 0..driver_distances.len() {
-            delta += (desired - driver_distances[i]).pow(2) - 
-                (desired - solution.get_driver_distance(i)).pow(2);
+            delta += i128::from(desired - driver_distances[i]).pow(2) - 
+                    i128::from(desired - solution.get_driver_distance(i)).pow(2);
         }
         DEMove::new(start_idx, block_length, delta, driver_distances)
     }
@@ -148,7 +148,7 @@ impl NeighborhoodImpl for DoubleEdgeExchange {
         self.stored_move = None;
     }
     
-    fn delta(&self) -> Option<isize> {
+    fn delta(&self) -> Option<i128> {
         match &self.stored_move {
             Some(x) => Some(x.delta),
             None => None
@@ -166,12 +166,12 @@ impl NeighborhoodImpl for DoubleEdgeExchange {
 struct DEMove {
     start_idx: usize,
     block_length: usize,
-    delta: isize,
-    distances: Vec<isize>
+    delta: i128,
+    distances: Vec<i64>
 }
 
 impl DEMove {
-    pub fn new(start_idx: usize, block_length: usize, delta: isize, distances: Vec<isize>) -> Self {
+    pub fn new(start_idx: usize, block_length: usize, delta: i128, distances: Vec<i64>) -> Self {
         DEMove {
             start_idx,
             block_length,
@@ -180,11 +180,11 @@ impl DEMove {
         }
     }
 
-    pub fn delta(&self) -> isize {
+    pub fn delta(&self) -> i128 {
         self.delta
     }
 
-    pub fn to_tuple(&self) -> (usize, usize, isize, Vec<isize>) {
+    pub fn to_tuple(&self) -> (usize, usize, i128, Vec<i64>) {
         (self.start_idx, self.block_length, self.delta, self.distances.clone())
     }
 }

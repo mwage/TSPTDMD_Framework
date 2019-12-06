@@ -98,7 +98,7 @@ impl NeighborhoodImpl for Compound {
         self.stored_move = None;
     }
     
-    fn delta(&self) -> Option<isize> {
+    fn delta(&self) -> Option<i128> {
         self.stored_move().delta()
     }
 

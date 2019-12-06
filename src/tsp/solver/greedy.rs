@@ -23,17 +23,17 @@ impl GreedySolver {
         self.candidate_size
     }
 
-    fn calculate_target_distance(&self, instance: &Rc<TSPInstance>, solution: &Solution) -> isize {
+    fn calculate_target_distance(&self, instance: &Rc<TSPInstance>, solution: &Solution) -> i64 {
         // Calculate available capacity as the sum of the missing distances
         let available_capacity = solution.driver_distances().iter()
             .filter(|x| **x < instance.desired_travel_distance())
             .fold(0, |acc, x| acc + instance.desired_travel_distance() - *x);
 
         // Return total capacity / number of unvisited vertices
-        available_capacity / (instance.number_of_vertices() - solution.number_of_assignments()) as isize   
+        available_capacity / (instance.number_of_vertices() - solution.number_of_assignments()) as i64   
     }
 
-    fn get_best_vertex(&self, instance: &Rc<TSPInstance>, solution: &Solution) -> (usize, isize) {
+    fn get_best_vertex(&self, instance: &Rc<TSPInstance>, solution: &Solution) -> (usize, i64) {
         let target_distance = self.calculate_target_distance(instance, solution); // Total available capacity / unvisited vertices
         let last_vertex = solution.get_last_vertex();
         let best_vertex = *(solution.unassigned_vertices().iter()  // Find vertex who's distance is closest to target distance
@@ -42,12 +42,12 @@ impl GreedySolver {
         (best_vertex, instance.get_vertex(last_vertex).get_weight(best_vertex))
     }
     
-    fn get_random_best_vertex(&self, instance: &Rc<TSPInstance>, solution: &Solution) -> (usize, isize) {
+    fn get_random_best_vertex(&self, instance: &Rc<TSPInstance>, solution: &Solution) -> (usize, i64) {
         let target_distance = self.calculate_target_distance(instance, solution); // Total available capacity / unvisited vertices
         let last_vertex = solution.get_last_vertex();
 
         // Calculate the deviation from the target distance for all unassinged vertices
-        let mut differences: Vec<(usize, isize)> = solution.unassigned_vertices().iter()  
+        let mut differences: Vec<(usize, i64)> = solution.unassigned_vertices().iter()  
             .map(|i| (*i, (instance.get_vertex(last_vertex).get_weight(*i) - target_distance).abs())).collect();
         differences.sort_by(|a, b| a.1.cmp(&b.1));
         let vertex = differences[rand::thread_rng().gen_range(0, cmp::min(differences.len(), self.candidate_size))].0;

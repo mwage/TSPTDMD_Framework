@@ -30,7 +30,7 @@ impl InstanceParser {
             if line.is_empty() {
                 continue;
             }
-            let vec: Vec<isize> = line.split(' ').map(|x| x.parse().unwrap()).collect();
+            let vec: Vec<i64> = line.split(' ').map(|x| x.parse().unwrap()).collect();
             points.push(Point::new(vec[0], vec[1]));    // Add point to the list
         }
 
@@ -62,14 +62,14 @@ impl InstanceParser {
                 continue;
             }
             let vec: Vec<usize> = line.split(' ').map(|x| x.parse().unwrap()).collect();
-            instance.add_edge(vec[0], vec[1], vec[2] as isize);    // Add an edge for each line in the file
+            instance.add_edge(vec[0], vec[1], vec[2] as i64);    // Add an edge for each line in the file
             
             if vec[2] > max {
                 max = vec[2];
             }
         }
 
-        instance.complete_graph((number_of_vertices * max + 1) as isize);  // Set weight for all unspecified edges
+        instance.complete_graph(desired_travel_distance as i64 + (number_of_vertices * max + 1) as i64);  // Set weight for all unspecified edges
 
         instance
     }

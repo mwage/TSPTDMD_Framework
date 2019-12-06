@@ -10,7 +10,7 @@ use crate::modulo_pos;
 pub struct Solution {
     assignments: Vec<Assignment>,
     unassigned_vertices: Vec<usize>,
-    driver_distances: Vec<isize>,
+    driver_distances: Vec<i64>,
     instance: Rc<TSPInstance>,
     objective_value: i128
 }
@@ -50,11 +50,11 @@ impl Solution {
         self.objective_value
     }
 
-    pub fn driver_distances(&self) -> &Vec<isize> {
+    pub fn driver_distances(&self) -> &Vec<i64> {
         &self.driver_distances
     }
 
-    pub fn get_driver_distance(&self, idx: usize) -> isize {
+    pub fn get_driver_distance(&self, idx: usize) -> i64 {
         self.driver_distances[idx]
     }
 
@@ -82,18 +82,18 @@ impl Solution {
         &mut self.assignments
     }
 
-    pub fn delta_evaluation(&mut self, delta: isize, distances: Vec<isize>) {
-        self.objective_value += delta as i128;
+    pub fn delta_evaluation(&mut self, delta: i128, distances: Vec<i64>) {
+        self.objective_value += delta;
         self.driver_distances = distances;
     }
 
-    pub fn get_distance(&self, idx: usize) -> isize {
+    pub fn get_distance(&self, idx: usize) -> i64 {
         let first = self.get_assignment(idx).vertex();
         let prev = self.get_assignment(modulo_pos(idx as isize - 1, self.instance.number_of_vertices())).vertex();
         self.instance.get_vertex(first).get_weight(prev)
     }
     
-    pub fn add_assignment(&mut self, vertex: usize, driver: usize, distance: isize) {
+    pub fn add_assignment(&mut self, vertex: usize, driver: usize, distance: i64) {
         if self.assignments.len() > self.instance.number_of_vertices() {
             panic!("Exceeded maximum number of assignments.");
         }

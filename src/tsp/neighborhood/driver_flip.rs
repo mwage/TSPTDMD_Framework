@@ -36,7 +36,7 @@ impl DriverFlip {
         let old_driver = solution.get_assignment(idx).driver();
         let old_driver_distance = solution.get_driver_distance(old_driver) - distance;
         let new_driver_distance = solution.get_driver_distance(new_driver);
-        let delta = 2 * distance * (new_driver_distance - old_driver_distance);
+        let delta = 2 * i128::from(distance) * i128::from(new_driver_distance - old_driver_distance);
 
         let mut distances = solution.driver_distances().clone();
         distances[old_driver] = old_driver_distance;
@@ -131,9 +131,9 @@ impl NeighborhoodImpl for DriverFlip {
         self.stored_move = None;
     }
 
-    fn delta(&self) -> Option<isize> {
+    fn delta(&self) -> Option<i128> {
         match &self.stored_move {
-            Some(x) => Some(x.delta),
+            Some(x) => Some(x.delta()),
             None => None
         }
     }
@@ -147,12 +147,12 @@ impl NeighborhoodImpl for DriverFlip {
 struct DFMove {
     idx: usize,
     new_driver: usize,
-    delta: isize,
-    distances: Vec<isize>
+    delta: i128,
+    distances: Vec<i64>
 }
 
 impl DFMove {
-    pub fn new(idx: usize, new_driver: usize, delta: isize, distances: Vec<isize>) -> Self {
+    pub fn new(idx: usize, new_driver: usize, delta: i128, distances: Vec<i64>) -> Self {
         DFMove {
             idx,
             new_driver,
@@ -161,11 +161,11 @@ impl DFMove {
         }
     }
 
-    pub fn delta(&self) -> isize {
+    pub fn delta(&self) -> i128 {
         self.delta
     }
 
-    pub fn to_tuple(&self) -> (usize, usize, isize, Vec<isize>) {
+    pub fn to_tuple(&self) -> (usize, usize, i128, Vec<i64>) {
         (self.idx, self.new_driver, self.delta, self.distances.clone())
     }
 }
