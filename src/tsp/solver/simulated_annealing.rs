@@ -22,10 +22,10 @@ impl<N> SimulatedAnnealing<N> where N: NeighborhoodImpl {
     pub fn new(neighborhood: N) -> Self {
         SimulatedAnnealing {
             neighborhood,
-            temperature: 4.0,
-            alpha: 0.99999,
-            starting_temperature: 4.0,
-            terminating_temperature: 10f64.powf(-10f64)
+            temperature: 0_f64,
+            alpha: 0.99999999,
+            starting_temperature: 10_f64.powf(20_f64),
+            terminating_temperature: 10_f64.powf(-5_f64)
         }
     }
 
@@ -34,13 +34,18 @@ impl<N> SimulatedAnnealing<N> where N: NeighborhoodImpl {
     }
 
     fn accept(&self, delta: i128) -> bool {
-        if delta < 0 {
+        if delta <= 0 {
             return true;
         }
 
         let x = E.powf(- delta as f64 / self.temperature);
         let mut rng = rand::thread_rng();
-        rng.gen::<f64>() < x
+        if rng.gen::<f64>() < x {
+            // println!("accepting: {}", delta);
+            return true;
+        }
+        // println!("reject: {}", delta);
+        false
     }
 }
 
