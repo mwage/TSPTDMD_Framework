@@ -25,7 +25,7 @@ impl<N> SimulatedAnnealing<N> where N: NeighborhoodImpl {
             temperature: 0_f64,
             alpha: 0.99999999,
             starting_temperature: 10_f64.powf(20_f64),
-            terminating_temperature: 10_f64.powf(-5_f64)
+            terminating_temperature: 10_f64.powf(-10_f64)
         }
     }
 
@@ -51,10 +51,11 @@ impl<N> SimulatedAnnealing<N> where N: NeighborhoodImpl {
 
 impl<N> Solver for SimulatedAnnealing<N> where N: NeighborhoodImpl {
     fn solve(&mut self, instance: Rc<TSPInstance>, logger: Logger) {
-        let mut best_solution = Solution::new(Rc::clone(&instance));
+        // let mut best_solution = Solution::new(Rc::clone(&instance));
+        let mut best_solution = Solution::new_random(Rc::clone(&instance));
         self.temperature = self.starting_temperature;
-        let mut greedy = GreedySolver::new(1);
-        greedy.solve_greedy(&instance, &mut best_solution, &logger);
+        // let mut greedy = GreedySolver::new(1);
+        // greedy.solve_greedy(&instance, &mut best_solution, &logger);
         best_solution.calculate_objective_value();
         
         while self.temperature > self.terminating_temperature {

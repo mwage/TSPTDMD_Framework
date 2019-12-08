@@ -16,14 +16,18 @@ use tsp::neighborhood::DriverFlip;
 use tsp::neighborhood::NeighborhoodImpl;
 use tsp::neighborhood::TripleEdgeExchange;
 use tsp::neighborhood::Compound;
+use tsp::io::get_opts;
 
 // exports
 pub use tsp::neighborhood::Neighborhood;
 pub use tsp::neighborhood::StepFunction;
 
 
-static TIME_LIMIT: u128 = 1000 * 60 * 15;
+static TIME_LIMIT: u128 = 1000 * 60 * 60;
 
+pub fn run_from_opts() {
+    get_opts();
+}
 
 pub fn pilot(instance_name: Option<&str>, beta: usize, runs: usize) {
     TestRunner::solve_instance(PilotSolver::new(beta), instance_name, runs);

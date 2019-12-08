@@ -12,13 +12,15 @@ use tsp_framework::local_search;
 use tsp_framework::grasp;
 use tsp_framework::variable_neighborhood;
 use tsp_framework::simulated_annealing;
+use tsp_framework::run_from_opts;
 
 
 fn main() {
-    all_from_env();
+    run_from_opts();
+    // all_from_env();
     // greedy(Some("berlin52_k2_2"), 1, 1);
     // pilot(Some("0025_k2"), 1000, 1);
-    // simulated_annealing(Some("rl5915_k3_2"), Neighborhood::Compound(Some(10)), 10);
+    // simulated_annealing(Some("1000_k1"), Neighborhood::Compound(None), 5);
     // local_search(None, Neighborhood::TripleEdgeExchange(Some(10)), StepFunction::FirstImprovement, 50000, 1);
     // variable_neighborhood(Some("berlin52_k2_2"), vec![Neighborhood::DoubleEdgeExchange(None), Neighborhood::DriverFlip, Neighborhood::TripleEdgeExchange(None)], 1);
     // grasp(Some("berlin52_k2_2"), 5, Neighborhood::DoubleEdgeExchange(None), StepFunction::BestImprovement, 100, 1000, 10);
